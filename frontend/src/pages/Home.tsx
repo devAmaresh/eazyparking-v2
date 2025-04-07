@@ -23,7 +23,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
+    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white ">
+      <div className="max-w-screen-xl mx-auto">
       <Header isMobile={isMobile} />
       <Hero />
       <Features />
@@ -33,6 +34,7 @@ export default function Home() {
       <Testimonials />
       <CTA />
       <Footer />
+      </div>
     </div>
   );
 }
