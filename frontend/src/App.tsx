@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import SpeedDial from '@mui/material/SpeedDial';
 import { Moon, Sun } from 'lucide-react';
+
 const App = () => {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   return (
