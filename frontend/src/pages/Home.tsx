@@ -9,7 +9,9 @@ import AdminPreview from "../components/landing/AdminPreview";
 import Locations from "../components/landing/Locations";
 import Testimonials from "../components/landing/Testimonials";
 import CTA from "../components/landing/CTA";
+import WorldMap from "../components/landing/WorldMap";
 import Footer from "../components/landing/Footer";
+import { dots } from "../utils/Dots";
 
 export default function Home() {
   const [currentCityIndex, setCurrentCityIndex] = useState<number>(0);
@@ -32,6 +34,7 @@ export default function Home() {
       <Locations currentCityIndex={currentCityIndex} setCurrentCityIndex={setCurrentCityIndex} />
       <Testimonials />
       <CTA />
+      <WorldMap dots={dots} />
       <Footer />
     </div>
   );
