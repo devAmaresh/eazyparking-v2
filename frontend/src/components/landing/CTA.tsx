@@ -20,7 +20,7 @@ export default function CTA() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-xl text-gray-300 mb-8"
+            className="text-xl text-gray-400 mb-8"
           >
             Join thousands of users who have simplified their parking with our platform
           </motion.p>

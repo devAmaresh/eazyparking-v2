@@ -1,5 +1,5 @@
 import express from "express";
-import primsa from "../../prisma/prismaClient.js";
+import primsa from "../../prisma/client.js";
 import auth from "../../middlewares/auth.js";
 
 const router = express.Router();
