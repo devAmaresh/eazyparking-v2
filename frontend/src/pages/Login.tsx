@@ -199,7 +199,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
 
       setSuccess('Login successful!');
       Cookies.set('token', res.data.token, { expires: 7 });
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Login failed');
     }
@@ -282,7 +282,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
-              <Link href="/signup" variant="body2" sx={{ alignSelf: 'center' }}>
+              <Link href="/register" variant="body2" sx={{ alignSelf: 'center' }}>
                 Sign up
               </Link>
             </Typography>

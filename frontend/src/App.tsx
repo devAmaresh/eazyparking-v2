@@ -7,6 +7,9 @@ import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import SpeedDial from '@mui/material/SpeedDial';
 import { Moon, Sun } from 'lucide-react';
+import AdminLogin from './pages/adminlogin';
+import AdminRegister from './pages/AdminRegister';
+import AdminDashboard from './pages/AdminDashboard';
 
 const App = () => {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
@@ -29,6 +32,9 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/register" element={<AdminRegister />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
         {/* Add 404 page */}
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
