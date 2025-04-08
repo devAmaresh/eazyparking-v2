@@ -53,8 +53,8 @@ export default function Header({ isMobile }: HeaderProps) {
               <Button onClick={handleLogout} variant="outlined" className="ml-4">Logout</Button>
             ) : (
               <>
-                <Button href="/login" variant="outlined" className="ml-4">Login</Button>
-                <Button href="/register" className="bg-black text-white hover:bg-gray-800">Create Account</Button>
+                <Button href="/login"  className="ml-3 ">Login</Button>
+                <Button href="/admin/login" variant="outlined" className="bg-black text-white hover:bg-gray-800 ">Admin Login</Button>
               </>
             )}
           </nav>
@@ -80,7 +80,7 @@ export default function Header({ isMobile }: HeaderProps) {
               ) : (
                 <>
                   <Button href="/login" variant="outlined" className="w-full">Login</Button>
-                  <Button href="/register" className="bg-black text-white hover:bg-gray-800">Create Account</Button>
+                  <Button href="/admin/register" className="bg-black text-white hover:bg-gray-800">Admin Login</Button>
                 </>
               )}
             </div>
