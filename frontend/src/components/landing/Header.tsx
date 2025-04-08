@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import {  Menu, X } from "lucide-react";
 import Button from '@mui/material/Button';
 import { NavHashLink as Link } from 'react-router-hash-link';
 import { useLocation, useNavigate } from "react-router-dom";
@@ -15,7 +15,7 @@ export default function Header({ isMobile }: HeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   const location = useLocation();
-  const navigate = useNavigate();
+ 
 
   useEffect(() => {
     const token = Cookies.get("token");
@@ -24,12 +24,7 @@ export default function Header({ isMobile }: HeaderProps) {
 
   const isActive = (targetPath: string) => location.hash === targetPath;
   const toggleMenu = (): void => setIsMenuOpen(!isMenuOpen);
-
-  const handleLogout = () => {
-    Cookies.remove("token");
-    setIsLoggedIn(false);
-    navigate("/");
-  };
+const navigate = useNavigate();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-black/10 border-b border-gray-200 dark:border-gray-700 shadow-md backdrop-blur-3xl transition-colors duration-300">
@@ -50,7 +45,9 @@ export default function Header({ isMobile }: HeaderProps) {
             <Link smooth to="#contact" className={`text-sm font-medium hover:text-gray-600 ${isActive("#contact") ? "text-blue-600" : "text-black dark:text-white"}`}>Contact</Link>
 
             {isLoggedIn ? (
-              <Button onClick={handleLogout} variant="outlined" className="ml-4">Logout</Button>
+              <Button onClick={()=>{
+                navigate("/dashboard")
+              }} variant="outlined" className="ml-4">Dashboard</Button>
             ) : (
               <>
                 <Button href="/login"  className="ml-3 ">Login</Button>
