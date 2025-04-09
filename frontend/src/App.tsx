@@ -18,6 +18,7 @@ import Logout from './pages/Logout'
 import Bookings from './pages/Bookings'
 import ProtectedRoute from './components/ProtectedRoute'
 import Cookies from 'js-cookie'
+import Book from './pages/Book'
 
 
 const ThemeSwitcher = () => {
@@ -92,7 +93,7 @@ const AppContent = () => {
            <ProtectedRoute isAuthenticated={isUserAuthenticated}
            redirectPath='/login'
            >
-            <Bookings />
+            <Book />
             </ProtectedRoute>
             } />
         </Routes>
