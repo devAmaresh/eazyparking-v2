@@ -208,13 +208,16 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <Button fullWidth variant="outlined" onClick={() => alert('Sign in with Google')} startIcon={<GoogleIcon />}>
               Sign in with Google
             </Button>
-            <Button fullWidth variant="outlined" onClick={() => alert('Sign in with Facebook')} startIcon={<FacebookIcon />}>
-              Sign in with Facebook
-            </Button>
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
               <Link href="/register" variant="body2" sx={{ alignSelf: 'center' }}>
                 Sign up
+              </Link>
+            </Typography>
+            <Typography sx={{ textAlign: 'center' }}>
+              Back to{' '}
+              <Link href="/" variant="body2" sx={{ alignSelf: 'center' }}>
+                Home
               </Link>
             </Typography>
           </Box>
