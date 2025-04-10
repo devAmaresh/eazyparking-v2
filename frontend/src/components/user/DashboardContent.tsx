@@ -16,6 +16,7 @@ import axios from 'axios'
 import dayjs from 'dayjs'
 import Cookies from 'js-cookie'
 import { BACKEND_URL } from '@/utils/backend'
+import { ShieldBan } from 'lucide-react'
 
 const UserDashboard = () => {
   const { theme } = useContext(ThemeContext)
@@ -66,11 +67,13 @@ const UserDashboard = () => {
     label,
     value
   }))
-
+  const pieChartFlag = timeSpentData.map((item) => item.value).some((value:any) => value > 0)
   const spendingData = Object.entries(spendingOverTime).sort(([a], [b]) => a.localeCompare(b))
 
   const spendingChartMonths = spendingData.map(([month]) => month)
   const spendingChartValues = spendingData.map(([_, value]) => value)
+
+  const spendingChartflag = spendingChartValues.map((item) => item).some((value:any) => value > 0)
 
   const formattedUpcoming = dayjs(upcomingBooking).format('DD MMM, hh:mm A')
 
@@ -131,7 +134,10 @@ const UserDashboard = () => {
             <Typography variant="h6" style={{ color: textColor }} className="mb-4">
               Time Spent in Parking
             </Typography>
-            <PieChart
+            {pieChartFlag===false ? (<div>
+             <img src="/nodata.png" alt="No data" className="w-2/3 h-72" />
+            </div>):(
+              <PieChart
               series={[
                 {
                   data: timeSpentData,
@@ -143,6 +149,8 @@ const UserDashboard = () => {
               ]}
               height={250}
             />
+            )}
+            
           </CardContent>
         </Card>
 
@@ -152,11 +160,13 @@ const UserDashboard = () => {
             <Typography variant="h6" style={{ color: textColor }} className="mb-4">
               Spending Over Time
             </Typography>
-            <LineChart
+            {spendingChartflag===false ? (<>No data available</>):(
+              <LineChart
               xAxis={[{
                 scaleType: 'point',
                 data: spendingChartMonths,
               }]}
+
               series={[{
                 data: spendingChartValues,
                 label: 'Spent ($)',
@@ -168,6 +178,9 @@ const UserDashboard = () => {
               height={250}
               grid={{ vertical: true }}
             />
+
+            )}
+            
           </CardContent>
         </Card>
       </div>

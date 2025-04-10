@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export async function getUserDashboardData(userId) {
+  try {
   // Fetch user bookings with vehicle and parkingLot data
   const bookings = await prisma.booking.findMany({
     where: { userId },
@@ -68,4 +69,8 @@ export async function getUserDashboardData(userId) {
     timeSpentBuckets: timeBuckets,
     spendingOverTime,
   };
+}catch (error) {
+  console.error(error);
+  res.status(500).json({ message: 'Internal server error' });
+}
 }
