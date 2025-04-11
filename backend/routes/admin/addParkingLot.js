@@ -9,10 +9,7 @@ dotenv.config();
 // Add Parking Lot Route
 router.post('/', auth, async (req, res) => {
     try {
-        const isAdmin = req.isAdmin;
-        if(!isAdmin) {
-            return res.status(403).json({ message: 'Access denied' });
-        }
+        
         const { location, imgUrl, totalSlot, price } = req.body;
         const parkingLot = await prisma.parkingLot.create({
             data: {

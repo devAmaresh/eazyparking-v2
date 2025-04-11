@@ -24,7 +24,7 @@ export default function Profile() {
   useEffect(() => {
     if (!token) return;
     axios
-      .get(`${BACKEND_URL}/api/user/profile`, {
+      .get(`${BACKEND_URL}/api/user/profile/getuserprofile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -47,7 +47,7 @@ export default function Profile() {
       .catch((err) => console.error(err));
   }, [token]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e:any) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -57,7 +57,7 @@ export default function Profile() {
   const handleSaveChanges = () => {
     axios
       .patch(
-        `${BACKEND_URL}/api/user/setuserprofile`,
+        `${BACKEND_URL}/api/user/profile/setuserprofile`,
         {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -81,7 +81,7 @@ export default function Profile() {
       .catch((err) => console.error(err));
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (e:any) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       const imageData = new FormData();

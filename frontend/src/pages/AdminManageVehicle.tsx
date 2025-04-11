@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom'
 
 import { Menu} from 'lucide-react'
 import Sidebar from '@/components/admin/Sidebar'
-import DashboardContent from '@/components/admin/DashboardContent'
+import ManageVehicle from '@/components/admin/ManageVehicle'
 
-
-const Dashboard = () => {
+const AdminManageVehicle = () => {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -33,9 +32,9 @@ const Dashboard = () => {
       {sidebarOpen && <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
 
       {/* Main Content */}
-      {/* <DashboardContent/> */}
+      <ManageVehicle/>
     </div>
   )
 }
 
-export default Dashboard
+export default AdminManageVehicle

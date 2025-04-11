@@ -7,17 +7,26 @@ import {
   BarChart2,
   Settings,
   X,
-  LogOut
+  LogOut,
+  PlusCircle,
+  ListChecks,
+  Search,
+  Users
 } from 'lucide-react'
 
 const menuItems = [
-  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { label: 'Bookings', path: '/bookings', icon: CalendarCheck2 },
-  // { label: 'Slots', path: '/slots', icon: ParkingSquare },
-  { label: 'Reports', path: '/reports', icon: BarChart2 },
-  { label: 'Settings', path: '/settings', icon: Settings },
-  { label: 'Logout', path:'/logout', icon :LogOut}
+  { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+  { label: 'Vehicle Category', path: '/admin/category', icon: ParkingSquare },
+  { label: 'Bookings', path: '/admin/bookings', icon: CalendarCheck2 },
+  { label: 'Manage Vehicle', path: '/admin/vehicle', icon: ListChecks },
+  { label: 'Reports', path: '/admin/reports', icon: BarChart2 },
+  { label: 'Search Vehicle', path: '/admin/search-vehicle', icon: Search },
+  { label: 'Reg Users', path: '/admin/registered-users', icon: Users },
+  { label: 'Settings', path: '/admin/settings', icon: Settings },
+  { label: 'Logout', path: '/logout', icon: LogOut }
 ]
+
+
 
 const Sidebar = ({ isOpen, toggleSidebar }: any) => {
   return (

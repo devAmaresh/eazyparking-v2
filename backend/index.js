@@ -3,17 +3,18 @@ import cors from 'cors';
 import userRoutes from './routes/userRoutes.js'
 import authRoute from './routes/authRoute.js'
 import getLocationsRoute from './routes/getParkingLot.js'
+
 import adminAuthRoute from './routes/admin/authRoute.js'
 import addParkingLotRoute from './routes/admin/addParkingLot.js'
-import getPastBookingsRoute from './routes/user/getPastBookings.js'
 import categoryRoutes from './routes/admin/categoryRoutes.js'
 import showRegisteredUsersRoute from './routes/admin/showRegisteredUsers.js'
 import generateReportRoute from './routes/admin/generateReport.js'
+
+import getPastBookingsRoute from './routes/user/getPastBookings.js'
 import getparkingsRoute from './routes/user/getParkings.js'
 import bookRoute from './routes/user/book.js'
 import getdashboardDataRoute from './routes/user/dashboardData.js'
 import getuserprofileRoute from './routes/user/getuserprofile.js'
-import setuserprofileRoute from './routes/user/setuserprofile.js'
 import changePasswordRoute from './routes/user/changePassword.js'
 
 const app = express();
@@ -40,7 +41,8 @@ app.use('/api/user/getParkings', getparkingsRoute);
 app.use('/api/user/book', bookRoute);
 app.use('/api/user/dashboardData',getdashboardDataRoute);
 app.use('/api/user/profile',getuserprofileRoute);
-app.use('/api/user/setuserprofile', setuserprofileRoute);
+
+
 app.use('/api/user/changePassword', changePasswordRoute);
 
 app.get('/', (req, res) => {

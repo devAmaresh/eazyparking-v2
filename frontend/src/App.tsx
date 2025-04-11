@@ -21,7 +21,10 @@ import Cookies from 'js-cookie'
 import Book from './pages/Book'
 import Reports from './pages/Reports'
 import Setting from './pages/Setting'
-
+import AdminVehicleCategory from './pages/AdminVehicleCategory'
+import AdminBookings from './pages/AdminBookings'
+import AdminManageVehicle from './pages/AdminManageVehicle'
+import AdminReports from './pages/AdminReports'
 
 const ThemeSwitcher = () => {
   const { theme, toggleTheme } = useContext(ThemeContext)
@@ -81,6 +84,30 @@ const AppContent = () => {
             <ProtectedRoute isAuthenticated={isAdminAuthenticated}
             >
             <AdminDashboard />
+            </ProtectedRoute>
+            } />
+          <Route path="/admin/category" element={
+            <ProtectedRoute isAuthenticated={isAdminAuthenticated}
+            >
+            <AdminVehicleCategory />
+            </ProtectedRoute>
+            } />
+          <Route path="/admin/bookings" element={
+            <ProtectedRoute isAuthenticated={isAdminAuthenticated}
+            >
+            <AdminBookings />
+            </ProtectedRoute>
+            } />
+          <Route path="/admin/vehicle" element={
+            <ProtectedRoute isAuthenticated={isAdminAuthenticated}
+            >
+            <AdminManageVehicle />
+            </ProtectedRoute>
+            } />
+          <Route path="/admin/reports" element={
+            <ProtectedRoute isAuthenticated={isAdminAuthenticated}
+            >
+            <AdminReports />
             </ProtectedRoute>
             } />
           <Route path="/logout" element={<Logout />} />
