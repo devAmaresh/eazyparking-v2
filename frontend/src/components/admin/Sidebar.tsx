@@ -8,7 +8,6 @@ import {
   Settings,
   X,
   LogOut,
-  PlusCircle,
   ListChecks,
   Search,
   Users,
@@ -27,7 +26,7 @@ const menuItems = [
   { label: "Logout", path: "/logout", icon: LogOut },
 ];
 
-const Sidebar = ({ isOpen, toggleSidebar }: any) => {
+const Sidebar = ({  toggleSidebar }: any) => {
   return (
     <motion.aside
       // initial={{ x: -150 }}
