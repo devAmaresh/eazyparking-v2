@@ -31,6 +31,7 @@ import AdminReports from "./pages/AdminReports";
 import AdminParkingLot from "./pages/AdminParkingLot";
 import { ConfigProvider, theme as antdtheme } from "antd";
 import { Toaster } from "react-hot-toast";
+import AdminregUser from "./pages/AdminregUser";
 
 const ThemeSwitcher = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -160,6 +161,14 @@ const AppContent = () => {
               element={
                 <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
                   <AdminParkingLot />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/registered-users"
+              element={
+                <ProtectedRoute isAuthenticated={isAdminAuthenticated}>
+                  <AdminregUser />
                 </ProtectedRoute>
               }
             />
