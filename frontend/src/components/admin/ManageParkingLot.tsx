@@ -169,7 +169,13 @@ const ManageParkingLot = () => {
       dataIndex: "imgUrl",
       key: "imgUrl",
       render: (url: string) => (
-        <img src={url} alt="parking" style={{ width: 100, borderRadius: 8 }} />
+        <div className="flex justify-center items-center">
+          <img
+            src={url}
+            alt="parking"
+            style={{ width: 100, height: 100, borderRadius: 8 }}
+          />
+        </div>
       ),
     },
 
