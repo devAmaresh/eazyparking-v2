@@ -1,19 +1,12 @@
-import * as React from "react";
 
 import InVehicle from "./InVehicle";
 import OutVehicle from "./OutVehicle";
 import History from "./History";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 // import ChangePassword from './ChangePassword';
-import Cookies from "js-cookie";
-import axios from "axios";
-import { BACKEND_URL } from "@/utils/backend";
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
+
+
 
 const Profiledata = () => {
   return (

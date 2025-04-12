@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import  { useEffect, useRef, useState } from 'react'
 import { SearchOutlined } from '@ant-design/icons'
 import { Button, Input, Space, Table } from 'antd'
 import type { InputRef, TableColumnType } from 'antd'
@@ -77,7 +77,7 @@ const ManageCategory = () => {
     }
   }
 
-  const handleEdit = (id: string) => {
+  const handleEdit = (_id: string) => {
     toast('Edit functionality coming soon...')
   }
 

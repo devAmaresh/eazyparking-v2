@@ -10,13 +10,13 @@ import {
   Typography,
   useTheme
 } from '@mui/material'
-import React, { useContext, useEffect, useState } from 'react'
+import  { useContext, useEffect, useState } from 'react'
 import { ThemeContext } from '@/context/ThemeContext'
 import axios from 'axios'
 import dayjs from 'dayjs'
 import Cookies from 'js-cookie'
 import { BACKEND_URL } from '@/utils/backend'
-import { ShieldBan } from 'lucide-react'
+
 
 const UserDashboard = () => {
   const { theme } = useContext(ThemeContext)

@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'react'
-import Cookies from 'js-cookie'
-import { useNavigate } from 'react-router-dom'
+import {  useState } from 'react'
 
 import { Menu} from 'lucide-react'
 import Sidebar from '@/components/admin/Sidebar'
 import ManageVehicle from '@/components/admin/ManageVehicle'
 
 const AdminManageVehicle = () => {
-  const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
 
