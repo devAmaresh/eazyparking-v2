@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { Table, Spin, Input, Button, Space, Tag } from "antd";
+import { Table, Spin, Input, Button, Space, Tag, Modal, Form } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import type { InputRef, TableColumnsType, TableColumnType } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import Highlighter from "react-highlight-words";
 import { BACKEND_URL } from "@/utils/backend";
+import toast from "react-hot-toast";
 
 type ParkingLot = {
   id: string;
@@ -25,6 +26,11 @@ const ManageParkingLot = () => {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [editingParkingLot, setEditingParkingLot] = useState<ParkingLot | null>(
+    null
+  );
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const searchInput = useRef<InputRef>(null);
 
   useEffect(() => {
@@ -183,7 +189,15 @@ const ManageParkingLot = () => {
       dataIndex: "bookedSlot",
       key: "bookedSlot",
       render: (booked, record) => (
-        <Tag color={booked === record.totalSlot ? "red" : "green"}>
+        <Tag
+          color={
+            booked >= 0.9 * record.totalSlot
+              ? "red"
+              : booked >= 0.6 * record.totalSlot
+              ? "gold"
+              : "green"
+          }
+        >
           {booked}/{record.totalSlot}
         </Tag>
       ),
@@ -198,18 +212,59 @@ const ManageParkingLot = () => {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
-        <a
-          onClick={() => editParkingLot(record.id)}
-          style={{ color: "#1677ff" }}
-        >
+        <a onClick={() => editParkingLot(record)} style={{ color: "#1677ff" }}>
           Edit
         </a>
       ),
     },
   ];
 
-  const editParkingLot = (id: string) => {
-    console.log("Edit parking lot:", id);
+  const editParkingLot = (record: ParkingLot) => {
+    setEditingParkingLot(record);
+    setIsModalVisible(true);
+  };
+  const [updating, setUpdating] = useState(false);
+  const handleOk = async () => {
+    if (editingParkingLot) {
+      try {
+        setUpdating(true);
+        const response = await axios.patch(
+          `${BACKEND_URL}/api/admin/addParkingLot/${editingParkingLot.id}`,
+          editingParkingLot,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.status === 200) {
+          setParkingLots((prev) =>
+            prev.map((lot) =>
+              lot.id === editingParkingLot.id ? response.data : lot
+            )
+          );
+          setIsModalVisible(false);
+          toast.success("Parking lot updated successfully!");
+        }
+      } catch (error) {
+        console.error("Error updating parking lot:", error);
+      } finally {
+        setUpdating(false);
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (editingParkingLot) {
+      setEditingParkingLot({
+        ...editingParkingLot,
+        [e.target.name]: e.target.value,
+      });
+    }
   };
 
   return (
@@ -217,7 +272,6 @@ const ManageParkingLot = () => {
       {loading ? (
         <div style={{ textAlign: "center", marginTop: 50 }}>
           <Spin size="large" tip="Loading Parking Lots" />
-          
         </div>
       ) : (
         <Table
@@ -228,6 +282,62 @@ const ManageParkingLot = () => {
           pagination={{ pageSize: 5 }}
         />
       )}
+
+      <Modal
+        title="Edit Parking Lot"
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="Cancel" onClick={handleCancel}>
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={updating}
+            disabled={updating}
+            onClick={handleOk}
+          >
+            Submit
+          </Button>,
+        ]}
+      >
+        {editingParkingLot && (
+          <Form layout="vertical">
+            <Form.Item label="Location">
+              <Input
+                name="location"
+                value={editingParkingLot.location}
+                onChange={handleChange}
+              />
+            </Form.Item>
+            <Form.Item label="Image URL">
+              <Input
+                name="imgUrl"
+                value={editingParkingLot.imgUrl}
+                onChange={handleChange}
+              />
+            </Form.Item>
+            <Form.Item label="Total Slots">
+              <Input
+                type="number"
+                name="totalSlot"
+                value={editingParkingLot.totalSlot}
+                onChange={handleChange}
+              />
+            </Form.Item>
+            <Form.Item label="Price">
+              <Input
+                type="number"
+                name="price"
+                value={editingParkingLot.price}
+                onChange={handleChange}
+              />
+            </Form.Item>
+          </Form>
+        )}
+      </Modal>
     </div>
   );
 };

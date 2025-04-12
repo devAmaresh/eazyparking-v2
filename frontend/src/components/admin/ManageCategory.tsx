@@ -221,7 +221,7 @@ const ManageCategory = () => {
         rowKey="id"
         loading={loading}
         bordered
-        className="bg-white dark:bg-gray-900 text-black dark:text-white [&_.ant-table]:bg-white dark:[&_.ant-table]:bg-gray-900 [&_.ant-table-thead]:bg-gray-100 dark:[&_.ant-table-thead]:bg-gray-800 [&_.ant-table-thead th]:text-black dark:[&_.ant-table-thead th]:text-white [&_.ant-table-tbody]:bg-white dark:[&_.ant-table-tbody]:bg-gray-900"
+      
       />
       {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>

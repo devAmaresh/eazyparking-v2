@@ -84,7 +84,13 @@ const AddParkingLot = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block loading={loading}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            loading={loading}
+            disabled={loading}
+          >
             Add Parking Lot
           </Button>
         </Form.Item>
