@@ -9,6 +9,9 @@ const router = express.Router();
 
 router.post('/', auth, async (req, res) => {
     try {
+      if (!req.isAdmin) 
+        return res.status(403).json({ message: "Access denied" });
+
       const {
         parkingLotId,
         vehicleCategory,
