@@ -18,7 +18,6 @@ import getdashboardDataRoute from './routes/user/dashboardData.js'
 import getuserprofileRoute from './routes/user/getuserprofile.js'
 import changePasswordRoute from './routes/user/changePassword.js'
 import userData from "./routes/admin/userData.js";
-import getVehicleDataRoute from './routes/admin/getVehicleData.js'
 const app = express();
 
 const PORT = 3000;
