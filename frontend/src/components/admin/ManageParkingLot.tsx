@@ -183,6 +183,7 @@ const ManageParkingLot = () => {
       title: "Total Slots",
       dataIndex: "totalSlot",
       key: "totalSlot",
+      sorter: (a, b) => a.totalSlot - b.totalSlot,
     },
     {
       title: "Booked Slot",
@@ -201,6 +202,7 @@ const ManageParkingLot = () => {
           {booked}/{record.totalSlot}
         </Tag>
       ),
+      sorter: (a, b) => a.bookedSlot - b.bookedSlot,
     },
     {
       title: "Price",
