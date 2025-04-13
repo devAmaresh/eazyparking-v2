@@ -51,12 +51,12 @@ const ChangePassword = () => {
     };
 
   return (
-    <div className=''>{/* Change Password Section */}
+    <div className='mt-8'>{/* Change Password Section */}
     <Toaster
   position="top-center"
   gutter={8}
 />
-    <div className="pt-16 border-t border-gray-300 dark:border-gray-700 max-w-96 flex-col mx-auto justify-center">
+    <div className="pt-16 max-w-96 flex-col mx-auto justify-center bg-white dark:bg-zinc-900 shadow-lg p-10 rounded-xl">
       <h2 className="text-lg font-semibold mb-4">Change Password</h2>
       <div className="space-y-4">
         <div>

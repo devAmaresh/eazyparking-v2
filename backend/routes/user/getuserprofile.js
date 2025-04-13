@@ -24,7 +24,7 @@ router.get('/getuserprofile', auth, async (req, res) => {
         email: true,
         mobileNumber: true,
         regDate: true,
-        // profileImage is removed since not in schema
+        profileImage: true,
       },
     });
 
@@ -32,13 +32,9 @@ router.get('/getuserprofile', auth, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Add dummy image URL
-    const userWithImage = {
-      ...user,
-      profileImage: 'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png', 
-    };
+   
 
-    res.json(userWithImage);
+    res.json(user);
   } catch (err) {
     console.error('Error fetching profile:', err);
     res.status(500).json({ message: 'Server error' });

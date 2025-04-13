@@ -28,6 +28,7 @@ model User {
   email        String?    @unique @db.VarChar(250)
   password     String?    @db.VarChar(250)
   regDate      DateTime?  @default(now()) @map("RegDate") @db.Timestamp(0)
+  profileImage String? @default("https://avatar.iran.liara.run/public") @map("profileImage") @db.VarChar(250)
   bookings     Booking[]
 
   @@map("tblregusers")

@@ -108,10 +108,10 @@ export const ParkingCardSlider: React.FC<ParkingCardSliderProps> = ({
       </div>
 
       {filteredSpots.length === 0 && (
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <Skeleton variant="rounded" width={330} height={290} />
-          <Skeleton variant="rounded" width={330} height={290} />
-          <Skeleton variant="rounded" width={330} height={290} />
+        <div className="grid grid-cols-3 gap-24 text-center">
+          <Skeleton variant="rounded" width={290} height={290} />
+          <Skeleton variant="rounded" width={290} height={290} />
+          <Skeleton variant="rounded" width={290} height={290} />
         </div>
       )}
 
