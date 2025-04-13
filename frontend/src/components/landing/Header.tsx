@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import Button from "@mui/material/Button";
+import { Button } from "../ui/button";
 import { NavHashLink as Link } from "react-router-hash-link";
 import { useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -90,22 +90,22 @@ export default function Header({ isMobile }: HeaderProps) {
                 onClick={() => {
                   navigate("/dashboard");
                 }}
-                variant="outlined"
-                className="ml-4"
+                className=""
               >
                 Dashboard
               </Button>
             ) : (
               <>
-                <Button href="/login" className="ml-3 ">
-                  Login
+                <Button  className="">
+                  <Link to="/login"
+                  >Login</Link>
+                  
                 </Button>
                 <Button
-                  href="/admin/login"
-                  variant="outlined"
-                  className="bg-black text-white hover:bg-gray-800 "
+                  asChild
+                  
                 >
-                  Admin Login
+                  <Link to="/admin/login">Admin Login</Link>
                 </Button>
               </>
             )}
@@ -150,22 +150,18 @@ export default function Header({ isMobile }: HeaderProps) {
               {isLoggedIn ? (
                 <Button
                   onClick={handleLogout}
-                  variant="outlined"
                   className="w-full"
                 >
                   Logout
                 </Button>
               ) : (
                 <>
-                  <Button href="/login" variant="outlined" className="w-full">
-                    Login
-                  </Button>
-                  <Button
-                    href="/admin/register"
-                    className="bg-black text-white hover:bg-gray-800"
-                  >
-                    Admin Login
-                  </Button>
+                  <Button asChild size={"lg"}>
+                <Link to="/register"> Create Account</Link>
+              </Button>
+              <Button asChild size={"lg"}>
+                <Link to="/login">Login</Link>
+              </Button>
                 </>
               )}
             </div>
