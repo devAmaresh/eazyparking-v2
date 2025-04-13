@@ -2,22 +2,30 @@
 
 A modern full-stack web application for efficient vehicle parking slot booking and management. EazyParking offers a clean and responsive frontend built with React and TypeScript, backed by RESTful APIs in Node.js and Express.
 
-🔗 **Live Demo**: [EazyParking App](https://economic-charline-saini-042465c4.koyeb.app/)  
+🔗 **Live Demo**: [EazyParking App](https://eazyparking.tech/)  
 💻 **Source Code**: [GitHub Repository](https://github.com/latelateef/eazy-parking-mern)
 
 ---
 
 ## 📋 Table of Contents
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Screenshots](#screenshots)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [Database Schema](#database-schema)
-- [Project Structure](#project-structure)
-- [Future Improvements](#future-improvements)
-- [License](#license)
+- [EazyParking: Parking Management System](#eazyparking-parking-management-system)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [🚀 Features](#-features)
+  - [⚙️ Tech Stack](#️-tech-stack)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Dev Tools](#dev-tools)
+  - [📸 Screenshots](#-screenshots)
+  - [🛠️ Installation](#️-installation)
+    - [Clone the Repo](#clone-the-repo)
+    - [1️⃣ Backend Setup](#1️⃣-backend-setup)
+    - [2️⃣ Frontend Setup](#2️⃣-frontend-setup)
+  - [🧾 Environment Variables](#-environment-variables)
+  - [🗃️ Database Schema](#️-database-schema)
+  - [📁 Project Structure](#-project-structure)
+  - [🔮 Future Improvements](#-future-improvements)
+  - [📄 License](#-license)
 
 ---
 
