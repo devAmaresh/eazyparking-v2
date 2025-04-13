@@ -119,7 +119,7 @@ export default function Profile() {
 
         <div className="relative w-28 h-28 mx-auto">
           <img
-            src={user.profileImage || "/default-avatar.png"}
+            src={user.profileImage || "https://avatar.iran.liara.run/public"}
             alt="Profile"
             className="rounded-full object-cover w-full h-full border-2 border-gray-300 dark:border-gray-600"
           />
