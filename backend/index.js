@@ -28,7 +28,7 @@ const PORT = 3000;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173","https://eazy-parking-mern.vercel.app"],
+    origin: ["http://localhost:5173","https://eazy-parking-mern.vercel.app","https://eazyparking.tech"],
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
