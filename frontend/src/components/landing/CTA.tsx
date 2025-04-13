@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 
 export default function CTA() {
   return (
-    <section className="py-20 bg-zinc-50 text-zinc-800 dark:text-white dark:bg-black">
+    <section className="py-20 text-zinc-800 dark:text-white dark:bg-black">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
           <motion.h2

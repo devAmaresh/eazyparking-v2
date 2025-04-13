@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
+import { TextGenerateEffect, TextGenerateEffectFast } from "../ui/text-generate-effect";
 
 export default function Hero() {
   return (
@@ -14,14 +15,12 @@ export default function Hero() {
             className="space-y-6"
           >
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-tight">
-              Book Your Spot.
-              <br />
-              <span className="text-gray-500">Park with Ease.</span>
+              <TextGenerateEffect words="Book Your Spot."></TextGenerateEffect>
+              <TextGenerateEffect className="text-gray-500" words="Park with Ease."></TextGenerateEffect>
             </h1>
-            <p className="text-xl text-gray-600 max-w-lg">
-              The smart way to find and book parking spaces in your city. No
-              more circling blocks or stressing over spots.
-            </p>
+            <TextGenerateEffectFast className="text-xl text-gray-600 max-w-lg"
+              words="The smart way to find and book parking spaces in your city. No more circling blocks or stressing over spots.">
+            </TextGenerateEffectFast>
             <div className="flex flex-wrap gap-4 pt-4">
               <Button asChild size={"lg"}>
                 <Link to="/register"> Create Account</Link>

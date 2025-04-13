@@ -28,7 +28,7 @@ export default function Header({ isMobile }: HeaderProps) {
   const navigate = useNavigate();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-black/10 border-b border-gray-200 dark:border-gray-700 shadow-md backdrop-blur-3xl transition-colors duration-300">
+    <header className="px-12 fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-black/10 border-b border-gray-200 dark:border-gray-700 shadow-md backdrop-blur-3xl transition-colors duration-300">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold tracking-tighter">
           EAZY<span className="text-gray-500">PARKING</span>
@@ -95,7 +95,7 @@ export default function Header({ isMobile }: HeaderProps) {
                 Dashboard
               </Button>
             ) : (
-              <>
+              <div className="flex space-x-4">
                 <Button  className="">
                   <Link to="/login"
                   >Login</Link>
@@ -107,7 +107,7 @@ export default function Header({ isMobile }: HeaderProps) {
                 >
                   <Link to="/admin/login">Admin Login</Link>
                 </Button>
-              </>
+              </div>
             )}
           </nav>
         )}

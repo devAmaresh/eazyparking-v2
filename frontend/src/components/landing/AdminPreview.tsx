@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 
 export default function AdminPreview() {
   return (
-    <section className="py-20 bg-zinc-50 dark:bg-black">
+    <section className="py-20 dark:bg-black">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <motion.div

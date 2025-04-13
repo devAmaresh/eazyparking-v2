@@ -9,7 +9,6 @@ import {
   X,
   LogOut,
   ListChecks,
-  Search,
   Users,
 } from "lucide-react";
 
@@ -20,7 +19,6 @@ const menuItems = [
   { label: "Parking Lot", path: "/admin/parkinglot", icon: ParkingSquare },
   { label: "Manage Vehicle", path: "/admin/vehicle", icon: ListChecks },
   { label: "Reports", path: "/admin/reports", icon: BarChart2 },
-  { label: "Search Vehicle", path: "/admin/search-vehicle", icon: Search },
   { label: "Reg Users", path: "/admin/registered-users", icon: Users },
   { label: "Settings", path: "/admin/settings", icon: Settings },
   { label: "Logout", path: "/logout", icon: LogOut },
