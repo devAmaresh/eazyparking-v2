@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { SpeedDial, CssBaseline } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import {
   createTheme,
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
-import { Moon, Sun } from "lucide-react";
-import { useContext, useMemo } from "react";
 
+import { useContext, useMemo } from "react";
+import ThemeSwitcher from "./components/ThemeSwitcher";
 import { ThemeContext, ThemeProvider } from "./context/ThemeContext";
 
 import Login from "./pages/Login";
@@ -35,19 +35,6 @@ import AdminregUser from "./pages/AdminregUser";
 import AdminBook from "./pages/AdminBook";
 import AdminSetting from "./pages/AdminSetting";
 // import AdminBookregUser from "./pages/AdminBookregUser";
-
-const ThemeSwitcher = () => {
-  const { theme, toggleTheme } = useContext(ThemeContext);
-
-  return (
-    <SpeedDial
-      ariaLabel="Theme Switcher"
-      icon={theme === "dark" ? <Moon /> : <Sun />}
-      sx={{ position: "fixed", bottom: 16, right: 16, color: "purple" }}
-      onClick={toggleTheme}
-    />
-  );
-};
 
 const AppContent = () => {
   const { theme } = useContext(ThemeContext);

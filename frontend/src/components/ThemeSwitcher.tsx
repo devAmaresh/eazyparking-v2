@@ -10,8 +10,17 @@ const ThemeSwitcher = () => {
       <SpeedDial
         ariaLabel="Theme Switcher"
         icon={theme === 'dark' ? <Moon /> : <Sun />}
-        sx={{ position: 'fixed', bottom: 16, right: 16, color: 'purple' }}
+        sx={{ position: 'fixed', bottom: 16, right: 16}}
         onClick={toggleTheme}
+        FabProps={{
+          sx: {
+            bgcolor: theme === "dark" ? "white" : "black",
+            color: theme === "dark" ? "black" : "white",
+            '&:hover': {
+              bgcolor: theme === "dark" ? "#ddd" : "#333",
+            },
+          },
+        }}
       />
     )
   }

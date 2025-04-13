@@ -1,5 +1,4 @@
-
-
+import { Link as LinkR } from 'react-router-dom';
 import * as React from 'react';
 import axios from 'axios';
 import { BACKEND_URL } from '../utils/backend';
@@ -271,21 +270,22 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
             <Typography sx={{ textAlign: 'center' }}>
               Already have an account?{' '}
               <Link
-                href="/admin/login"
+               
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
               >
-                <a
+                <LinkR to="/admin/login"
                   className="no-underline hover:underline hover:text-blue-600 transition duration-200"
                 >
                   Sign in
-                </a>
+                </LinkR>
               </Link>
             </Typography>
             <Typography sx={{ textAlign: 'center' }}>
               Back to{' '}
-              <Link href="/" variant="body2" sx={{ alignSelf: 'center' }}>
-                Home
+              <Link  variant="body2" sx={{ alignSelf: 'center' }}>
+              <LinkR to="/">Home</LinkR>
+
               </Link>
             </Typography>
           </Box>

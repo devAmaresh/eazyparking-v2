@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../utils/backend";
-
+import { Link as LinkR } from "react-router-dom";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -237,18 +237,14 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             </Button>
             <Typography sx={{ textAlign: "center" }}>
               Don&apos;t have an account?{" "}
-              <Link
-                href="/admin/register"
-                variant="body2"
-                sx={{ alignSelf: "center" }}
-              >
-                Sign up
+              <Link variant="body2" sx={{ alignSelf: "center" }}>
+                <LinkR to="/admin/register">Sign up</LinkR>
               </Link>
             </Typography>
             <Typography sx={{ textAlign: "center" }}>
               Back to{" "}
-              <Link href="/" variant="body2" sx={{ alignSelf: "center" }}>
-                Home
+              <Link variant="body2" sx={{ alignSelf: "center" }}>
+                <LinkR to="/">Home</LinkR>
               </Link>
             </Typography>
           </Box>
