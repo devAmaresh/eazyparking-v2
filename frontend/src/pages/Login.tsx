@@ -252,7 +252,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <Typography sx={{ textAlign: "center" }}>
               Back to{" "}
               <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/register">Home</LinkR>
+                <LinkR to="/">Home</LinkR>
               </Link>
             </Typography>
           </Box>
