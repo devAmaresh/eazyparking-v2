@@ -157,10 +157,10 @@ export default function Header({ isMobile }: HeaderProps) {
               ) : (
                 <>
                   <Button asChild size={"lg"}>
-                <Link to="/register"> Create Account</Link>
+                <Link to="/login"> Login</Link>
               </Button>
               <Button asChild size={"lg"}>
-                <Link to="/login">Login</Link>
+                <Link to="/admin/login">Admin Login</Link>
               </Button>
                 </>
               )}

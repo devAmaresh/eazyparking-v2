@@ -9,7 +9,6 @@ import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import CssBaseline from "@mui/material/CssBaseline";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Divider from "@mui/material/Divider";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import Link from "@mui/material/Link";
@@ -21,7 +20,6 @@ import { styled } from "@mui/material/styles";
 import ForgotPassword from "../components/auth/ForgotPassword";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
-import { GoogleIcon } from "../components/auth/CustomIcons";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -166,7 +164,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 autoFocus
                 required
                 fullWidth
-                variant="outlined"
+                variant="standard"
                 color={emailError ? "error" : "primary"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -185,7 +183,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 autoComplete="current-password"
                 required
                 fullWidth
-                variant="outlined"
+                variant="standard"
                 color={passwordError ? "error" : "primary"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -209,7 +207,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               variant="body2"
               sx={{ alignSelf: "center" }}
             >
-              Forgot your password?
+              <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Forgot your password?</span>
             </Link>
 
             {error && (
@@ -223,28 +221,12 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               </Typography>
             )}
           </Box>
-
-          <Divider>or</Divider>
-
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert("Sign in with Google")}
-              startIcon={<GoogleIcon />}
-            >
-              Sign in with Google
-            </Button>
-            <Typography sx={{ textAlign: "center" }}>
-              Don&apos;t have an account?{" "}
-              <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/admin/register">Sign up</LinkR>
-              </Link>
-            </Typography>
+
             <Typography sx={{ textAlign: "center" }}>
               Back to{" "}
               <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/">Home</LinkR>
+                <LinkR to="/"><span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Home</span></LinkR>
               </Link>
             </Typography>
           </Box>

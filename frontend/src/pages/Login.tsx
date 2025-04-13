@@ -125,6 +125,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
         email,
         password,
       });
+      console.log(res)
 
       setSuccess("Login successful!");
       Cookies.set("token", res.data.token, { expires: 7 });
@@ -172,7 +173,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 autoFocus
                 required
                 fullWidth
-                variant="outlined"
+                variant="standard"
                 color={emailError ? "error" : "primary"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -191,7 +192,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 autoComplete="current-password"
                 required
                 fullWidth
-                variant="outlined"
+                variant="standard"
                 color={passwordError ? "error" : "primary"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -215,7 +216,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               variant="body2"
               sx={{ alignSelf: "center" }}
             >
-              Forgot your password?
+              <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Forgot your password?</span>
+              
             </Link>
 
             {error && (
@@ -246,13 +248,13 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <Typography sx={{ textAlign: "center" }}>
               Don&apos;t have an account?{" "}
               <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/register">Sign up</LinkR>
+                <LinkR to="/register"><span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Sign up</span></LinkR>
               </Link>
             </Typography>
             <Typography sx={{ textAlign: "center" }}>
               Back to{" "}
               <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/">Home</LinkR>
+                <LinkR to="/"><span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Home</span></LinkR>
               </Link>
             </Typography>
           </Box>

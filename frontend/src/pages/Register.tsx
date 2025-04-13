@@ -192,6 +192,8 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
             onSubmit={handleSubmit}
             sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
           >
+            <div className='flex flex-col sm:flex-row gap-2'>
+
             <FormControl>
               <FormLabel htmlFor="firstName">First name</FormLabel>
               <TextField
@@ -221,6 +223,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 color={nameError ? 'error' : 'primary'}
               />
             </FormControl>
+            </div>
 
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
@@ -294,16 +297,15 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
               >
-                <LinkR to="/login" 
-                   className="no-underline hover:underline hover:text-blue-600 transition duration-200"    >
-                  Sign in
+                <LinkR to="/login"  >
+                <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Sign In</span>
                   </LinkR>
               </Link>
             </Typography>
             <Typography sx={{ textAlign: 'center' }}>
               Back to{' '}
               <Link variant="body2" sx={{ alignSelf: 'center' }}>
-                <LinkR to="/">Home</LinkR>
+                <LinkR to="/"><span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Home</span></LinkR>
               </Link>
             </Typography>
           </Box>

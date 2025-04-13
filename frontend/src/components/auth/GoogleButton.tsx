@@ -39,7 +39,7 @@ const GoogleButton = () => {
   };
   const { theme } = useContext(ThemeContext);
   return (
-    <div>
+    <div className="bg-white dark:bg-black">
       {loading && <Spin fullscreen size="large"
       tip={<div className="text-lg">Please Wait!</div>} spinning/>}
       <center>
