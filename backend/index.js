@@ -22,6 +22,8 @@ import getAdmindashboardDataRoute from "./routes/admin/dashboard.js";
 import AdminbookRoute from "./routes/admin/Adminbook.js";
 import adminprofileRoute from "./routes/admin/profile.js";
 import adminchangePasswordRoute from "./routes/admin/changePassword.js";
+import googleAuthRoute from "./routes/googleAuth.js";
+
 
 const app = express();
 
@@ -59,6 +61,8 @@ app.use("/api/user/dashboardData", getdashboardDataRoute);
 app.use("/api/user/profile", getuserprofileRoute);
 
 app.use("/api/user/changePassword", changePasswordRoute);
+
+app.use("/api/user/googleAuth", googleAuthRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello, World! pyaaare kushagra");

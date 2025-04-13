@@ -21,7 +21,8 @@ import { styled } from "@mui/material/styles";
 import ForgotPassword from "../components/auth/ForgotPassword";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
-import { GoogleIcon } from "../components/auth/CustomIcons";
+import GoogleButton from "@/components/auth/GoogleButton";
+
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -134,6 +135,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     }
   };
 
+
+
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
@@ -233,14 +236,16 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
           <Divider>or</Divider>
 
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Button
+            {/* <Button
               fullWidth
               variant="outlined"
               onClick={() => alert("Sign in with Google")}
               startIcon={<GoogleIcon />}
             >
               Sign in with Google
-            </Button>
+            </Button> */}
+           <GoogleButton />
+
             <Typography sx={{ textAlign: "center" }}>
               Don&apos;t have an account?{" "}
               <Link
