@@ -4,6 +4,7 @@ import { CameraIcon, PencilIcon, SaveIcon } from "lucide-react";
 import Cookies from "js-cookie";
 import { BACKEND_URL } from "@/utils/backend";
 import toast from "react-hot-toast";
+import { Skeleton, Spin } from "antd";
 
 export default function Profile() {
   const [user, setUser] = useState({
@@ -20,17 +21,21 @@ export default function Profile() {
   const [formData, setFormData] = useState({ ...user });
 
   const token = Cookies.get("token");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!token) return;
-    axios
-      .get(`${BACKEND_URL}/api/user/profile/getuserprofile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          `${BACKEND_URL}/api/user/profile/getuserprofile`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const {
           firstName,
           lastName,
@@ -50,8 +55,13 @@ export default function Profile() {
         };
         setUser(updatedUser);
         setFormData(updatedUser);
-      })
-      .catch((err) => console.error(err));
+      } catch (error) {
+        console.error("Error in fetching", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [token]);
 
   const handleInputChange = (e: any) => {
@@ -118,11 +128,22 @@ export default function Profile() {
         </div>
 
         <div className="relative w-28 h-28 mx-auto">
-          <img
-            src={user.profileImage || "https://avatar.iran.liara.run/public"}
-            alt="Profile"
-            className="rounded-full object-cover w-full h-full border-2 border-gray-300 dark:border-gray-600"
-          />
+          {loading ? (
+            <>
+            <Skeleton.Image active className="w-28 h-28 " style={{borderRadius:"full"}} />
+            </>
+          ) : (
+            <>
+              <img
+                src={
+                  user.profileImage || "https://avatar.iran.liara.run/public"
+                }
+                alt="Profile"
+                className="rounded-full object-cover w-full h-full border-2 border-gray-300 dark:border-gray-600"
+              />
+            </>
+          )}
+
           <label
             htmlFor="profileUpload"
             className="absolute bottom-1 right-1 bg-white dark:bg-zinc-700 p-1 rounded-full shadow cursor-pointer"
@@ -139,6 +160,13 @@ export default function Profile() {
         </div>
 
         <div className="space-y-4">
+          {loading && (
+            <div className="flex justify-center items-center mt-5">
+            <Spin size="large" tip={<div className="text-lg text-black">Loading</div>} />
+            </div>
+          )}
+          {!loading && (<>
+        
           <div>
             <label className="block text-sm font-medium mb-1">First Name</label>
             <input
@@ -206,8 +234,10 @@ export default function Profile() {
               } border border-gray-300 dark:border-gray-600`}
             />
           </div>
+          </>)}
         </div>
 
+  {!loading &&(<>
         <div className="pt-4 space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="font-semibold">Member Since</span>
@@ -230,7 +260,9 @@ export default function Profile() {
           )}
           {editMode ? "Save Changes" : "Edit Profile"}
         </button>
+        </>)}
       </div>
+      
     </div>
   );
 }
