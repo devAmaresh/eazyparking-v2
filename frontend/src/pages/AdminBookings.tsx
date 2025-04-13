@@ -26,7 +26,7 @@ const AdminBookings = () => {
           return;
         }
   
-        const res = await axios.get(`${BACKEND_URL}/api/admin/getParkings`, {
+        const res = await axios.get(`${BACKEND_URL}/api/user/getParkings`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

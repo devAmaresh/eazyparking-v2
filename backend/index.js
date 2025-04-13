@@ -19,8 +19,9 @@ import getuserprofileRoute from './routes/user/getuserprofile.js'
 import changePasswordRoute from './routes/user/changePassword.js'
 import userData from "./routes/admin/userData.js";
 import getAdmindashboardDataRoute from "./routes/admin/dashboard.js";
-import getAdminparkingsRoute from "./routes/admin/getParkings.js";
 import AdminbookRoute from "./routes/admin/Adminbook.js";
+import adminprofileRoute from "./routes/admin/profile.js";
+import adminchangePasswordRoute from "./routes/admin/changePassword.js";
 
 const app = express();
 
@@ -47,8 +48,9 @@ app.use("/api/admin/showRegisteredUsers", showRegisteredUsersRoute);
 app.use("/api/admin/generateReport", generateReportRoute);
 app.use('/api/admin/vehicle', vehicleRoutes);
 app.use("/api/admin/dashboard", getAdmindashboardDataRoute);
-app.use("/api/admin/getParkings", getAdminparkingsRoute);
 app.use("/api/admin/book", AdminbookRoute);
+app.use("/api/admin/profile", adminprofileRoute);
+app.use("/api/admin/changePassword", adminchangePasswordRoute);
 
 
 app.use("/api/user/getParkings", getparkingsRoute);
