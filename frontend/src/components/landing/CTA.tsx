@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import Button from '@mui/material/Button';
+import { Button } from "../ui/button";
+import { Link } from "react-router-dom";
 
 export default function CTA() {
   return (
@@ -31,9 +32,11 @@ export default function CTA() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Button className="bg-white text-black hover:bg-gray-200 px-8 py-6 text-lg">Create Free Account</Button>
-            <Button variant="outlined" className="border-white text-white hover:bg-white/10 px-8 py-6 text-lg">
-              Contact Sales
+            <Button asChild size={"lg"} variant="default">
+              <Link to="/register">Create Free Account</Link>
+            </Button>
+            <Button asChild variant="outline" size={"lg"}>
+              <Link to="/contact">Contact Sales</Link>
             </Button>
           </motion.div>
         </div>

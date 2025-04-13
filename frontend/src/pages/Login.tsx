@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../utils/backend";
-
+import { Link as LinkR } from "react-router-dom";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -22,7 +22,6 @@ import ForgotPassword from "../components/auth/ForgotPassword";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
 import GoogleButton from "@/components/auth/GoogleButton";
-
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -135,8 +134,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     }
   };
 
-
-
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
@@ -244,22 +241,18 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             >
               Sign in with Google
             </Button> */}
-           <GoogleButton />
+            <GoogleButton />
 
             <Typography sx={{ textAlign: "center" }}>
               Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                variant="body2"
-                sx={{ alignSelf: "center" }}
-              >
-                Sign up
+              <Link variant="body2" sx={{ alignSelf: "center" }}>
+                <LinkR to="/register">Sign up</LinkR>
               </Link>
             </Typography>
             <Typography sx={{ textAlign: "center" }}>
               Back to{" "}
-              <Link href="/" variant="body2" sx={{ alignSelf: "center" }}>
-                Home
+              <Link variant="body2" sx={{ alignSelf: "center" }}>
+                <LinkR to="/register">Home</LinkR>
               </Link>
             </Typography>
           </Box>

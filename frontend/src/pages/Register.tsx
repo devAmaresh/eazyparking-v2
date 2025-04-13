@@ -14,6 +14,7 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import { Link as LinkR } from 'react-router-dom';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from '../shared-theme/AppTheme';
@@ -289,20 +290,20 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
             <Typography sx={{ textAlign: 'center' }}>
               Already have an account?{' '}
               <Link
-                href="/material-ui/getting-started/templates/sign-in/"
+                
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
               >
-                <a href="/login" 
+                <LinkR to="/login" 
                    className="no-underline hover:underline hover:text-blue-600 transition duration-200"    >
                   Sign in
-                  </a>
+                  </LinkR>
               </Link>
             </Typography>
             <Typography sx={{ textAlign: 'center' }}>
               Back to{' '}
-              <Link href="/" variant="body2" sx={{ alignSelf: 'center' }}>
-                Home
+              <Link variant="body2" sx={{ alignSelf: 'center' }}>
+                <LinkR to="/">Home</LinkR>
               </Link>
             </Typography>
           </Box>
