@@ -167,7 +167,7 @@ router.get("/history", auth, async (req, res) => {
         inTime: vehicle.inTime,
         parkingNumber: vehicle.booking?.parkingLotId || 'N/A', 
         ownerName: `${vehicle.booking?.user?.firstName || ''} ${vehicle.booking?.user?.lastName || ''}`.trim(),
-        settledTime: vehicle.outTime ? vehicle.outTime.toLocaleString() : 'N/A',  
+        settledTime: vehicle.outTime ,  
         remark: vehicle.remark || 'N/A',  
       }));
   

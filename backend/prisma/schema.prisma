@@ -40,6 +40,7 @@ model Category {
   id           String     @id @default(uuid()) @db.Char(36)
   vehicleCat   String     @map("VehicleCat") @db.VarChar(120)
   creationDate DateTime?  @default(now()) @map("CreationDate") @db.Timestamp(0)
+  vehicles     Vehicle[]
 
   @@map("tblcategory")
 }
@@ -76,15 +77,16 @@ model Booking {
 // Vehicle Model
 model Vehicle {
   id                  String     @id @default(uuid()) @db.Char(36)
-  bookId              String?    @unique @map("BookId") @db.VarChar(36)
-  vehicleCategory     String     @map("VehicleCategory") @db.VarChar(120)
-  vehicleCompanyName  String?    @map("VehicleCompanyname") @db.VarChar(120)
-  registrationNumber  String?    @map("RegistrationNumber") @db.VarChar(120)
-  inTime              DateTime?  @default(now()) @map("InTime") @db.Timestamp(0)
+  bookId              String    @unique @map("BookId") @db.VarChar(36)
+  categoryId          String     @map("CategoryId") @db.Char(36)
+  vehicleCategory     Category   @relation(fields: [categoryId], references: [id])
+  vehicleCompanyName  String    @map("VehicleCompanyname") @db.VarChar(120)
+  registrationNumber  String    @map("RegistrationNumber") @db.VarChar(120)
+  inTime              DateTime  @default(now()) @map("InTime") @db.Timestamp(0)
   outTime             DateTime?  @map("OutTime") @db.Timestamp(0)
   remark              String?     @map("Remark") @db.MediumText
   status              String?     @db.VarChar(5)
-  booking             Booking?   @relation("BookingVehicle", fields: [bookId], references: [bookId])
+  booking             Booking   @relation("BookingVehicle", fields: [bookId], references: [bookId])
 
   @@map("tblvehicle")
 }

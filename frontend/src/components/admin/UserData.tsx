@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Table, Button, Modal, Spin, Typography, Space, Input } from "antd";
 import { BACKEND_URL } from "@/utils/backend";
@@ -17,13 +17,14 @@ import Cookies from "js-cookie";
 import { FilterDropdownProps } from "antd/es/table/interface";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
+import { ThemeContext } from "@/context/ThemeContext";
 
 declare module "jspdf" {
   interface jsPDF {
     lastAutoTable: { finalY: number };
   }
 }
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const UserData = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -250,7 +251,7 @@ const UserData = () => {
       render: (val: string) => (val ? new Date(val).toLocaleString() : "-"),
     },
   ];
-
+  const { theme } = useContext(ThemeContext);
   return (
     <div style={{ padding: 24 }}>
       <Space
@@ -290,20 +291,27 @@ const UserData = () => {
           </Button>,
         ]}
         width={1000}
-        title="User Details"
+        title={<div className="text-bold text-lg">User Details</div>}
+        className={`${theme}`}
       >
         {selectedUser && (
           <>
-            <p>
-              <Text strong>Name:</Text> {selectedUser.firstName}{" "}
-              {selectedUser.lastName}
-            </p>
-            <p>
-              <Text strong>Email:</Text> {selectedUser.email}
-            </p>
-            <p>
-              <Text strong>Phone:</Text> {selectedUser.mobileNumber}
-            </p>
+            <div className="rounded-2xl shadow-md p-5 space-y-2 border border-zinc-200 dark:border-zinc-800 mb-2">
+              <div>
+                <p className="text-zinc-500 text-sm">Name</p>
+                <p className="font-semibold">
+                  {selectedUser.firstName} {selectedUser.lastName}
+                </p>
+              </div>
+              <div>
+                <p className="text-zinc-500 text-sm">Email</p>
+                <p className="font-medium">{selectedUser.email}</p>
+              </div>
+              <div>
+                <p className="text-zinc-500 text-sm">Phone</p>
+                <p className="font-medium">{selectedUser.mobileNumber}</p>
+              </div>
+            </div>
 
             <Title level={4}>Bookings</Title>
             <Table
@@ -312,24 +320,31 @@ const UserData = () => {
               rowKey="bookId"
               pagination={false}
               size="small"
+              className="overflow-auto max-h-96"
             />
 
             <Title level={4} style={{ marginTop: 20 }}>
               Spending Per Booking
             </Title>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={selectedUser.bookings.map((b: any, idx: number) => ({
-                  name: `Booking ${idx + 1}`,
-                  price: b.parkingLot?.price || 0,
-                }))}
-              >
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="price" fill="#1677ff" />
-              </BarChart>
-            </ResponsiveContainer>
+            {selectedUser.bookings.length === 0 ? (
+              <>No Bookings Found</>
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={selectedUser.bookings.map((b: any, idx: number) => ({
+                      name: `Booking ${idx + 1}`,
+                      price: b.parkingLot?.price || 0,
+                    }))}
+                  >
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="price" fill="#1677ff" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </>
+            )}
           </>
         )}
       </Modal>

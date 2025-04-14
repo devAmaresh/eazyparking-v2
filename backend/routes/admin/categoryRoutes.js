@@ -33,9 +33,9 @@ router.post("/add", auth, async (req, res) => {
 // Get All Categories
 router.get("/get-all", auth, async (req, res) => {
   try {
-    if (!req.isAdmin) {
-      return res.status(403).json({ message: "Access denied" });
-    }
+    // if (!req.isAdmin) {
+    //   return res.status(403).json({ message: "Access denied" });
+    // }
 
     const categories = await prisma.category.findMany();
     res.status(200).json(categories);

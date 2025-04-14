@@ -41,13 +41,13 @@ const Dashboard = () => {
               value="manage-parking-lot"
               className="hover:cursor-pointer w-44"
             >
-              Manage Parking Lot
+              Admin Profile
             </TabsTrigger>
             <TabsTrigger
               value="add-parking-lot"
               className="hover:cursor-pointer w-44"
             >
-              Add Parking Lot
+              Change Password
             </TabsTrigger>
           </TabsList>
         </center>
