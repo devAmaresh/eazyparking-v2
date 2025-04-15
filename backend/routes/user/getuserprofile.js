@@ -1,17 +1,17 @@
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import auth from '../../middlewares/auth.js'; 
+import express from "express";
+import { PrismaClient } from "@prisma/client";
+import auth from "../../middlewares/auth.js";
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // GET /api/user/profile
-router.get('/getuserprofile', auth, async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
     const userId = req.userId;
 
     if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     const user = await prisma.user.findUnique({
@@ -29,25 +29,23 @@ router.get('/getuserprofile', auth, async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
-
-   
 
     res.json(user);
   } catch (err) {
-    console.error('Error fetching profile:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching profile:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-router.patch('/setuserprofile', auth, async (req, res) => {
+router.patch("/", auth, async (req, res) => {
   try {
     const userId = req.userId;
-    const { firstName, lastName, email, mobileNumber } = req.body;
+    const { firstName, lastName, mobileNumber, profileImage } = req.body;
 
     if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -55,7 +53,7 @@ router.patch('/setuserprofile', auth, async (req, res) => {
     });
 
     if (!existingUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     const updatedUser = await prisma.user.update({
@@ -63,23 +61,25 @@ router.patch('/setuserprofile', auth, async (req, res) => {
       data: {
         firstName,
         lastName,
-        email,
         mobileNumber,
+        profileImage,
       },
     });
 
     res.status(200).json({
-      message: 'Profile updated successfully',
+      message: "Profile updated successfully",
       user: {
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         email: updatedUser.email,
         mobileNumber: updatedUser.mobileNumber,
+        regDate: updatedUser.regDate,
+        profileImage: updatedUser.profileImage,
       },
     });
   } catch (err) {
-    console.error('Error updating profile:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error updating profile:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

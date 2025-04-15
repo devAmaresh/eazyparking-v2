@@ -55,26 +55,6 @@ const OutVehicle: React.FC = () => {
     }
   };
 
-  const autoUpdateVehicles = async () => {
-    const token = Cookies.get('adminToken');
-    if (!token) {
-      toast.error('Admin token not found!');
-      return;
-    }
-    try {
-      const res = await axios.post(`${BACKEND_URL}/api/admin/vehicle/auto-update`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      toast.success(res.data.message || 'Vehicles updated!');
-      fetchOutVehicles(); // Fetch updated data
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Auto update failed';
-      toast.error(msg);
-      console.error(err);
-    }
-  };
 
   useEffect(() => {
     fetchOutVehicles();
@@ -215,11 +195,6 @@ const OutVehicle: React.FC = () => {
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <Button type="primary" onClick={autoUpdateVehicles}>
-          Refresh
-        </Button>
-      </div>
       <Table columns={columns} dataSource={data} rowKey="id" loading={loading} bordered />
       {error && <p className="text-red-500 mt-2">{error}</p>}
       <Modal

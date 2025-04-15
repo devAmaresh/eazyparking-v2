@@ -18,6 +18,7 @@ import { FilterDropdownProps } from "antd/es/table/interface";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 import { ThemeContext } from "@/context/ThemeContext";
+import { DownloadIcon } from "lucide-react";
 
 declare module "jspdf" {
   interface jsPDF {
@@ -79,7 +80,7 @@ const UserData = () => {
         Email: u.email,
         Phone: u.mobileNumber,
         "Reg Date": new Date(u.regDate).toLocaleDateString(),
-        "Total Spent": `₹${u.totalSpent || 0}`,
+        "Total Spent": `Rs ${u.totalSpent || 0}`,
       }))
     );
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -100,7 +101,7 @@ const UserData = () => {
       ["Name", `${selectedUser.firstName} ${selectedUser.lastName}`],
       ["Email", selectedUser.email],
       ["Phone", selectedUser.mobileNumber],
-      ["Total Spent", `₹${selectedUser.totalSpent || 0}`],
+      ["Total Spent", `Rs ${selectedUser.totalSpent || 0}`],
     ];
 
     autoTable(doc, {
@@ -283,7 +284,7 @@ const UserData = () => {
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={[
-          <Button key="export" onClick={exportPDF}>
+          <Button key="export" onClick={exportPDF} icon={<DownloadIcon className="w-4 h-4"/>}>
             Export PDF
           </Button>,
           <Button key="close" onClick={() => setModalOpen(false)}>
@@ -320,7 +321,7 @@ const UserData = () => {
               rowKey="bookId"
               pagination={false}
               size="small"
-              className="overflow-auto max-h-96"
+              className="overflow-auto max-h-64"
             />
 
             <Title level={4} style={{ marginTop: 20 }}>

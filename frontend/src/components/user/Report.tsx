@@ -1,146 +1,351 @@
-import * as React from 'react';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { Table, Button, Spin, Typography, Space, Input } from "antd";
+import { BACKEND_URL } from "@/utils/backend";
+import Papa from "papaparse";
+import Cookies from "js-cookie";
+import { FilterDropdownProps } from "antd/es/table/interface";
+import Highlighter from "react-highlight-words";
+import { SearchOutlined } from "@ant-design/icons";
+import { Skeleton } from "antd";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { Download } from "lucide-react";
 
-interface Column {
-  id: 'name' | 'code' | 'population' | 'size' | 'density';
-  label: string;
-  minWidth?: number;
-  align?: 'right';
-  format?: (value: number) => string;
+declare module "jspdf" {
+  interface jsPDF {
+    lastAutoTable: { finalY: number };
+  }
 }
+const { Title, Text } = Typography;
+const BasicSkeleton: React.FC = () => <Skeleton active />;
 
-const columns: readonly Column[] = [
-  { id: 'name', label: 'Name', minWidth: 170 },
-  { id: 'code', label: 'ISO\u00a0Code', minWidth: 100 },
-  {
-    id: 'population',
-    label: 'Population',
-    minWidth: 170,
-    align: 'right',
-    format: (value: number) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'size',
-    label: 'Size\u00a0(km\u00b2)',
-    minWidth: 170,
-    align: 'right',
-    format: (value: number) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'density',
-    label: 'Density',
-    minWidth: 170,
-    align: 'right',
-    format: (value: number) => value.toFixed(2),
-  },
-];
+const Report = () => {
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [ongoing, setOngoing] = useState<any[]>([]);
+  const [upcoming, setUpcoming] = useState<any[]>([]);
+  const [past, setPast] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const searchInput = useRef<any>(null);
 
-interface Data {
-  name: string;
-  code: string;
-  population: number;
-  size: number;
-  density: number;
-}
+  const handleSearch = (
+    selectedKeys: string[],
+    confirm: FilterDropdownProps["confirm"],
+    dataIndex: string
+  ) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters: () => void) => {
+    clearFilters();
+    setSearchText("");
+  };
+  // Helper function to classify bookings
+  useEffect(() => {
+    const classifyBookings = () => {
+      const now = new Date();
+      const upcoming = [];
+      const ongoing = [];
+      const past = [];
 
-function createData(
-  name: string,
-  code: string,
-  population: number,
-  size: number,
-): Data {
-  const density = population / size;
-  return { name, code, population, size, density };
-}
+      for (const b of bookings) {
+        const inTime = new Date(b.inTime);
+        const outTime = b.outTime ? new Date(b.outTime) : null;
 
-const rows = [
-  createData('India', 'IN', 1324171354, 3287263),
-  createData('China', 'CN', 1403500365, 9596961),
-  createData('Italy', 'IT', 60483973, 301340),
-  createData('United States', 'US', 327167434, 9833520),
-  createData('Canada', 'CA', 37602103, 9984670),
-  createData('Australia', 'AU', 25475400, 7692024),
-  createData('Germany', 'DE', 83019200, 357578),
-  createData('Ireland', 'IE', 4857000, 70273),
-  createData('Mexico', 'MX', 126577691, 1972550),
-  createData('Japan', 'JP', 126317000, 377973),
-  createData('France', 'FR', 67022000, 640679),
-  createData('United Kingdom', 'GB', 67545757, 242495),
-  createData('Russia', 'RU', 146793744, 17098246),
-  createData('Nigeria', 'NG', 200962417, 923768),
-  createData('Brazil', 'BR', 210147125, 8515767),
-];
+        if (inTime > now) {
+          upcoming.push(b);
+        } else if (outTime && outTime < now) {
+          past.push(b);
+        } else {
+          ongoing.push(b);
+        }
+      }
 
-export function Report() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+      setOngoing(ongoing);
+      setPast(past);
+      setUpcoming(upcoming);
+    };
+    classifyBookings();
+  }, [bookings]);
 
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
+  useEffect(() => {
+    const fetchReportData = async () => {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/user/report`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        });
+        setBookings(res.data);
+      } catch (error) {
+        console.error("Failed to fetch users", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReportData();
+  }, []);
+
+  const exportCSV = () => {
+    const csv = Papa.unparse(
+      bookings.map((b) => ({
+        "Company Name": b.company || "N/A",
+        "Registration Number": b.registrationNumber || "N/A",
+        Location: b.location,
+        "Vehicle Category": b.category || "N/A",
+        "In Time": new Date(b.inTime).toLocaleDateString(),
+        "Out Time": new Date(b.outTime).toLocaleDateString() || "-",
+        "Total Spent": `Rs ${b.totalSpent || 0}`,
+      }))
+    );
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Report.csv";
+    link.click();
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
+  const getColumnSearchProps = (dataIndex: string) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }: FilterDropdownProps) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() =>
+            handleSearch(selectedKeys as string[], confirm, dataIndex)
+          }
+          style={{ marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() =>
+              handleSearch(selectedKeys as string[], confirm, dataIndex)
+            }
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => (
+      <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+    ),
+    onFilter: (value: any, record: any) =>
+      `${record[dataIndex]}`.toLowerCase().includes(value.toLowerCase()),
+    render: (text: string) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (
+        text
+      ),
+  });
+
+  const bookingsColumns = [
+    {
+      title: "Company",
+      dataIndex: "company",
+      ...getColumnSearchProps("company"),
+    },
+    {
+      title: "Reg No",
+      dataIndex: "registrationNumber",
+      ...getColumnSearchProps("registrationNumber"),
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      ...getColumnSearchProps("category"),
+    },
+    {
+      title: "Location",
+      dataIndex: "location",
+      ...getColumnSearchProps("location"),
+    },
+    {
+      title: "In Time",
+      dataIndex: "inTime",
+      render: (date: string) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: "Total Spent",
+      dataIndex: "totalSpent",
+      render: (val: number) => `₹${val || 0}`,
+    },
+  ];
+
+  const outTimeColumn = {
+    title: "Out Time",
+    dataIndex: "outTime",
+    render: (date: string) => new Date(date).toLocaleDateString(),
+  };
+
+  const pastBookingColumns = [
+    ...bookingsColumns.slice(0, 5),
+    outTimeColumn,
+    ...bookingsColumns.slice(5),
+  ];
+
+  const exportPDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.setTextColor(40, 40, 40);
+    doc.text("Parking Booking Report", 14, 22);
+
+    const sections = [
+      { title: "Ongoing Bookings", data: ongoing },
+      { title: "Upcoming Bookings", data: upcoming },
+      { title: "Past Bookings", data: past },
+    ];
+
+    let finalY = 30;
+
+    sections.forEach((section, _index) => {
+      if (section.data.length > 0) {
+        doc.setTextColor(0, 112, 192); // blue
+        doc.setFontSize(14);
+        doc.text(section.title, 14, finalY);
+        finalY += 6;
+
+        autoTable(doc, {
+          startY: finalY,
+          head: [
+            [
+              "Company Name",
+              "Reg No",
+              "Category",
+              "Location",
+              "In Time",
+              ...(section.title === "Past Bookings" ? ["Out Time"] : []),
+              "Total Spent",
+            ],
+          ],
+          body: section.data.map((b) => [
+            b.company || "N/A",
+            b.registrationNumber || "N/A",
+            b.category || "N/A",
+            b.location || "N/A",
+            new Date(b.inTime).toLocaleString(),
+            ...(section.title === "Past Bookings"
+              ? [new Date(b.outTime).toLocaleString()]
+              : []),
+            `Rs ${b.totalSpent || 0}`,
+          ]),
+          theme: "grid",
+          styles: {
+            fillColor: [240, 240, 240],
+            textColor: 20,
+            fontSize: 10,
+          },
+          headStyles: {
+            fillColor: [0, 112, 192], // blue header
+            textColor: 255,
+            fontStyle: "bold",
+          },
+          margin: { left: 14, right: 14 },
+        });
+
+        finalY = doc.lastAutoTable.finalY + 10;
+      }
+    });
+
+    doc.save("Booking_Report.pdf");
   };
 
   return (
-    <div className='overflow-y-auto p-10'>
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </Paper>
-  </div>
+    <div style={{ padding: 24 }}>
+      <Space
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 16,
+        }}
+      >
+        <Title level={2}>Report</Title>
+        <Space>
+          <Button type="primary" onClick={exportCSV}>
+            Export CSV
+          </Button>
+          <Button
+            onClick={exportPDF}
+            type="dashed"
+            icon={<Download className="w-4 h-4" />}
+          >
+            Export PDF
+          </Button>
+        </Space>
+      </Space>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-around h-screen">
+          <Spin size="large" tip="Loading..." />
+          <BasicSkeleton />
+          <BasicSkeleton />
+          <BasicSkeleton />
+        </div>
+      ) : (
+        <>
+          <Table
+            columns={bookingsColumns}
+            dataSource={ongoing}
+            rowKey="id"
+            pagination={{ pageSize: 6 }}
+            bordered
+            title={() => <Text strong>Ongoing Bookings</Text>}
+            className="my-4"
+          />
+          <Table
+            columns={bookingsColumns}
+            dataSource={upcoming}
+            rowKey="id"
+            pagination={{ pageSize: 6 }}
+            bordered
+            title={() => <Text strong>Upcoming Bookings</Text>}
+            className="my-4"
+          />
+          <Table
+            columns={pastBookingColumns}
+            dataSource={past}
+            rowKey="id"
+            pagination={{ pageSize: 6 }}
+            bordered
+            title={() => <Text strong>Past Bookings</Text>}
+            className="my-4"
+          />
+        </>
+      )}
+    </div>
   );
-}
+};
+
+export default Report;

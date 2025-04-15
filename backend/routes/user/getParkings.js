@@ -11,7 +11,6 @@ const router = express.Router();
 router.get('/', auth, async (req, res) => {
     try {
         const parkingLots = await prisma.parkingLot.findMany({
-          
             select: {
                 id: true,
                 imgUrl: true,

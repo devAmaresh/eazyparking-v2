@@ -23,6 +23,7 @@ import AdminbookRoute from "./routes/admin/Adminbook.js";
 import adminprofileRoute from "./routes/admin/profile.js";
 import adminchangePasswordRoute from "./routes/admin/changePassword.js";
 import googleAuthRoute from "./routes/googleAuth.js";
+import getReport from "./routes/user/getReport.js";
 
 
 const app = express();
@@ -59,6 +60,7 @@ app.use("/api/user/getParkings", getparkingsRoute);
 app.use("/api/user/book", bookRoute);
 app.use("/api/user/dashboardData", getdashboardDataRoute);
 app.use("/api/user/profile", getuserprofileRoute);
+app.use("/api/user/report", getReport);
 app.use("/api/user/changePassword", changePasswordRoute);
 
 app.use("/api/user/googleAuth", googleAuthRoute);

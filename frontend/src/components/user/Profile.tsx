@@ -1,41 +1,30 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { CameraIcon, PencilIcon, SaveIcon } from "lucide-react";
+import { Form, Input, Button, Skeleton, Avatar, Popover } from "antd";
+import { EditOutlined, SaveOutlined, CameraOutlined } from "@ant-design/icons";
 import Cookies from "js-cookie";
-import { BACKEND_URL } from "@/utils/backend";
 import toast from "react-hot-toast";
-import { Skeleton, Spin } from "antd";
+import { BACKEND_URL } from "@/utils/backend";
 
-export default function Profile() {
-  const [user, setUser] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    mobileNumber: "",
-    profileImage: "",
-    memberSince: "",
-    status: "Active",
-  });
-
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({ ...user });
-
-  const token = Cookies.get("token");
+const Profile = () => {
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const token = Cookies.get("token");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!token) return;
-    setLoading(true);
-    const fetchData = async () => {
+
+    const fetchProfile = async () => {
       try {
-        const res = await axios.get(
-          `${BACKEND_URL}/api/user/profile/getuserprofile`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get(`${BACKEND_URL}/api/user/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         const {
           firstName,
           lastName,
@@ -44,7 +33,7 @@ export default function Profile() {
           regDate,
           profileImage,
         } = res.data;
-        const updatedUser = {
+        const profileData = {
           firstName,
           lastName,
           email,
@@ -53,216 +42,234 @@ export default function Profile() {
           memberSince: new Date(regDate).toLocaleDateString(),
           status: "Active",
         };
-        setUser(updatedUser);
-        setFormData(updatedUser);
+
+        setUser(profileData);
+        form.setFieldsValue(profileData);
       } catch (error) {
-        console.error("Error in fetching", error);
+        console.error("Error fetching profile:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+
+    fetchProfile();
   }, [token]);
 
-  const handleInputChange = (e: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const handleSave = async () => {
+    try {
+      setSubmitting(true);
+      const values = await form.validateFields();
 
-  const handleSaveChanges = () => {
-    axios
-      .patch(
-        `${BACKEND_URL}/api/user/profile/setuserprofile`,
+      await axios.patch(
+        `${BACKEND_URL}/api/user/profile`,
         {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          mobileNumber: formData.mobileNumber,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          mobileNumber: values.mobileNumber,
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
-      )
-      .then((_res: any) => {
-        setUser((prev) => ({
-          ...prev,
-          ...formData,
-        }));
-        setEditMode(false);
-        toast.success("Profile updated successfully!");
-      })
-      .catch((err) => console.error(err));
+      );
+      setUser({ ...user, ...values });
+      setEditMode(false);
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    } finally {
+      setSubmitting(false);
+    }
   };
+  const [imagePopoverOpen, setImagePopoverOpen] = useState(false);
+  const [imageForm] = Form.useForm();
 
-  const handleImageChange = (e: any) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      const imageData = new FormData();
-      imageData.append("profileImage", selectedFile);
+  const handleImageUrlSubmit = async () => {
+    try {
+      const values = await imageForm.validateFields();
+      const newUrl = values.profileImageUrl;
 
-      axios
-        .post("/api/user/upload-profile", imageData, {
+      setSubmitting(true);
+
+      await axios.patch(
+        `${BACKEND_URL}/api/user/profile`,
+        {
+          profileImage: newUrl,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          mobileNumber: user.mobileNumber,
+        },
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        })
-        .then((res) => {
-          setUser((prev) => ({ ...prev, profileImage: res.data.profileImage }));
-        })
-        .catch((err) => console.error(err));
+        }
+      );
+
+      setUser((prev: any) => ({
+        ...prev,
+        profileImage: newUrl,
+      }));
+      toast.success("Profile image updated!");
+      setImagePopoverOpen(false);
+      imageForm.resetFields();
+    } catch (err) {
+      console.error("Error updating image:", err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen  text-zinc-800 dark:text-gray-100 flex justify-center items-center p-4">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-6 space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">Profile</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Your profile information
+    <div className="min-h-screen flex justify-center  p-4 ">
+      <div className="w-full max-w-lg bg-white dark:bg-zinc-800 rounded-xl shadow-xl p-6">
+        <div className="text-center mb-2">
+          <h2 className="text-2xl font-bold text-zinc-800 dark:text-white">
+            Your Profile
+          </h2>
+          <p className="text-zinc-500 dark:text-zinc-400">
+            Manage your account information
           </p>
         </div>
 
-        <div className="relative w-28 h-28 mx-auto">
-          {loading ? (
-            <>
-            <Skeleton.Image active className="w-28 h-28 " style={{borderRadius:"full"}} />
-            </>
-          ) : (
-            <>
-              <img
+        {loading ? (
+          <div className="space-y-4 flex flex-col items-center">
+            <Skeleton.Avatar active size={96} shape="circle" />
+            <Skeleton active paragraph={{ rows: 4 }} />
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col items-center mb-4">
+              <Avatar
+                size={96}
                 src={
-                  user.profileImage || "https://avatar.iran.liara.run/public"
+                  user?.profileImage || "https://avatar.iran.liara.run/public"
                 }
-                alt="Profile"
-                className="rounded-full object-cover w-full h-full border-2 border-gray-300 dark:border-gray-600"
               />
-            </>
-          )}
+              <Popover
+                content={
+                  <Form form={imageForm} onFinish={handleImageUrlSubmit}>
+                    <Form.Item
+                      name="profileImageUrl"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter an image URL",
+                        },
+                        {
+                          type: "url",
+                          message: "Please enter a valid URL",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="Enter image URL" />
+                    </Form.Item>
 
-          <label
-            htmlFor="profileUpload"
-            className="absolute bottom-1 right-1 bg-white dark:bg-zinc-700 p-1 rounded-full shadow cursor-pointer"
-          >
-            <CameraIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-          </label>
-          <input
-            type="file"
-            id="profileUpload"
-            className="hidden"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-        </div>
-
-        <div className="space-y-4">
-          {loading && (
-            <div className="flex justify-center items-center mt-5">
-            <Spin size="large" tip={<div className="text-lg text-black">Loading</div>} />
+                    <center>
+                      <Button
+                        type="dashed"
+                        size="small"
+                        htmlType="submit"
+                        icon={<SaveOutlined />}
+                        loading={submitting}
+                        disabled={submitting}
+                      >
+                        Save
+                      </Button>
+                    </center>
+                  </Form>
+                }
+                title="Change Profile Image"
+                trigger="click"
+                open={imagePopoverOpen}
+                onOpenChange={setImagePopoverOpen}
+              >
+                <Button icon={<CameraOutlined />} size="small" className="mt-2">
+                  Change Photo
+                </Button>
+              </Popover>
             </div>
-          )}
-          {!loading && (<>
-        
-          <div>
-            <label className="block text-sm font-medium mb-1">First Name</label>
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              readOnly={!editMode}
-              className={`w-full p-2 rounded-md ${
-                editMode
-                  ? "bg-white dark:bg-gray-700"
-                  : "bg-gray-100 dark:bg-gray-700"
-              } border border-gray-300 dark:border-gray-600`}
-            />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Last Name</label>
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              readOnly={!editMode}
-              className={`w-full p-2 rounded-md ${
-                editMode
-                  ? "bg-white dark:bg-gray-700"
-                  : "bg-gray-100 dark:bg-gray-700"
-              } border border-gray-300 dark:border-gray-600`}
-            />
-          </div>
+            <Form form={form} layout="vertical" disabled={!editMode}
+            className="-space-y-2"
+            >
+              <div className="flex justify-between gap-x-3">
+                <Form.Item
+                  label="First Name"
+                  name="firstName"
+                  rules={[
+                    { required: true, message: "Please input your first name" },
+                  ]}
+                  className="w-1/2"
+                >
+                  <Input />
+                </Form.Item>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              readOnly={!editMode}
-              className={`w-full p-2 rounded-md ${
-                editMode
-                  ? "bg-white dark:bg-gray-700"
-                  : "bg-gray-100 dark:bg-gray-700"
-              } border border-gray-300 dark:border-gray-600`}
-            />
-          </div>
+                <Form.Item
+                  label="Last Name"
+                  name="lastName"
+                  rules={[
+                    { required: true, message: "Please input your last name" },
+                  ]}
+                  className="w-1/2"
+                >
+                  <Input />
+                </Form.Item>
+              </div>
+              <Form.Item
+                label="Email Address"
+                name="email"
+                rules={[
+                  { required: true, message: "Please input your email" },
+                  { type: "email", message: "Enter a valid email" },
+                ]}
+              >
+                <Input readOnly />
+              </Form.Item>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Mobile Number
-            </label>
-            <input
-              type="text"
-              name="mobileNumber"
-              value={formData.mobileNumber}
-              onChange={handleInputChange}
-              readOnly={!editMode}
-              className={`w-full p-2 rounded-md ${
-                editMode
-                  ? "bg-white dark:bg-gray-700"
-                  : "bg-gray-100 dark:bg-gray-700"
-              } border border-gray-300 dark:border-gray-600`}
-            />
-          </div>
-          </>)}
-        </div>
+              <Form.Item
+                label="Mobile Number"
+                name="mobileNumber"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your mobile number",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Form>
 
-  {!loading &&(<>
-        <div className="pt-4 space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="font-semibold">Member Since</span>
-            <span>{user.memberSince}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-semibold">Account Status</span>
-            <span className="text-green-500 font-bold">{user.status}</span>
-          </div>
-        </div>
+            <div className=" space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+              <div className="flex justify-between">
+                <span className="font-medium">Member Since</span>
+                <span>{user.memberSince}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Account Status</span>
+                <span className="text-green-500 font-bold">{user.status}</span>
+              </div>
+            </div>
 
-        <button
-          onClick={editMode ? handleSaveChanges : () => setEditMode(true)}
-          className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md mt-4"
-        >
-          {editMode ? (
-            <SaveIcon className="w-4 h-4" />
-          ) : (
-            <PencilIcon className="w-4 h-4" />
-          )}
-          {editMode ? "Save Changes" : "Edit Profile"}
-        </button>
-        </>)}
+            <Button
+              type="primary"
+              block
+              className="mt-6 flex items-center justify-center gap-2"
+              icon={editMode ? <SaveOutlined /> : <EditOutlined />}
+              onClick={editMode ? handleSave : () => setEditMode(true)}
+              loading={submitting}
+              disabled={submitting}
+            >
+              {editMode ? "Save Changes" : "Edit Profile"}
+            </Button>
+          </>
+        )}
       </div>
-      
     </div>
   );
-}
+};
+
+export default Profile;

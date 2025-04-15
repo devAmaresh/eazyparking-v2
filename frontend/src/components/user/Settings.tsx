@@ -7,7 +7,7 @@ const Profiledata = () => {
 
 
   return (
-    <Tabs defaultValue="profile" className="w-full p-10">
+    <Tabs defaultValue="profile" className="w-full p-5">
       <center>
         <TabsList className="bg-zinc-200 dark:bg-zinc-800">
           <TabsTrigger value="profile" className="hover:cursor-pointer w-44">
@@ -25,7 +25,6 @@ const Profiledata = () => {
         <ChangePassword />
       </TabsContent>
     </Tabs>
-    
   );
 };
 
