@@ -152,7 +152,7 @@ const InVehicle: React.FC = () => {
 
   return (
     <div>
-      
+
       <Table
         columns={columns}
         dataSource={data}

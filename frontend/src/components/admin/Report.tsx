@@ -41,6 +41,20 @@ const Report = () => {
     clearFilters();
     setSearchText("");
   };
+
+  const formatData = (data: any[]) => {
+    return data.map((b) => ({
+      key: b.bookId,
+      name: `${b.user?.firstName || "N/A"} ${b.user?.lastName || ""}`,
+      company: b.vehicle?.vehicleCompanyName || "N/A",
+      registrationNumber: b.vehicle?.registrationNumber || "N/A",
+      category: b.vehicle?.vehicleCategory?.vehicleCat || "N/A",
+      location: b.parkingLot?.location || "N/A",
+      inTime: b.vehicle?.inTime ? new Date(b.vehicle.inTime).toLocaleString() : "-",
+      outTime: b.vehicle?.outTime ? new Date(b.vehicle.outTime).toLocaleString() : "-",
+      totalSpent: `Rs.${b.parkingLot?.price || 0}`,
+    }));
+  }
   // Helper function to classify bookings
   useEffect(() => {
     const classifyBookings = () => {
@@ -72,12 +86,12 @@ const Report = () => {
   useEffect(() => {
     const fetchReportData = async () => {
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/user/report`, {
+        const res = await axios.get(`${BACKEND_URL}/api/admin/generateReport`, {
           headers: {
-            Authorization: `Bearer ${Cookies.get("token")}`,
+            Authorization: `Bearer ${Cookies.get("adminToken")}`,
           },
         });
-        setBookings(res.data);
+        setBookings(formatData(res.data));
       } catch (error) {
         console.error("Failed to fetch users", error);
       } finally {
@@ -91,13 +105,15 @@ const Report = () => {
   const exportCSV = () => {
     const csv = Papa.unparse(
       bookings.map((b) => ({
-        "Company Name": b.company || "N/A",
-        "Registration Number": b.registrationNumber || "N/A",
-        Location: b.location,
-        "Vehicle Category": b.category || "N/A",
-        "In Time": new Date(b.inTime).toLocaleDateString(),
-        "Out Time": new Date(b.outTime).toLocaleDateString() || "-",
-        "Total Spent": `Rs ${b.totalSpent || 0}`,
+        "Parking Number": b.key || "N/A",
+        Name: `${b.name}` || "N/A",
+        Company: b.company || "N/A",
+        "Reg No": b.registrationNumber || "N/A",
+        Category: b.category || "N/A",
+        Location: b.location || "N/A",
+        "In Time": b.inTime || "-",
+        "Out Time": b.outTime || "-",
+        "Total Spent": b.totalSpent,
       }))
     );
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -170,6 +186,16 @@ const Report = () => {
 
   const bookingsColumns = [
     {
+      title: "Parking Number",
+      dataIndex: "key",
+      ...getColumnSearchProps("key"),
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      ...getColumnSearchProps("name"),
+    },
+    {
       title: "Company",
       dataIndex: "company",
       ...getColumnSearchProps("company"),
@@ -197,7 +223,7 @@ const Report = () => {
     {
       title: "Total Spent",
       dataIndex: "totalSpent",
-      render: (val: number) => `₹${val || 0}`,
+      render: (val: number) => `${val || 0}`,
     },
   ];
 
@@ -239,6 +265,8 @@ const Report = () => {
           startY: finalY,
           head: [
             [
+              "Parking Number",
+              "Name",
               "Company Name",
               "Reg No",
               "Category",
@@ -249,15 +277,15 @@ const Report = () => {
             ],
           ],
           body: section.data.map((b) => [
+            b.key || "N/A",
+            b.name || "N/A",
             b.company || "N/A",
             b.registrationNumber || "N/A",
             b.category || "N/A",
             b.location || "N/A",
-            new Date(b.inTime).toLocaleString(),
-            ...(section.title === "Past Bookings"
-              ? [new Date(b.outTime).toLocaleString()]
-              : []),
-            `Rs ${b.totalSpent || 0}`,
+            b.inTime || "-",
+            ...(section.title === "Past Bookings" ? [b.outTime || "-"] : []),
+            `₹${b.totalSpent}`,
           ]),
           theme: "grid",
           styles: {

@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { Menu} from 'lucide-react'
 import Sidebar from '@/components/admin/Sidebar'
+import Report from '@/components/admin/Report'
 
 
 const AdminReports = () => {
@@ -30,7 +31,7 @@ const AdminReports = () => {
       {sidebarOpen && <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
 
       {/* Main Content */}
-      {/* <VehicleCategory/> */}
+      <Report/>
     </div>
   )
 }

@@ -269,7 +269,9 @@ const UserData = () => {
       </Space>
 
       {loading ? (
-        <Spin size="large" tip="Loading..." />
+        <div className="flex justify-center items-center">
+          <Spin size="large" tip="Loading..." />
+        </div>
       ) : (
         <Table
           columns={userColumns}

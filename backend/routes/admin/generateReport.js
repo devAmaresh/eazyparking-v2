@@ -21,15 +21,42 @@ router.post('/', auth, async (req, res) => {
                 },
             },
             include: {
-                parkingLotId: true,
-                userId: true,
-                bookId: true,
+                parkingLot: true,
+                user: true,
+                vehicle: {
+                    include: {
+                      vehicleCategory: true,
+                    },
+                  },
             },
         });
         res.status(200).json(report);
     } catch (error) {
         console.error('Error generating report:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.get("/", auth, async (req, res) =>{
+    try {
+        if(!req.isAdmin){
+            return res.status(403).json({ message: "Access denied" });
+        }
+        const report = await prisma.booking.findMany({
+            include: {
+                parkingLot: true,
+                user: true,
+                vehicle: {
+                    include: {
+                      vehicleCategory: true,
+                    },
+                  },
+            },
+        });
+        res.status(200).json(report);
+    } catch (error) {
+        console.error("Error generating report:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 });
 

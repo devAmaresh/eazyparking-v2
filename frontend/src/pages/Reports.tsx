@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 import Sidebar from "@/components/user/Sidebar";
-import Report from "../components/user/Report";
+import Report from "@/components/user/Report";
 // import { Skeleton } from "@mui/material";
 
 const Dashboard = () => {

@@ -3,9 +3,6 @@ import InVehicle from "./InVehicle";
 import OutVehicle from "./OutVehicle";
 import History from "./History";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-// import ChangePassword from './ChangePassword';
-
-
 
 
 const Profiledata = () => {
