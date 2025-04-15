@@ -9,14 +9,14 @@ import addParkingLotRoute from "./routes/admin/addParkingLot.js";
 import categoryRoutes from "./routes/admin/categoryRoutes.js";
 import showRegisteredUsersRoute from "./routes/admin/showRegisteredUsers.js";
 import generateReportRoute from "./routes/admin/generateReport.js";
-import vehicleRoutes from './routes/admin/Vehicle.js'
+import vehicleRoutes from "./routes/admin/Vehicle.js";
 
-import getPastBookingsRoute from './routes/user/getPastBookings.js'
-import getparkingsRoute from './routes/user/getParkings.js'
-import bookRoute from './routes/user/book.js'
-import getdashboardDataRoute from './routes/user/dashboardData.js'
-import getuserprofileRoute from './routes/user/getuserprofile.js'
-import changePasswordRoute from './routes/user/changePassword.js'
+import getPastBookingsRoute from "./routes/user/getPastBookings.js";
+import getparkingsRoute from "./routes/user/getParkings.js";
+import bookRoute from "./routes/user/book.js";
+import getdashboardDataRoute from "./routes/user/dashboardData.js";
+import getuserprofileRoute from "./routes/user/getuserprofile.js";
+import changePasswordRoute from "./routes/user/changePassword.js";
 import userData from "./routes/admin/userData.js";
 import getAdmindashboardDataRoute from "./routes/admin/dashboard.js";
 import AdminbookRoute from "./routes/admin/Adminbook.js";
@@ -25,14 +25,18 @@ import adminchangePasswordRoute from "./routes/admin/changePassword.js";
 import googleAuthRoute from "./routes/googleAuth.js";
 import getReport from "./routes/user/getReport.js";
 
-
 const app = express();
 
 const PORT = 3000;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173","https://eazy-parking-mern.vercel.app","https://eazyparking.tech"],
+    origin: [
+      "http://localhost:5173",
+      "https://eazy-parking-mern.vercel.app",
+      "https://eazyparking.tech",
+      "https://eazyparking-v2.vercel.app",
+    ],
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
@@ -49,12 +53,11 @@ app.use("/api/user/getPastBookings", getPastBookingsRoute);
 app.use("/api/admin/category", categoryRoutes);
 app.use("/api/admin/showRegisteredUsers", showRegisteredUsersRoute);
 app.use("/api/admin/generateReport", generateReportRoute);
-app.use('/api/admin/vehicle', vehicleRoutes);
+app.use("/api/admin/vehicle", vehicleRoutes);
 app.use("/api/admin/dashboard", getAdmindashboardDataRoute);
 app.use("/api/admin/book", AdminbookRoute);
 app.use("/api/admin/profile", adminprofileRoute);
 app.use("/api/admin/changePassword", adminchangePasswordRoute);
-
 
 app.use("/api/user/getParkings", getparkingsRoute);
 app.use("/api/user/book", bookRoute);
