@@ -54,7 +54,7 @@ const Profile = () => {
 
     fetchProfile();
   }, [token]);
-
+  const [loaded, setLoaded] = useState(false);
   const handleSave = async () => {
     try {
       setSubmitting(true);
@@ -145,7 +145,20 @@ const Profile = () => {
               <Avatar
                 size={96}
                 src={
-                  user?.profileImage || "https://avatar.iran.liara.run/public"
+                  <img
+                    src={
+                      user?.profileImage ||
+                      "https://avatar.iran.liara.run/public"
+                    }
+                    alt={"Avatar"}
+                    loading="lazy"
+                    onLoad={() => setLoaded(true)}
+                    style={{
+                      objectFit: "cover",
+                      filter: loaded ? "none" : "blur(8px)",
+                      transition: "filter 0.3s ease-out",
+                    }}
+                  />
                 }
               />
               <Popover
@@ -192,8 +205,11 @@ const Profile = () => {
               </Popover>
             </div>
 
-            <Form form={form} layout="vertical" disabled={!editMode}
-            className="-space-y-2"
+            <Form
+              form={form}
+              layout="vertical"
+              disabled={!editMode}
+              className="-space-y-2"
             >
               <div className="flex justify-between gap-x-3">
                 <Form.Item

@@ -65,6 +65,11 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const navigate = useNavigate();
+  React.useEffect(() => {
+    if (Cookies.get("adminToken")) {
+      navigate("/admin/dashboard");
+    }
+  }, []);
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -207,7 +212,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               variant="body2"
               sx={{ alignSelf: "center" }}
             >
-              <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Forgot your password?</span>
+              <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">
+                Forgot your password?
+              </span>
             </Link>
 
             {error && (
@@ -222,11 +229,14 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             )}
           </Box>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-
             <Typography sx={{ textAlign: "center" }}>
               Back to{" "}
               <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/"><span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Home</span></LinkR>
+                <LinkR to="/">
+                  <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">
+                    Home
+                  </span>
+                </LinkR>
               </Link>
             </Typography>
           </Box>
