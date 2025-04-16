@@ -7,6 +7,7 @@ export async function getUserReportData(userId) {
     // Format response
     const format = (data) =>
       data.map((b) => ({
+        id: b.bookId,
         registrationNumber: b.vehicle?.registrationNumber || "N/A",
         location: b.parkingLot.location,
         company: b.vehicle?.vehicleCompanyName || "N/A",
