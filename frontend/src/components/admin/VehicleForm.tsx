@@ -60,6 +60,7 @@ const VehicleForm = ({ parkingLotId }: any) => {
       vehicleCompanyName: values.vehicleCompanyName,
       registrationNumber: values.registrationNumber,
       inTime: values.inTime.toISOString(),
+      paymentId: null,
     };
 
     try {

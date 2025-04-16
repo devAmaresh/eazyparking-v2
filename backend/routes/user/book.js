@@ -16,6 +16,7 @@ router.post("/", auth, async (req, res) => {
       vehicleCompanyName,
       registrationNumber,
       inTime,
+      paymentId
     } = req.body;
     const intime = new Date(inTime);
     const result = await prisma.$transaction(async (tx) => {
@@ -55,7 +56,7 @@ router.post("/", auth, async (req, res) => {
         data: {
           userId,
           parkingLotId,
-          paymentId: null,
+          paymentId: paymentId,
         },
       });
 

@@ -44,6 +44,7 @@ router.post(
         vehicleCompanyName,
         inTime,
       } = session.metadata;
+      const paymentId  = session.payment_intent;
 
       try {
         await axios.post(`${BACKEND_URL}/api/user/book`, {
@@ -53,6 +54,7 @@ router.post(
           parkingLotId,
           vehicleCompanyName,
           inTime,
+          paymentId
         },
         {
             headers: {
