@@ -4,7 +4,10 @@ import { InfiniteMovingCards } from "../ui/infinite-moving-cards";
 
 export default function Testimonials() {
   return (
-    <div id="testimonials" className="h-[40rem] rounded-md flex flex-col antialiased bg-white dark:bg-black dark:bg-grid-white/[0.05] items-center justify-center relative overflow-hidden">
+    <div
+      id="testimonials"
+      className="h-[40rem] rounded-md flex flex-col antialiased bg-white dark:bg-black dark:bg-grid-white/[0.05] items-center justify-center relative overflow-hidden"
+    >
       <InfiniteMovingCards
         items={testimonials}
         direction="right"
@@ -17,31 +20,32 @@ export default function Testimonials() {
 const testimonials = [
   {
     quote:
-      "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair.",
-    name: "Charles Dickens",
-    title: "A Tale of Two Cities",
+      "EazyParking has completely streamlined our parking operations. We used to deal with manual logs and frustrated customers—now everything is automated, efficient, and seamless.",
+    name: "Anita Verma",
+    title: "Facility Manager, Urban Mall",
   },
   {
     quote:
-      "To be, or not to be, that is the question: Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take Arms against a Sea of troubles, And by opposing end them: to die, to sleep.",
-    name: "William Shakespeare",
-    title: "Hamlet",
-  },
-  {
-    quote: "All that we see or seem is but a dream within a dream.",
-    name: "Edgar Allan Poe",
-    title: "A Dream Within a Dream",
+      "I love how easy it is to find and book a parking spot now. The real-time availability and quick payments save me so much time during my daily commute.",
+    name: "Rohan Desai",
+    title: "Daily Commuter, Pune",
   },
   {
     quote:
-      "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.",
-    name: "Jane Austen",
-    title: "Pride and Prejudice",
+      "Our team was able to onboard in minutes. The admin dashboard gives us total control over every spot, and the reporting tools are a game changer.",
+    name: "Sandeep Mehra",
+    title: "Operations Head, SmartPark Pvt. Ltd.",
   },
   {
     quote:
-      "Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world.",
-    name: "Herman Melville",
-    title: "Moby-Dick",
+      "I used to circle for 20+ minutes looking for parking. With EazyParking, I find, reserve, and park in under five. It's a must-have for every driver in the city.",
+    name: "Mehak Kapoor",
+    title: "App User & Freelancer",
+  },
+  {
+    quote:
+      "EazyParking has helped us reduce congestion and improve traffic flow near our commercial complex. It's a smart solution with a real impact.",
+    name: "Rajeev Iyer",
+    title: "City Planner, Navi Mumbai",
   },
 ];

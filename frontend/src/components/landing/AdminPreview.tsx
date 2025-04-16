@@ -1,96 +1,70 @@
 import { motion } from "framer-motion";
-import Button from '@mui/material/Button';
+import { CheckCircle2 } from "lucide-react";
 
 export default function AdminPreview() {
   return (
-    <section className="py-20 dark:bg-black">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <section className="py-20 bg-white dark:bg-black">
+      <div className="container mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          {/* Image Block */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="relative h-[400px] rounded-xl overflow-hidden shadow-xl"
+            transition={{ duration: 0.6 }}
+            className="relative h-[450px] rounded-2xl overflow-hidden shadow-2xl border dark:border-neutral-800"
           >
             <img
               src="https://img.freepik.com/free-photo/person-preparing-get-driver-license_23-2150167566.jpg?ga=GA1.1.111555767.1744038035&semt=ais_country_boost&w=740"
               alt="Admin Dashboard"
-              className="object-cover fill"
+              className="object-cover w-full h-full"
             />
           </motion.div>
 
+          {/* Text Block */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
             className="space-y-6"
           >
-            <h2 className="text-4xl font-bold">Admin Functionality</h2>
-            <p className="text-xl text-gray-500">
-              Our system provides powerful tools for parking administrators to manage spaces efficiently.
+            <h2 className="text-4xl md:text-5xl font-bold leading-tight text-neutral-900 dark:text-white">
+              Powerful Admin Controls
+            </h2>
+            <p className="text-lg text-neutral-600 dark:text-neutral-400">
+              Streamline parking operations with tools designed for efficiency,
+              clarity, and speed.
             </p>
 
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <div className="bg-black text-white p-2 rounded-full mr-4">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M5 13L9 17L19 7"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+            <div className="space-y-6">
+              {[
+                {
+                  title: "Book Slot on User Arrival",
+                  desc: "Admins can quickly allocate slots to walk-in users with no prior booking.",
+                },
+                {
+                  title: "Real-time Space Management",
+                  desc: "Get a live view and control of parking occupancy and availability.",
+                },
+                {
+                  title: "Reporting & Analytics",
+                  desc: "Track trends, revenue, and usage with detailed insights.",
+                },
+              ].map(({ title, desc }, index) => (
+                <div className="flex items-start space-x-4" key={index}>
+                  <div className="text-blue-400 mt-1">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-neutral-800 dark:text-white">
+                      {title}
+                    </h3>
+                    <p className="text-neutral-600 dark:text-neutral-400">{desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold">Book Slot on User Arrival</h3>
-                  <p className="text-gray-500">
-                    Admins can quickly book slots for users who arrive without a reservation
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start">
-                <div className="bg-black text-white p-2 rounded-full mr-4">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M5 13L9 17L19 7"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">Real-time Space Management</h3>
-                  <p className="text-gray-500">Monitor and manage all parking spaces from a single dashboard</p>
-                </div>
-              </div>
-
-              <div className="flex items-start">
-                <div className="bg-black text-white p-2 rounded-full mr-4">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M5 13L9 17L19 7"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">Reporting & Analytics</h3>
-                  <p className="text-gray-500">Generate detailed reports on usage, revenue, and occupancy rates</p>
-                </div>
-              </div>
+              ))}
             </div>
-
-            <Button className="bg-black text-white hover:bg-gray-800">Learn More About Admin Features</Button>
           </motion.div>
         </div>
       </div>

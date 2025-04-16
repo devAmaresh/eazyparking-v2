@@ -22,6 +22,7 @@ import ForgotPassword from "../components/auth/ForgotPassword";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
 import GoogleButton from "@/components/auth/GoogleButton";
+import { Spin } from "antd";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -76,6 +77,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   }, []);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
@@ -121,17 +123,20 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     if (!validateInputs()) return;
 
     try {
+      setLoading(true);
       const res = await axios.post(`${BACKEND_URL}/api/auth/login`, {
         email,
         password,
       });
-      console.log(res)
+      console.log(res);
 
       setSuccess("Login successful!");
       Cookies.set("token", res.data.token, { expires: 7 });
       navigate("/dashboard");
     } catch (err: any) {
       setError(err?.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -205,8 +210,13 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             />
             <ForgotPassword open={open} handleClose={handleClose} />
 
-            <Button type="submit" fullWidth variant="contained">
-              Sign in
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={loading}
+            >
+              {loading ? <Spin /> : "Sign In"}
             </Button>
 
             <Link
@@ -216,8 +226,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               variant="body2"
               sx={{ alignSelf: "center" }}
             >
-              <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Forgot your password?</span>
-              
+              <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">
+                Forgot your password?
+              </span>
             </Link>
 
             {error && (
@@ -248,13 +259,21 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <Typography sx={{ textAlign: "center" }}>
               Don&apos;t have an account?{" "}
               <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/register"><span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Sign up</span></LinkR>
+                <LinkR to="/register">
+                  <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">
+                    Sign up
+                  </span>
+                </LinkR>
               </Link>
             </Typography>
             <Typography sx={{ textAlign: "center" }}>
               Back to{" "}
               <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/"><span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">Home</span></LinkR>
+                <LinkR to="/">
+                  <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">
+                    Home
+                  </span>
+                </LinkR>
               </Link>
             </Typography>
           </Box>

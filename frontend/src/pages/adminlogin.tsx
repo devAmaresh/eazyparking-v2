@@ -20,6 +20,7 @@ import { styled } from "@mui/material/styles";
 import ForgotPassword from "../components/auth/ForgotPassword";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
+import { Spin } from "antd";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -73,6 +74,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
@@ -118,6 +120,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     if (!validateInputs()) return;
 
     try {
+      setLoading(true);
       const res = await axios.post(`${BACKEND_URL}/api/admin/auth/login`, {
         email,
         password,
@@ -128,6 +131,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       navigate("/admin/dashboard");
     } catch (err: any) {
       setError(err?.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -201,8 +206,13 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             />
             <ForgotPassword open={open} handleClose={handleClose} />
 
-            <Button type="submit" fullWidth variant="contained">
-              Sign in
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={loading}
+            >
+              {loading ? <Spin /> : "Sign in"}
             </Button>
 
             <Link
