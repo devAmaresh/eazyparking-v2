@@ -10,13 +10,13 @@ const router = express.Router();
 router.post("/", auth, async (req, res) => {
   try {
     const {
+      userId,
       parkingLotId,
       vehicleCategory,
       vehicleCompanyName,
       registrationNumber,
       inTime,
     } = req.body;
-    const userId = req.userId;
     const intime = new Date(inTime);
     const result = await prisma.$transaction(async (tx) => {
       // Get the parking lot

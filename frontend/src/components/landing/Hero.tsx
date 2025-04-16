@@ -5,7 +5,7 @@ import { TextGenerateEffect, TextGenerateEffectFast } from "../ui/text-generate-
 
 export default function Hero() {
   return (
-    <section className="pt-32 pb-20 md:pt-40 md:pb-32 bg-gradient-to-b from-gray-50 to-white dark:from-zinc-900 dark:to-black">
+    <section className="pt-32 pb-20 md:pt-40 md:pb-32">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <motion.div

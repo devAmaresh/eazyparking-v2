@@ -5,18 +5,20 @@ import Cookies from "js-cookie";
 import { LoadingOutlined } from "@ant-design/icons";
 import { BACKEND_URL } from "../../utils/backend";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { loadStripe } from "@stripe/stripe-js";
 
 const VehicleForm = ({ parkingLotId }: any) => {
   const [vehicleCategories, setVehicleCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Fetch Vehicle Categories
   const fetchVehicles = async () => {
     try {
+      console.log(BACKEND_URL)
       const response = await axios.get(
         `${BACKEND_URL}/api/admin/category/get-all`,
         {
@@ -36,13 +38,17 @@ const VehicleForm = ({ parkingLotId }: any) => {
     fetchVehicles();
   }, []);
 
-  // Handle form submission
+  
   const handleSubmit = async (values: any) => {
     setLoading(true);
     const formData = { ...values, parkingLotId };
+    console.log(formData);
+  
     try {
+      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY); // Your publishable key
+  
       const response = await axios.post(
-        `${BACKEND_URL}/api/user/book`,
+        `${BACKEND_URL}/api/stripe/create-checkout-session`,
         formData,
         {
           headers: {
@@ -50,18 +56,17 @@ const VehicleForm = ({ parkingLotId }: any) => {
           },
         }
       );
-      console.log("Form submitted successfully:", response.data);
-      toast.success("Vehicle booked successfully!");
-      // Reset form
-      form.resetFields();
-      navigate("/reports");
+  
+      const session = response.data;
+      await stripe?.redirectToCheckout({ sessionId: session.id });
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Failed to book vehicle. Please try again.");
+      console.error("Error during payment session creation:", error);
+      toast.error("Failed to initiate payment. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
 
   // Validation rules
   const validateFutureDate = (_: any, value: any) => {

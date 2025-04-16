@@ -25,6 +25,9 @@ import adminchangePasswordRoute from "./routes/admin/changePassword.js";
 import googleAuthRoute from "./routes/googleAuth.js";
 import getReport from "./routes/user/getReport.js";
 
+import stripeRoutes from "./routes/stripe.js";
+import webhookRouter from "./routes/stripeWebhook.js";
+
 const app = express();
 
 const PORT = 3000;
@@ -41,6 +44,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use("/api/stripe/webhook", webhookRouter);
 
 app.use(express.json());
 app.use("/api/users", userRoutes);
@@ -67,6 +72,10 @@ app.use("/api/user/report", getReport);
 app.use("/api/user/changePassword", changePasswordRoute);
 
 app.use("/api/user/googleAuth", googleAuthRoute);
+
+app.use("/api/stripe", stripeRoutes);
+
+
 
 app.get("/", (req, res) => {
   res.send("Hello, World! pyaaare kushagra");

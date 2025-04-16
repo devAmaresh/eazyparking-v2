@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, PanInfo } from "framer-motion";
-import { ChevronLeft, ChevronRight, Search } from "./Icons"; // Make sure path is correct
+import { ChevronLeft, ChevronRight, Search } from "./Icons";
 import { Skeleton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 interface ParkingSpot {
   id: number;
@@ -244,7 +245,14 @@ const ParkingCard: React.FC<ParkingCardProps> = ({ spot }) => {
         hover:cursor-pointer
         hover:bg-teal-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50"
           onClick={() => {
-            navigate(`/bookings/${spot.id}`);
+            // Check if available slots are greater than 0 before navigating
+            if (spot.availableSlot > 0) {
+              navigate(`/bookings/${spot.id}`);
+            }
+            // If no available slots, show an alert or handle accordingly
+            else {
+              toast.error("No available slots for booking.");
+            }
           }}
         >
           Book Now
