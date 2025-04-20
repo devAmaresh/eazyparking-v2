@@ -19,6 +19,7 @@ import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 import { ThemeContext } from "@/context/ThemeContext";
 import { DownloadIcon } from "lucide-react";
+import CustomTooltip from "./barChart/CustomTooltip";
 
 declare module "jspdf" {
   interface jsPDF {
@@ -286,7 +287,11 @@ const UserData = () => {
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={[
-          <Button key="export" onClick={exportPDF} icon={<DownloadIcon className="w-4 h-4"/>}>
+          <Button
+            key="export"
+            onClick={exportPDF}
+            icon={<DownloadIcon className="w-4 h-4" />}
+          >
             Export PDF
           </Button>,
           <Button key="close" onClick={() => setModalOpen(false)}>
@@ -342,7 +347,7 @@ const UserData = () => {
                   >
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="price" fill="#1677ff" />
                   </BarChart>
                 </ResponsiveContainer>

@@ -20,7 +20,7 @@ const VehicleForm = ({ parkingLotId }: any) => {
     try {
       console.log(BACKEND_URL)
       const response = await axios.get(
-        `${BACKEND_URL}/api/admin/category/get-all`,
+        `${BACKEND_URL}/api/admin/category/`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("token")}`,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Card, Typography } from "antd";
+import { Card, Typography, Skeleton } from "antd";
 import {
   PieChart,
   Pie,
@@ -63,6 +63,7 @@ const monthNames = [
 ];
 
 const DashboardContent: React.FC = () => {
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     totalParkingLots: 0,
     totalBookings: 0,
@@ -116,6 +117,8 @@ const DashboardContent: React.FC = () => {
       } catch (error) {
         toast.error("Failed to fetch dashboard data");
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -139,7 +142,7 @@ const DashboardContent: React.FC = () => {
   };
 
   return (
-    <div className="p-6 min-h-screen bg-white text-black dark:bg-gradient-to-br dark:from-black  dark:to-zinc-900 dark:text-white transition-colors">
+    <div className="p-6 min-h-screen bg-white text-black dark:bg-gradient-to-br dark:from-black dark:to-zinc-900 dark:text-white transition-colors">
       <div className="flex justify-between items-center mb-6">
         <Title level={2} className="!text-black dark:!text-white">
           Admin Dashboard
@@ -148,36 +151,25 @@ const DashboardContent: React.FC = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        <Card className="dark:bg-[#1f1f1f] dark:text-white shadow-md rounded-xl transition-all duration-200 hover:scale-105">
-          <Title level={4} className="!text-inherit">
-            Parking Lots
-          </Title>
-          <p className="text-2xl">{stats.totalParkingLots}</p>
-        </Card>
-        <Card className="dark:bg-[#1f1f1f] dark:text-white shadow-md rounded-xl transition-all duration-200 hover:scale-105">
-          <Title level={4} className="!text-inherit">
-            Bookings
-          </Title>
-          <p className="text-2xl">{stats.totalBookings}</p>
-        </Card>
-        <Card className="dark:bg-[#1f1f1f] dark:text-white shadow-md rounded-xl transition-all duration-200 hover:scale-105">
-          <Title level={4} className="!text-inherit">
-            Vehicles In
-          </Title>
-          <p className="text-2xl">{stats.totalVehiclesIn}</p>
-        </Card>
-        <Card className="dark:bg-[#1f1f1f] dark:text-white shadow-md rounded-xl transition-all duration-200 hover:scale-105">
-          <Title level={4} className="!text-inherit">
-            Vehicles Out
-          </Title>
-          <p className="text-2xl">{stats.totalVehiclesOut}</p>
-        </Card>
-        <Card className="dark:bg-[#1f1f1f] dark:text-white shadow-md rounded-xl transition-all duration-200 hover:scale-105">
-          <Title level={4} className="!text-inherit">
-            History
-          </Title>
-          <p className="text-2xl">{stats.totalVehiclesHistory}</p>
-        </Card>
+        {[
+          { title: "Parking Lots", value: stats.totalParkingLots },
+          { title: "Bookings", value: stats.totalBookings },
+          { title: "Vehicles In", value: stats.totalVehiclesIn },
+          { title: "Vehicles Out", value: stats.totalVehiclesOut },
+          { title: "History", value: stats.totalVehiclesHistory },
+        ].map((item, index) => (
+          <Card
+            key={index}
+            className="dark:bg-[#1f1f1f] dark:text-white shadow-md rounded-xl transition-all duration-200 hover:scale-105"
+          >
+            <Skeleton active loading={loading} paragraph={{ rows: 1 }}>
+              <Title level={4} className="!text-inherit">
+                {item.title}
+              </Title>
+              <p className="text-2xl">{item.value}</p>
+            </Skeleton>
+          </Card>
+        ))}
       </div>
 
       {/* Charts */}
@@ -188,30 +180,31 @@ const DashboardContent: React.FC = () => {
           className="dark:bg-[#1f1f1f] dark:text-white"
           styles={{ header: { color: "inherit" } }}
         >
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={occupancyData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                label={({ name, percent }) =>
-                  `${name} (${(percent * 100).toFixed(0)}%)`
-                }
-              >
-                {occupancyData.map((_, index) => (
-                  <Cell
-                    key={index}
-                    fill={pieColors[index % pieColors.length]}
-                  />
-                ))}
-              </Pie>
-              <Legend />
-              {/* Tooltip removed for PieChart */}
-            </PieChart>
-          </ResponsiveContainer>
+          <Skeleton active loading={loading} paragraph={{ rows: 8 }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={occupancyData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  label={({ name, percent }) =>
+                    `${name} (${(percent * 100).toFixed(0)}%)`
+                  }
+                >
+                  {occupancyData.map((_, index) => (
+                    <Cell
+                      key={index}
+                      fill={pieColors[index % pieColors.length]}
+                    />
+                  ))}
+                </Pie>
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </Skeleton>
         </Card>
 
         {/* Line Chart */}
@@ -220,50 +213,52 @@ const DashboardContent: React.FC = () => {
           className="dark:bg-[#1f1f1f] dark:text-white"
           styles={{ header: { color: "inherit" } }}
         >
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={trendData}>
-              <XAxis
-                dataKey="date"
-                stroke="currentColor"
-                tickFormatter={formatDateToDDMMYYYY}
-              />
-              <YAxis
-                stroke="currentColor"
-                label={{
-                  value: "Vehicle Count",
-                  angle: -90,
-                  position: "insideLeft",
-                  style: { fill: "currentColor" },
-                }}
-              />
-              <Tooltip
-                contentStyle={tooltipStyle}
-                cursor={{ fill: "transparent" }}
-              />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="in"
-                name="Upcoming"
-                stroke="#6366F1" // Indigo
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="out"
-                name="Parked"
-                stroke="#F59E0B" // Amber
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="history"
-                name="Settled"
-                stroke="#10B981" // Emerald
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <Skeleton active loading={loading} paragraph={{ rows: 8 }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={trendData}>
+                <XAxis
+                  dataKey="date"
+                  stroke="currentColor"
+                  tickFormatter={formatDateToDDMMYYYY}
+                />
+                <YAxis
+                  stroke="currentColor"
+                  label={{
+                    value: "Vehicle Count",
+                    angle: -90,
+                    position: "insideLeft",
+                    style: { fill: "currentColor" },
+                  }}
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  cursor={{ fill: "transparent" }}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="in"
+                  name="Upcoming"
+                  stroke="#6366F1"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="out"
+                  name="Parked"
+                  stroke="#F59E0B"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="history"
+                  name="Settled"
+                  stroke="#10B981"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </Skeleton>
         </Card>
 
         {/* Bar Chart */}
@@ -272,30 +267,32 @@ const DashboardContent: React.FC = () => {
           className="dark:bg-[#1f1f1f] dark:text-white"
           styles={{ header: { color: "inherit" } }}
         >
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={earningsData}>
-              <XAxis
-                dataKey="month"
-                stroke="currentColor"
-                tickFormatter={monthTickFormatter}
-              />
-              <YAxis
-                stroke="currentColor"
-                label={{
-                  value: "Earnings (₹)",
-                  angle: -90,
-                  position: "insideLeft",
-                  style: { fill: "currentColor" },
-                }}
-              />
-              <Tooltip
-                contentStyle={tooltipStyle}
-                cursor={{ fill: "transparent" }}
-              />
-              <Legend />
-              <Bar dataKey="earnings" fill="#22D3EE" />
-            </BarChart>
-          </ResponsiveContainer>
+          <Skeleton active loading={loading} paragraph={{ rows: 8 }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={earningsData}>
+                <XAxis
+                  dataKey="month"
+                  stroke="currentColor"
+                  tickFormatter={monthTickFormatter}
+                />
+                <YAxis
+                  stroke="currentColor"
+                  label={{
+                    value: "Earnings (₹)",
+                    angle: -90,
+                    position: "insideLeft",
+                    style: { fill: "currentColor" },
+                  }}
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  cursor={{ fill: "transparent" }}
+                />
+                <Legend />
+                <Bar dataKey="earnings" fill="#22D3EE" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Skeleton>
         </Card>
       </div>
     </div>

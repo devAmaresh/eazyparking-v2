@@ -1,10 +1,18 @@
+import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import AddCategory from "./AddCategory";
 import ManageCategory from "./ManageCategory";
 
-const Profiledata = () => {
+const VehicleCategory = () => {
+  const [activeTab, setActiveTab] = useState("manage");
+
+  const handleCategoryAdded = () => {
+    // Switch to manage tab and toggle refresh trigger
+    setActiveTab("manage");
+  };
+
   return (
-    <Tabs defaultValue="manage" className="w-full p-5">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full p-5">
       <center>
         <TabsList className="bg-zinc-200 dark:bg-zinc-800">
           <TabsTrigger value="manage" className="w-44 hover:cursor-pointer">
@@ -15,11 +23,9 @@ const Profiledata = () => {
           </TabsTrigger>
         </TabsList>
       </center>
-
       <TabsContent value="add">
-        <AddCategory />
+        <AddCategory onCategoryAdded={handleCategoryAdded} />
       </TabsContent>
-
       <TabsContent value="manage">
         <ManageCategory />
       </TabsContent>
@@ -27,4 +33,4 @@ const Profiledata = () => {
   );
 };
 
-export default Profiledata;
+export default VehicleCategory;

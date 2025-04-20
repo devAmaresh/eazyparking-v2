@@ -38,7 +38,7 @@ const VehicleForm = ({ parkingLotId }: any) => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/api/admin/category/get-all`, {
+      const res = await axios.get(`${BACKEND_URL}/api/admin/category/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCategories(res.data);
