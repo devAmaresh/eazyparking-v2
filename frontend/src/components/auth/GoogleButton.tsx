@@ -54,6 +54,7 @@ const GoogleButton = () => {
           onError={errorMessage}
           useOneTap={false}
           theme={theme == "light" ? "outline" : "filled_black"}
+          size={theme == "light" ? "large" : "medium"}
           shape="rectangular"
           auto_select={false}
         />
