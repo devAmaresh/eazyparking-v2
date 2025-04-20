@@ -39,15 +39,22 @@ const GoogleButton = () => {
   };
   const { theme } = useContext(ThemeContext);
   return (
-    <div className="bg-white dark:bg-black">
-      {loading && <Spin fullscreen size="large"
-      tip={<div className="text-lg">Please Wait!</div>} spinning/>}
+    <div className="bg-white dark:bg-[#0C111C]">
+      {loading && (
+        <Spin
+          fullscreen
+          size="large"
+          tip={<div className="text-lg">Please Wait!</div>}
+          spinning
+        />
+      )}
       <center>
         <GoogleLogin
           onSuccess={responseMessage}
           onError={errorMessage}
           useOneTap={false}
           theme={theme == "light" ? "outline" : "filled_black"}
+          shape="pill"
         />
       </center>
     </div>
