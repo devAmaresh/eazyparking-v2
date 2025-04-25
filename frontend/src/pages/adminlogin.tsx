@@ -20,7 +20,7 @@ import { styled } from "@mui/material/styles";
 import ForgotPassword from "../components/auth/ForgotPassword";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
-import { Spin } from "antd";
+import { Spin, Button as AButton } from "antd";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -135,6 +135,26 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       setLoading(false);
     }
   };
+  const [dloading, setDLoading] = React.useState(false);
+  const handleDemoLogin = async () => {
+    setError("");
+    setSuccess("");
+
+    try {
+      setDLoading(true);
+      const res = await axios.post(`${BACKEND_URL}/api/admin/auth/login`, {
+        email: "admin@gmail.com",
+        password: "12345678",
+      });
+      setSuccess("Login successful!");
+      Cookies.set("adminToken", res.data.token, { expires: 7 });
+      navigate("/admin/dashboard");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Login failed");
+    } finally {
+      setDLoading(false);
+    }
+  };
 
   return (
     <AppTheme {...props}>
@@ -214,6 +234,17 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             >
               {loading ? <Spin /> : "Sign in"}
             </Button>
+
+            <AButton
+              onClick={handleDemoLogin}
+              size="large"
+              loading={dloading}
+              disabled={dloading}
+            >
+              <span className="font-[500]" style={{ fontSize: "0.875rem" }}>
+                Demo Login
+              </span>
+            </AButton>
 
             <Link
               component="button"
