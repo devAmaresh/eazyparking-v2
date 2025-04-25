@@ -253,6 +253,14 @@ const Profile = () => {
                     required: true,
                     message: "Please input your mobile number",
                   },
+                  {
+                    pattern: /^\d+$/,
+                    message: "Mobile number must be digits only",
+                  },
+                  {
+                    len: 10,
+                    message: "Mobile number must be 10 digits long",
+                  },
                 ]}
               >
                 <Input />
