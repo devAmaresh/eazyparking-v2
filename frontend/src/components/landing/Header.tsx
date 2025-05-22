@@ -13,9 +13,7 @@ interface HeaderProps {
 export default function Header({ isMobile }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const handleLogout = () => {
-    navigate("/logout");
-  };
+  const [scrolled, setScrolled] = useState<boolean>(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -23,145 +21,160 @@ export default function Header({ isMobile }: HeaderProps) {
     setIsLoggedIn(!!token);
   }, [location]); // re-check login status on route change
 
+  // Add scroll listener to detect when page is scrolled
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 20;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [scrolled]);
+
   const isActive = (targetPath: string) => location.hash === targetPath;
   const toggleMenu = (): void => setIsMenuOpen(!isMenuOpen);
   const navigate = useNavigate();
 
   return (
-    <header className="px-12 fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-black/10 border-b border-gray-200 dark:border-gray-700 shadow-md backdrop-blur-3xl transition-colors duration-300">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold tracking-tighter">
-          EAZY<span className="text-gray-500">PARKING</span>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/70 dark:bg-black/70 backdrop-blur-xl shadow-md border-b border-gray-100/50 dark:border-gray-800/50 py-3"
+          : "bg-white/40 dark:bg-black/30 backdrop-blur-sm py-5"
+      }`}
+    >
+      <div className="container mx-auto px-6 sm:px-8 flex justify-between items-center">
+        <Link
+          to="/"
+          className="text-2xl font-bold tracking-tighter text-black dark:text-white"
+        >
+          EAZY
+          <span className="bg-gradient-to-r from-blue-600 to-violet-600 dark:from-blue-400 dark:to-violet-400 bg-clip-text text-transparent font-extrabold">
+            PARKING
+          </span>
         </Link>
 
         {isMobile ? (
-          <button onClick={toggleMenu} className="p-2">
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          <button
+            onClick={toggleMenu}
+            className="p-2 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         ) : (
-          <nav className="flex items-center space-x-8">
-            <Link
-              smooth
-              to="#features"
-              className={`text-sm font-medium hover:text-gray-600 ${
-                isActive("#features")
-                  ? "text-blue-600"
-                  : "text-black dark:text-white"
-              }`}
-            >
-              Features
-            </Link>
-            <Link
-              smooth
-              to="#locations"
-              className={`text-sm font-medium hover:text-gray-600 ${
-                isActive("#locations")
-                  ? "text-blue-600"
-                  : "text-black dark:text-white"
-              }`}
-            >
-              Locations
-            </Link>
-            <Link
-              smooth
-              to="#testimonials"
-              className={`text-sm font-medium hover:text-gray-600 ${
-                isActive("#testimonials")
-                  ? "text-blue-600"
-                  : "text-black dark:text-white"
-              }`}
-            >
-              Testimonials
-            </Link>
-            <Link
-              smooth
-              to="#contact"
-              className={`text-sm font-medium hover:text-gray-600 ${
-                isActive("#contact")
-                  ? "text-blue-600"
-                  : "text-black dark:text-white"
-              }`}
-            >
-              Contact
-            </Link>
-
-            {isLoggedIn ? (
-              <Button
-                onClick={() => {
-                  navigate("/dashboard");
-                }}
-                className=""
-              >
-                Dashboard
-              </Button>
-            ) : (
-              <div className="flex space-x-4">
-                <Button  className="">
-                  <Link to="/login"
-                  >Login</Link>
-                  
-                </Button>
-                <Button
-                  asChild
-                  
+          <nav className="flex items-center space-x-1 sm:space-x-2">
+            {["features", "locations", "testimonials", "contact"].map(
+              (item) => (
+                <Link
+                  key={item}
+                  smooth
+                  to={`#${item}`}
+                  className={`px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
+                    isActive(`#${item}`)
+                      ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                      : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                  }`}
                 >
-                  <Link to="/admin/login">Admin Login</Link>
-                </Button>
-              </div>
+                  {item.charAt(0).toUpperCase() + item.slice(1)}
+                </Link>
+              )
             )}
+
+            <div className="ml-2 pl-2 border-l border-gray-200 dark:border-gray-700">
+              {isLoggedIn ? (
+                <Button
+                  onClick={() => navigate("/dashboard")}
+                  className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-full px-5 py-2 text-sm font-medium shadow-sm hover:shadow transition-all duration-200"
+                >
+                  Dashboard
+                </Button>
+              ) : (
+                <div className="flex space-x-2">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="rounded-full border-2 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 px-4 py-1.5 text-sm font-medium transition-all duration-200"
+                  >
+                    <Link to="/login">Login</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 dark:from-blue-500 dark:to-violet-500 text-white rounded-full px-4 py-1.5 text-sm font-medium shadow-sm hover:shadow transition-all duration-200"
+                  >
+                    <Link to="/admin/login">Admin</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
           </nav>
         )}
       </div>
 
       {isMobile && isMenuOpen && (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg dark:bg-zinc-900 dark:border-gray-700"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.3 }}
+          className="border-t border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-black/95 backdrop-blur-xl shadow-lg"
         >
-          <nav className="flex flex-col py-4 px-4">
-            <Link
-              to="#features"
-              className="py-3 text-sm font-medium hover:text-gray-600 transition-colors"
-            >
-              Features
-            </Link>
-            <Link
-              to="#locations"
-              className="py-3 text-sm font-medium hover:text-gray-600 transition-colors"
-            >
-              Locations
-            </Link>
-            <Link
-              to="#testimonials"
-              className="py-3 text-sm font-medium hover:text-gray-600 transition-colors"
-            >
-              Testimonials
-            </Link>
-            <Link
-              to="#contact"
-              className="py-3 text-sm font-medium hover:text-gray-600 transition-colors"
-            >
-              Contact
-            </Link>
+          <nav className="flex flex-col py-3 px-6 space-y-1">
+            {["features", "locations", "testimonials", "contact"].map(
+              (item) => (
+                <Link
+                  key={item}
+                  to={`#${item}`}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`py-3 px-4 text-sm font-medium rounded-lg transition-colors ${
+                    isActive(`#${item}`)
+                      ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                  }`}
+                >
+                  {item.charAt(0).toUpperCase() + item.slice(1)}
+                </Link>
+              )
+            )}
 
-            <div className="flex flex-col space-y-2 mt-4">
+            <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-800 grid gap-2">
               {isLoggedIn ? (
                 <Button
-                  onClick={handleLogout}
-                  className="w-full"
+                  onClick={() => {
+                    navigate("/dashboard");
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg py-3 font-medium shadow-sm"
                 >
-                  Logout
+                  Dashboard
                 </Button>
               ) : (
                 <>
-                  <Button asChild size={"lg"}>
-                <Link to="/login"> Login</Link>
-              </Button>
-              <Button asChild size={"lg"}>
-                <Link to="/admin/login">Admin Login</Link>
-              </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full rounded-lg border-2 border-gray-200 dark:border-gray-700 py-3 font-medium"
+                  >
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                      Login
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 dark:from-blue-500 dark:to-violet-500 text-white rounded-lg py-3 font-medium shadow-sm"
+                  >
+                    <Link
+                      to="/admin/login"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Admin Login
+                    </Link>
+                  </Button>
                 </>
               )}
             </div>
