@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Table, Input, Space, Button } from 'antd';
-import type { InputRef, TableColumnType } from 'antd';
-import type { FilterDropdownProps } from 'antd/es/table/interface';
-import { SearchOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-hot-toast';
 import { BACKEND_URL } from '@/utils/backend';
+import { VehicleTableLayout, StatusBadge } from './VehicleTableLayout';
+import { format, formatDistance } from 'date-fns';
+
+// Icons
+import { Car, Calendar, User, FileText, Clock } from 'lucide-react';
 
 interface InVehicleType {
   id: string;
@@ -17,15 +17,12 @@ interface InVehicleType {
   inTime: string;
 }
 
-type DataIndex = keyof InVehicleType;
-
 const InVehicle: React.FC = () => {
   const [data, setData] = useState<InVehicleType[]>([]);
+  const [filteredData, setFilteredData] = useState<InVehicleType[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [searchText, setSearchText] = useState('');
-  const [searchedColumn, setSearchedColumn] = useState('');
-  const searchInput = useRef<InputRef>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchInVehicles = async () => {
     const token = Cookies.get('adminToken');
@@ -42,6 +39,7 @@ const InVehicle: React.FC = () => {
         },
       });
       setData(response.data);
+      setFilteredData(response.data);
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Failed to fetch in vehicles';
       setError(msg);
@@ -52,116 +50,148 @@ const InVehicle: React.FC = () => {
     }
   };
 
-
-
   useEffect(() => {
     fetchInVehicles();
   }, []);
 
-  const handleSearch = (selectedKeys: string[], confirm: any, dataIndex: DataIndex) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = data.filter(
+        (vehicle) =>
+          vehicle.parkingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          vehicle.ownerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          vehicle.registrationNumber.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+  }, [searchQuery, data]);
+
+  // Format date with relative time
+  const formatInTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    
+    try {
+      // If it's in the future, show how far away
+      if (date > now) {
+        return (
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">
+              {format(date, 'MMM dd, yyyy h:mm a')}
+            </span>
+            <span className="text-xs text-muted-foreground mt-0.5">
+              {formatDistance(date, now, { addSuffix: true })}
+            </span>
+          </div>
+        );
+      } else {
+        // If it's in the past
+        return (
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">
+              {format(date, 'MMM dd, yyyy h:mm a')}
+            </span>
+            <span className="text-xs text-destructive mt-0.5">
+              {formatDistance(now, date, { addSuffix: true })}
+            </span>
+          </div>
+        );
+      }
+    } catch (e) {
+      return dateString;
+    }
   };
 
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    setSearchText('');
-  };
-
-  const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<InVehicleType> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }: FilterDropdownProps) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0] as string}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-          style={{ marginBottom: 8, display: 'block' }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Search
-          </Button>
-          <Button onClick={() => clearFilters && handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-            Reset
-          </Button>
-          <Button type="link" size="small" onClick={() => close()}>
-            Close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex]?.toString().toLowerCase().includes((value as string).toLowerCase()),
-    render: (text: string) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ''}
-        />
-      ) : (
-        text
-      ),
-  });
-
-  const columns: TableColumnType<InVehicleType>[] = [
+  const columns = [
     {
-      title: 'S.NO',
-      dataIndex: 'index',
       key: 'index',
-      render: (_text, _record, index) => index + 1,
+      header: '#',
+      cell: (_: any, index: number) => (
+        <div className="font-medium text-muted-foreground">{index + 1}</div>
+      ),
     },
     {
-      title: 'Parking Number',
-      dataIndex: 'parkingNumber',
       key: 'parkingNumber',
-      ...getColumnSearchProps('parkingNumber'),
+      header: (
+        <div className="flex items-center gap-2">
+          <FileText className="h-4 w-4 text-primary" />
+          <span>Parking Number</span>
+        </div>
+      ),
+      cell: (item: InVehicleType) => (
+        <div className="font-medium">{item.parkingNumber}</div>
+      ),
     },
     {
-      title: 'Owner Name',
-      dataIndex: 'ownerName',
       key: 'ownerName',
-      ...getColumnSearchProps('ownerName'),
+      header: (
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-primary" />
+          <span>Owner</span>
+        </div>
+      ),
+      cell: (item: InVehicleType) => <div>{item.ownerName}</div>,
     },
     {
-      title: 'Vehicle Reg Number',
-      dataIndex: 'registrationNumber',
       key: 'registrationNumber',
-      ...getColumnSearchProps('registrationNumber'),
+      header: (
+        <div className="flex items-center gap-2">
+          <Car className="h-4 w-4 text-primary" />
+          <span>Reg. Number</span>
+        </div>
+      ),
+      cell: (item: InVehicleType) => (
+        <div className="font-mono">{item.registrationNumber}</div>
+      ),
     },
     {
-      title: 'In Date',
-      dataIndex: 'inTime',
       key: 'inTime',
-      render: (inTime) => new Date(inTime).toLocaleString(),
+      header: (
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-primary" />
+          <span>Arrival Time</span>
+        </div>
+      ),
+      cell: (item: InVehicleType) => formatInTime(item.inTime),
+    },
+    {
+      key: 'status',
+      header: (
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-primary" />
+          <span>Status</span>
+        </div>
+      ),
+      cell: (item: InVehicleType) => {
+        const arrivalDate = new Date(item.inTime);
+        const now = new Date();
+        
+        return (
+          <StatusBadge 
+            status={arrivalDate > now ? "upcoming" : "parked"} 
+            text={arrivalDate > now ? "Upcoming" : "Due for Arrival"} 
+          />
+        );
+      },
     },
   ];
 
   return (
-    <div>
-
-      <Table
-        columns={columns}
-        dataSource={data}
-        rowKey="id"
-        loading={loading}
-        bordered
-      />
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-    </div>
+    <VehicleTableLayout
+      title="Upcoming Vehicles"
+      subtitle="View all vehicles that are due for arrival"
+      icon={<Car className="h-5 w-5 text-primary" />}
+      data={filteredData}
+      columns={columns}
+      loading={loading}
+      error={error}
+      onSearch={setSearchQuery}
+      searchQuery={searchQuery}
+      onRefresh={fetchInVehicles}
+      emptyMessage="No upcoming vehicles found"
+    />
   );
 };
 

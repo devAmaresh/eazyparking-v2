@@ -9,8 +9,7 @@ dotenv.config();
 // Add Parking Lot Route
 router.post("/", auth, async (req, res) => {
   try {
-    if (!req.isAdmin) 
-      return res.status(403).json({ message: "Access denied" });
+    if (!req.isAdmin) return res.status(403).json({ message: "Access denied" });
 
     const { location, imgUrl, totalSlot, price } = req.body;
     const parkingLot = await prisma.parkingLot.create({
@@ -33,8 +32,7 @@ router.post("/", auth, async (req, res) => {
 // patch request to update parking lot details
 router.patch("/:id", auth, async (req, res) => {
   try {
-    if (!req.isAdmin) 
-      return res.status(403).json({ message: "Access denied" });
+    if (!req.isAdmin) return res.status(403).json({ message: "Access denied" });
 
     const { location, imgUrl, totalSlot, price } = req.body;
     const parkingLot = await prisma.parkingLot.update({
@@ -55,3 +53,31 @@ router.patch("/:id", auth, async (req, res) => {
   }
 });
 export default router;
+
+//delete parking lot
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    if (!req.isAdmin) return res.status(403).json({ message: "Access denied" });
+
+    //check whether the integrity is maintained or not
+    const bookings = await prisma.booking.findMany({
+      where: {
+        parkingLotId: req.params.id,
+      },
+    });
+    if (bookings.length > 0) {
+      return res
+        .status(400)
+        .json({ message: "Cannot delete parking lot with bookings" });
+    }
+    const parkingLot = await prisma.parkingLot.delete({
+      where: {
+        id: req.params.id,
+      },
+    });
+    res.status(200).json(parkingLot);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});

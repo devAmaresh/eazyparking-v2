@@ -1,11 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { CssBaseline } from "@mui/material";
-import {
-  createTheme,
-  ThemeProvider as MuiThemeProvider,
-} from "@mui/material/styles";
-
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
 import ThemeSwitcher from "./components/ThemeSwitcher";
 import { ThemeContext, ThemeProvider } from "./context/ThemeContext";
 
@@ -24,21 +18,15 @@ import { ConfigProvider, theme as antdtheme } from "antd";
 import { Toaster } from "react-hot-toast";
 import NotFound from "./pages/NotFound";
 import AdminRoutes from "./pages/admin/AdminRoutes";
+import { DarkModeFix } from "./components/ui/dark-mode-fix";
+
+
 const AppContent = () => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
-  const muiTheme = useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: isDark ? "dark" : "light",
-        },
-      }),
-    [isDark]
-  );
+  
 
   return (
-    <MuiThemeProvider theme={muiTheme}>
       <ConfigProvider
         theme={
           theme == "dark"
@@ -57,8 +45,9 @@ const AppContent = () => {
             },
           }}
         />
-        <CssBaseline />
+
         <ThemeSwitcher />
+        <DarkModeFix />
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -74,7 +63,14 @@ const AppContent = () => {
             />
             <Route path="/admin/login" element={<AdminLogin />} />
 
-            <Route path="/admin/*" element={<AdminRoutes />} />
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedRoute redirectPath="/admin/login">
+                  <AdminRoutes />
+                </ProtectedRoute>
+              }
+            />
 
             <Route path="/logout" element={<Logout />} />
             <Route path="*" element={<NotFound />} />
@@ -113,7 +109,6 @@ const AppContent = () => {
           </Routes>
         </Router>
       </ConfigProvider>
-    </MuiThemeProvider>
   );
 };
 

@@ -1,13 +1,21 @@
-const CustomTooltip = ({ active, payload, label }: any) => {
+import React from 'react';
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: any[];
+  label?: string;
+}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-md p-2 text-sm shadow-lg bg-white text-zinc-800 dark:bg-zinc-900 dark:text-white border dark:border-zinc-700">
+      <div className="bg-card p-2 border rounded-md shadow-md text-sm">
         <p className="font-medium">{label}</p>
-        <p>Price: ₹{payload[0].value}</p>
+        <p className="text-primary">₹{payload[0].value}</p>
       </div>
     );
   }
-
   return null;
 };
+
 export default CustomTooltip;

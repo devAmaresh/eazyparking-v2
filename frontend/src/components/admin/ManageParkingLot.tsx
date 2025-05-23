@@ -1,13 +1,59 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { Table, Spin, Input, Button, Space, Tag, Modal, Form } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
-import type { InputRef, TableColumnsType, TableColumnType } from "antd";
-import type { FilterDropdownProps } from "antd/es/table/interface";
-import Highlighter from "react-highlight-words";
 import { BACKEND_URL } from "@/utils/backend";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
+
+// ShadCN UI Components
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+// Icons
+import {
+  Pencil,
+  Search,
+  Loader2,
+  ParkingSquare,
+  ArrowUpDown,
+  RotateCcw,
+  Trash2,
+} from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ParkingLot = {
   id: string;
@@ -18,335 +64,521 @@ type ParkingLot = {
   price: number;
 };
 
-type DataIndex = keyof ParkingLot;
+// Form validation schema
+const parkingLotSchema = z.object({
+  location: z
+    .string()
+    .min(3, { message: "Location must be at least 3 characters" }),
+  imgUrl: z.string().url({ message: "Please enter a valid image URL" }),
+  totalSlot: z.coerce
+    .number()
+    .positive({ message: "Total slots must be a positive number" }),
+  price: z.coerce
+    .number()
+    .nonnegative({ message: "Price must be zero or positive" }),
+});
+
+type ParkingLotFormValues = z.infer<typeof parkingLotSchema>;
 
 const ManageParkingLot = () => {
-  const token = Cookies.get("adminToken");
   const [parkingLots, setParkingLots] = useState<ParkingLot[]>([]);
+  const [filteredLots, setFilteredLots] = useState<ParkingLot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchText, setSearchText] = useState("");
-  const [searchedColumn, setSearchedColumn] = useState("");
-  const [editingParkingLot, setEditingParkingLot] = useState<ParkingLot | null>(
-    null
-  );
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedLot, setSelectedLot] = useState<ParkingLot | null>(null);
+  const [updating, setUpdating] = useState(false);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const searchInput = useRef<InputRef>(null);
+  // Initialize form
+  const form = useForm<ParkingLotFormValues>({
+    resolver: zodResolver(parkingLotSchema),
+    defaultValues: {
+      location: "",
+      imgUrl: "",
+      totalSlot: 1,
+      price: 0,
+    },
+  });
 
   useEffect(() => {
-    const fetchParkingLots = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(
-          `${BACKEND_URL}/api/user/getParkings`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setParkingLots(response.data);
-      } catch (error) {
-        console.error("Error fetching parking lots:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchParkingLots();
   }, []);
 
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: FilterDropdownProps["confirm"],
-    dataIndex: DataIndex
-  ) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-  };
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = parkingLots.filter((lot) =>
+        lot.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredLots(filtered);
+    } else {
+      setFilteredLots(parkingLots);
+    }
+  }, [searchQuery, parkingLots]);
 
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    setSearchText("");
-  };
-
-  const getColumnSearchProps = (
-    dataIndex: DataIndex
-  ): TableColumnType<ParkingLot> => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-      close,
-    }) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() =>
-            handleSearch(selectedKeys as string[], confirm, dataIndex)
-          }
-          style={{ marginBottom: 8, display: "block" }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() =>
-              handleSearch(selectedKeys as string[], confirm, dataIndex)
-            }
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              confirm({ closeDropdown: false });
-              setSearchText((selectedKeys as string[])[0]);
-              setSearchedColumn(dataIndex);
-            }}
-          >
-            Filter
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              close();
-            }}
-          >
-            Close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        ?.toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase()),
-    filterDropdownProps: {
-      onOpenChange(open) {
-        if (open) {
-          setTimeout(() => searchInput.current?.select(), 100);
-        }
-      },
-    },
-    render: (text: string) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      ),
-  });
-
-  const columns: TableColumnsType<ParkingLot> = [
-    {
-      title: "Image",
-      dataIndex: "imgUrl",
-      key: "imgUrl",
-      render: (url: string) => (
-        <div className="flex justify-center items-center">
-          <img
-            src={url}
-            alt="parking"
-            style={{ width: 100, height: 100, borderRadius: 8 }}
-          />
-        </div>
-      ),
-    },
-
-    {
-      title: "Location",
-      dataIndex: "location",
-      key: "location",
-      ...getColumnSearchProps("location"),
-    },
-    {
-      title: "Total Slots",
-      dataIndex: "totalSlot",
-      key: "totalSlot",
-      sorter: (a, b) => a.totalSlot - b.totalSlot,
-    },
-    {
-      title: "Booked Slot",
-      dataIndex: "bookedSlot",
-      key: "bookedSlot",
-      render: (booked, record) => (
-        <Tag
-          color={
-            booked >= 0.9 * record.totalSlot
-              ? "red"
-              : booked >= 0.6 * record.totalSlot
-              ? "gold"
-              : "green"
-          }
-        >
-          {booked}/{record.totalSlot}
-        </Tag>
-      ),
-      sorter: (a, b) => a.bookedSlot - b.bookedSlot,
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-      render: (price: number) => `₹${price}`,
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <a onClick={() => editParkingLot(record)} style={{ color: "#1677ff" }}>
-          Edit
-        </a>
-      ),
-    },
-  ];
-
-  const editParkingLot = (record: ParkingLot) => {
-    setEditingParkingLot(record);
-    setIsModalVisible(true);
-  };
-  const [updating, setUpdating] = useState(false);
-  const handleOk = async () => {
-    if (editingParkingLot) {
-      try {
-        setUpdating(true);
-        const response = await axios.patch(
-          `${BACKEND_URL}/api/admin/addParkingLot/${editingParkingLot.id}`,
-          editingParkingLot,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (response.status === 200) {
-          setParkingLots((prev) =>
-            prev.map((lot) =>
-              lot.id === editingParkingLot.id ? response.data : lot
-            )
-          );
-          setIsModalVisible(false);
-          toast.success("Parking lot updated successfully!");
-        }
-      } catch (error) {
-        console.error("Error updating parking lot:", error);
-      } finally {
-        setUpdating(false);
+  const fetchParkingLots = async () => {
+    try {
+      setLoading(true);
+      const token = Cookies.get("adminToken");
+      if (!token) {
+        toast.error("Authentication token not found");
+        return;
       }
-    }
-  };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (editingParkingLot) {
-      setEditingParkingLot({
-        ...editingParkingLot,
-        [e.target.name]: e.target.value,
+      const response = await axios.get(`${BACKEND_URL}/api/user/getParkings`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+      setParkingLots(response.data);
+      setFilteredLots(response.data);
+    } catch (error) {
+      console.error("Error fetching parking lots:", error);
+      toast.error("Failed to load parking lots");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const editParkingLot = (lot: ParkingLot) => {
+    setSelectedLot(lot);
+    form.reset({
+      location: lot.location,
+      imgUrl: lot.imgUrl,
+      totalSlot: lot.totalSlot,
+      price: lot.price,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const onSubmit = async (values: ParkingLotFormValues) => {
+    if (!selectedLot) return;
+
+    const token = Cookies.get("adminToken");
+    if (!token) {
+      toast.error("Authentication token not found");
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      const response = await axios.patch(
+        `${BACKEND_URL}/api/admin/addParkingLot/${selectedLot.id}`,
+        values,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setParkingLots((prev) =>
+        prev.map((lot) =>
+          lot.id === selectedLot.id ? { ...response.data } : lot
+        )
+      );
+
+      setIsEditDialogOpen(false);
+      toast.success("Parking lot updated successfully!");
+    } catch (error) {
+      console.error("Error updating parking lot:", error);
+      toast.error("Failed to update parking lot");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDelete = (lot: ParkingLot) => {
+    setSelectedLot(lot);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedLot) return;
+
+    const token = Cookies.get("adminToken");
+    if (!token) {
+      toast.error("Authentication token not found");
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      await axios.delete(
+        `${BACKEND_URL}/api/admin/addParkingLot/${selectedLot.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setParkingLots((prev) => prev.filter((lot) => lot.id !== selectedLot.id));
+      setFilteredLots((prev) =>
+        prev.filter((lot) => lot.id !== selectedLot.id)
+      );
+
+      setIsDeleteDialogOpen(false);
+      toast.success("Parking lot deleted successfully!");
+    } catch (error: any) {
+      console.error("Error deleting parking lot:", error);
+      toast.error(
+        "Failed to delete parking lot " + error?.response?.data?.message
+      );
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      // Toggle direction if already sorting by this column
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new sort column and default to ascending
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+
+    // Sort the data
+    const sorted = [...filteredLots].sort((a: any, b: any) => {
+      if (column === "location") {
+        return sortDirection === "asc"
+          ? a.location.localeCompare(b.location)
+          : b.location.localeCompare(a.location);
+      } else {
+        return sortDirection === "asc"
+          ? a[column] - b[column]
+          : b[column] - a[column];
+      }
+    });
+
+    setFilteredLots(sorted);
   };
 
   return (
-    <div style={{ padding: 24 }}>
-      {loading ? (
-        <div style={{ textAlign: "center", marginTop: 50 }}>
-          <Spin size="large" tip="Loading Parking Lots" />
-        </div>
-      ) : (
-        <Table
-          columns={columns}
-          dataSource={parkingLots}
-          rowKey="id"
-          bordered
-          pagination={{ pageSize: 5 }}
-        />
-      )}
+    <Card className="border shadow-sm">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <CardTitle className="text-2xl flex items-center gap-2">
+              <ParkingSquare className="h-6 w-6 text-primary" />
+              Manage Parking Lots
+            </CardTitle>
+            <CardDescription>
+              View and edit all parking locations in your system
+            </CardDescription>
+          </div>
 
-      <Modal
-        title="Edit Parking Lot"
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={[
-          <Button key="Cancel" onClick={handleCancel}>
-            Cancel
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            loading={updating}
-            disabled={updating}
-            onClick={handleOk}
-          >
-            Submit
-          </Button>,
-        ]}
-      >
-        {editingParkingLot && (
-          <Form layout="vertical">
-            <Form.Item label="Location">
+          <div className="flex gap-2 w-full sm:w-auto">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                placeholder="Search locations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 w-full"
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={fetchParkingLots}
+              className="flex-shrink-0"
+              title="Refresh"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <div className="rounded-md border overflow-hidden">
+          {loading ? (
+            <div className="p-4 space-y-5">
+              {Array(3)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <Skeleton className="h-20 w-20 rounded-md" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                    <Skeleton className="h-8 w-20" />
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/50">
+                  <TableRow>
+                    <TableHead className="w-[100px]">Image</TableHead>
+                    <TableHead>
+                      <div
+                        className="flex items-center gap-1 cursor-pointer"
+                        onClick={() => handleSort("location")}
+                      >
+                        Location
+                        <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <div
+                        className="flex items-center justify-center gap-1 cursor-pointer"
+                        onClick={() => handleSort("totalSlot")}
+                      >
+                        Total Slots
+                        <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <div
+                        className="flex items-center justify-center gap-1 cursor-pointer"
+                        onClick={() => handleSort("bookedSlot")}
+                      >
+                        Occupancy
+                        <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <div
+                        className="flex items-center justify-center gap-1 cursor-pointer"
+                        onClick={() => handleSort("price")}
+                      >
+                        Price
+                        <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredLots.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={6}
+                        className="text-center py-8 text-muted-foreground"
+                      >
+                        {searchQuery
+                          ? "No matching parking lots found"
+                          : "No parking lots available"}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredLots.map((lot) => (
+                      <TableRow
+                        key={lot.id}
+                        className="group hover:bg-muted/50"
+                      >
+                        <TableCell>
+                          <img
+                            src={lot.imgUrl}
+                            alt={lot.location}
+                            className="w-16 h-16 object-cover rounded-md"
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {lot.location}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {lot.totalSlot}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Badge
+                            variant={
+                              lot.bookedSlot >= 0.9 * lot.totalSlot
+                                ? "destructive"
+                                : lot.bookedSlot >= 0.6 * lot.totalSlot
+                                ? "secondary"
+                                : "outline"
+                            }
+                            className={`font-medium text-black ${
+                              lot.bookedSlot >= 0.9 * lot.totalSlot
+                                ? "bg-red-300/80"
+                                : lot.bookedSlot >= 0.6 * lot.totalSlot
+                                ? "bg-yellow-300/80"
+                                : "bg-green-300/80"
+                            }`}
+                          >
+                            {lot.bookedSlot}/{lot.totalSlot}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          ₹{lot.price}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => editParkingLot(lot)}
+                              className="opacity-70 group-hover:opacity-100"
+                            >
+                              <Pencil className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(lot)}
+                              className="opacity-70 hover:cursor-pointer flex justify-center items-center group-hover:opacity-100 text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                             
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
+      </CardContent>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Parking Lot</DialogTitle>
+            <DialogDescription>
+              Update the details for {selectedLot?.location}
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-5 py-2"
+            >
+              <FormField
+                control={form.control}
                 name="location"
-                value={editingParkingLot.location}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </Form.Item>
-            <Form.Item label="Image URL">
-              <Input
+
+              <FormField
+                control={form.control}
                 name="imgUrl"
-                value={editingParkingLot.imgUrl}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image URL</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </Form.Item>
-            <Form.Item label="Total Slots">
-              <Input
-                type="number"
+
+              <FormField
+                control={form.control}
                 name="totalSlot"
-                value={editingParkingLot.totalSlot}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Total Slots</FormLabel>
+                    <FormControl>
+                      <Input type="number" min={1} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </Form.Item>
-            <Form.Item label="Price">
-              <Input
-                type="number"
+
+              <FormField
+                control={form.control}
                 name="price"
-                value={editingParkingLot.price}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price (₹ per hour)</FormLabel>
+                    <FormControl>
+                      <Input type="number" min={0} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </Form.Item>
+
+              <DialogFooter className="pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}
+                  disabled={updating}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={updating} className="ml-2">
+                  {updating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
           </Form>
-        )}
-      </Modal>
-    </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Parking Lot</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the parking lot "
+              {selectedLot?.location}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={updating}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={updating}
+              className="ml-2"
+              onClick={confirmDelete}
+            >
+              {updating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Parking Lot"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
   );
 };
 

@@ -118,6 +118,91 @@ body {
     --sidebar-ring: oklch(0.556 0 0);
 }
 
+
+.dark [data-radix-select-content] {
+  --select-content-bg: oklch(0.205 0 0);
+  --select-content-border: oklch(1 0 0 / 10%);
+  --select-content-text: oklch(0.985 0 0);
+  --select-item-hover-bg: oklch(0.269 0 0);
+  --select-item-hover-text: oklch(0.985 0 0);
+  
+  background-color: var(--select-content-bg) !important;
+  border-color: var(--select-content-border) !important;
+  color: var(--select-content-text) !important;
+}
+
+.dark [data-radix-select-item][data-highlighted] {
+  background-color: var(--select-item-hover-bg) !important;
+  color: var(--select-item-hover-text) !important;
+}
+
+.dark [data-radix-dialog-content] {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+  color: var(--card-foreground) !important;
+}
+
+/* More aggressive fixes for dark mode components */
+.dark [data-radix-select-content],
+.dark div[data-radix-popper-content-wrapper] [role="listbox"] {
+  background-color: hsl(220, 30%, 10%) !important;
+  border-color: hsl(220, 30%, 15%) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark [data-radix-select-viewport] [role="option"],
+.dark div[data-radix-popper-content-wrapper] [role="option"] {
+  color: white !important;
+}
+
+.dark [data-radix-select-item][data-highlighted],
+.dark [data-radix-select-viewport] [role="option"][data-highlighted],
+.dark div[data-radix-popper-content-wrapper] [role="option"][data-highlighted] {
+  background-color: hsl(220, 30%, 15%) !important;
+  color: white !important;
+}
+
+.dark [data-radix-dialog-content],
+.dark [role="dialog"] {
+  background-color: hsl(220, 30%, 10%) !important;
+  border-color: hsl(220, 30%, 15%) !important;
+  color: white !important;
+}
+
+/* Fix for Dialog Overlay */
+.dark [data-radix-dialog-overlay] {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Fix for Select dropdown arrow */
+.dark [data-radix-select-trigger] svg,
+
+
+/* General fix for any popovers (including context menus) */
+.dark [data-radix-popper-content-wrapper] [role="menu"],
+.dark [data-radix-popper-content-wrapper] [role="dialog"],
+.dark [data-radix-popper-content-wrapper] [data-radix-menu-content] {
+  background-color: hsl(220, 30%, 10%) !important;
+  border-color: hsl(220, 30%, 15%) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+
+.dark [role="dialog"] {
+  background-color: hsl(220, 30%, 10%) !important;
+  border-color: hsl(220, 30%, 15%) !important;
+}
+
+/* Fix for any potential icons or decorations */
+.dark [role="dialog"] svg,
+.dark [role="listbox"] svg,
+.dark [role="menu"] svg,
+.dark [role="combobox"] svg {
+  color: white !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

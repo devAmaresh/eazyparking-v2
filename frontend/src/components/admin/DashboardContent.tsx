@@ -4,14 +4,12 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip,
   Legend,
-  LineChart,
-  Line,
   CartesianGrid,
 } from "recharts";
 import axios from "axios";
@@ -28,6 +26,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { BarChart } from "@/components/ui/bar-chart";
 
 // icons
 import {
@@ -68,6 +67,12 @@ interface EarningsDataItem {
   earnings: number;
 }
 
+interface BarChartData {
+  name: string;
+  value: number;
+  color?: string;
+}
+
 const monthNames = [
   "Jan",
   "Feb",
@@ -96,6 +101,9 @@ const DashboardContent: React.FC = () => {
   const [occupancyData, setOccupancyData] = useState<OccupancyDataItem[]>([]);
   const [trendData, setTrendData] = useState<TrendDataItem[]>([]);
   const [earningsData, setEarningsData] = useState<EarningsDataItem[]>([]);
+  const [formattedEarningsData, setFormattedEarningsData] = useState<
+    BarChartData[]
+  >([]);
 
   // Modern color palette
   const pieColors = ["#6366F1", "#F97316", "#06B6D4"];
@@ -104,7 +112,7 @@ const DashboardContent: React.FC = () => {
     out: "#EC4899",
     history: "#10B981",
   };
-
+  const barColor = "#0EA5E9";
 
   useEffect(() => {
     const token = Cookies.get("adminToken");
@@ -145,6 +153,18 @@ const DashboardContent: React.FC = () => {
 
     fetchAll();
   }, []);
+
+  // Add a new useEffect to transform earnings data for ShadCN BarList
+  useEffect(() => {
+    if (earningsData.length > 0) {
+      const formatted = earningsData.map((item) => ({
+        name: monthTickFormatter(item.month),
+        value: item.earnings,
+        color: barColor,
+      }));
+      setFormattedEarningsData(formatted);
+    }
+  }, [earningsData]);
 
   const monthTickFormatter = (value: string) => {
     const parts = value.split("-");
@@ -237,29 +257,6 @@ const DashboardContent: React.FC = () => {
     return null;
   };
 
-  const EarningsTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-card p-3 border rounded-lg shadow-lg">
-          <p className="font-medium text-sm">{monthTickFormatter(label)}</p>
-          {payload.map((entry: any, index: number) => (
-            <div
-              key={`tooltip-${index}`}
-              className="flex items-center mt-1 text-sm"
-            >
-              <div
-                className="w-2 h-2 rounded-full mr-2"
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="font-medium">Earnings:</span>
-              <span className="ml-1">₹{entry.value.toLocaleString()}</span>
-            </div>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="p-6 min-h-screen bg-background text-foreground transition-colors">
@@ -392,7 +389,8 @@ const DashboardContent: React.FC = () => {
                         <div className="flex flex-col items-center">
                           <span className="font-medium text-sm">{value}</span>
                           <span className="text-xs text-muted-foreground">
-                            {occupancyData[index]?.value || 0} vehicles ({(
+                            {occupancyData[index]?.value || 0} vehicles (
+                            {(
                               ((occupancyData[index]?.value || 0) /
                                 occupancyData.reduce(
                                   (acc, item) => acc + item.value,
@@ -505,7 +503,7 @@ const DashboardContent: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Bar Chart - Full Width */}
+        {/* Bar Chart - Full Width with ShadCN UI */}
         <Card className="border shadow-sm lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
@@ -523,66 +521,18 @@ const DashboardContent: React.FC = () => {
               </div>
             ) : (
               <div className="h-[350px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={earningsData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                  >
-                    <defs>
-                      <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#06B6D4" stopOpacity={0.9} />
-                        <stop offset="100%" stopColor="#0EA5E9" stopOpacity={0.6} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke={theme === "dark" ? "#333" : "#eee"}
-                      opacity={0.6}
-                    />
-                    <XAxis
-                      dataKey="month"
-                      tickFormatter={monthTickFormatter}
-                      tick={{ fontSize: 12 }}
-                      stroke="currentColor"
-                      opacity={0.6}
-                      axisLine={{ strokeWidth: 0 }}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      stroke="currentColor"
-                      opacity={0.6}
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => `₹${value}`}
-                      axisLine={{ strokeWidth: 0 }}
-                      tickLine={false}
-                    />
-                    <Tooltip content={<EarningsTooltip />} />
-                    <Bar
-                      dataKey="earnings"
-                      name="Earnings"
-                      radius={[6, 6, 0, 0]}
-                      fill="url(#barGradient)"
-                      barSize={40}
-                      animationDuration={1500}
-                      animationEasing="ease-in-out"
-                      className="!hover:opacity-95"
-                      onMouseOver={(_data, index) => {
-                        document.querySelectorAll('.recharts-bar-rectangle').forEach((rect, i) => {
-                          if (i === index) {
-                            rect.classList.add('opacity-95');
-                            (rect as HTMLElement).style.filter = 'brightness(1.1)';
-                          }
-                        });
-                      }}
-                      onMouseLeave={() => {
-                        document.querySelectorAll('.recharts-bar-rectangle').forEach(rect => {
-                          rect.classList.remove('opacity-95');
-                          (rect as HTMLElement).style.filter = '';
-                        });
-                      }}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarChart
+                  data={formattedEarningsData}
+                  valueFormatter={(value) => `₹${value.toLocaleString()}`}
+                  showAnimation={true}
+                  color={barColor}
+                  onClick={(item) => {
+                    toast.success(
+                      `${item.name}: ₹${item.value.toLocaleString()}`
+                    );
+                  }}
+                  className="h-full"
+                />
               </div>
             )}
           </CardContent>

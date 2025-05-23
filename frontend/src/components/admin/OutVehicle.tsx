@@ -1,13 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Table, Input, Space, Button, Modal } from 'antd';
-import type { InputRef, TableColumnType } from 'antd';
-import type { FilterDropdownProps } from 'antd/es/table/interface';
-import { SearchOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-hot-toast';
 import { BACKEND_URL } from '@/utils/backend';
+import { VehicleTableLayout, RemarkDialog, StatusBadge } from './VehicleTableLayout';
+import { format, formatDistance } from 'date-fns';
+
+// Icons
+import { LogOut, Calendar, User, FileText, Car, ArrowRightLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface OutVehicleType {
   id: string;
@@ -17,18 +18,16 @@ interface OutVehicleType {
   outTime: string;
 }
 
-type DataIndex = keyof OutVehicleType;
-
 const OutVehicle: React.FC = () => {
   const [data, setData] = useState<OutVehicleType[]>([]);
+  const [filteredData, setFilteredData] = useState<OutVehicleType[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [searchText, setSearchText] = useState('');
-  const [searchedColumn, setSearchedColumn] = useState('');
-  const searchInput = useRef<InputRef>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [remarkModalVisible, setRemarkModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState('');
   const [remark, setRemark] = useState('');
+  const [settling, setSettling] = useState(false);
 
   const fetchOutVehicles = async () => {
     const token = Cookies.get('adminToken');
@@ -45,6 +44,7 @@ const OutVehicle: React.FC = () => {
         },
       });
       setData(response.data);
+      setFilteredData(response.data);
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Failed to fetch out vehicles';
       setError(msg);
@@ -55,22 +55,36 @@ const OutVehicle: React.FC = () => {
     }
   };
 
-
   useEffect(() => {
     fetchOutVehicles();
   }, []);
 
-  const handleSettle = async (id: string) => {
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = data.filter(
+        (vehicle) =>
+          vehicle.parkingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          vehicle.ownerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          vehicle.registrationNumber.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+  }, [searchQuery, data]);
+
+  const handleSettle = async () => {
     const token = Cookies.get('adminToken');
     if (!token) {
       toast.error('Admin token not found!');
       return;
     }
+
     try {
-      setLoading(true);
+      setSettling(true);
       await axios.post(
         `${BACKEND_URL}/api/admin/vehicle/settle`,
-        { vehicleId: id, remark },
+        { vehicleId: selectedId, remark },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -86,131 +100,135 @@ const OutVehicle: React.FC = () => {
       toast.error(msg);
       console.error(err);
     } finally {
-      setLoading(false);
+      setSettling(false);
     }
   };
 
-  const handleSearch = (selectedKeys: string[], confirm: any, dataIndex: DataIndex) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-  };
-
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    setSearchText('');
-  };
-
-  const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<OutVehicleType> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }: FilterDropdownProps) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0] as string}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-          style={{ marginBottom: 8, display: 'block' }}
-        />
-        <Space>
-          <Button type="primary" onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)} icon={<SearchOutlined />} size="small" style={{ width: 90 }}>
-            Search
-          </Button>
-          <Button onClick={() => clearFilters && handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-            Reset
-          </Button>
-          <Button type="link" size="small" onClick={() => close()}>
-            Close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex]?.toString().toLowerCase().includes((value as string).toLowerCase()),
-    render: (text: string) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ''}
-        />
-      ) : (
-        text
-      ),
-  });
-
-  const columns: TableColumnType<OutVehicleType>[] = [
+  const columns = [
     {
-      title: 'S.NO',
-      dataIndex: 'index',
       key: 'index',
-      render: (_text, _record, index) => index + 1,
+      header: '#',
+      cell: (_: any, index: number) => (
+        <div className="font-medium text-muted-foreground">{index + 1}</div>
+      ),
     },
     {
-      title: 'Parking Number',
-      dataIndex: 'parkingNumber',
       key: 'parkingNumber',
-      ...getColumnSearchProps('parkingNumber'),
+      header: (
+        <div className="flex items-center gap-2">
+          <FileText className="h-4 w-4 text-primary" />
+          <span>Parking Number</span>
+        </div>
+      ),
+      cell: (item: OutVehicleType) => (
+        <div className="font-medium">{item.parkingNumber}</div>
+      ),
     },
     {
-      title: 'Owner Name',
-      dataIndex: 'ownerName',
       key: 'ownerName',
-      ...getColumnSearchProps('ownerName'),
+      header: (
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-primary" />
+          <span>Owner</span>
+        </div>
+      ),
+      cell: (item: OutVehicleType) => <div>{item.ownerName}</div>,
     },
     {
-      title: 'Vehicle Reg Number',
-      dataIndex: 'registrationNumber',
       key: 'registrationNumber',
-      ...getColumnSearchProps('registrationNumber'),
+      header: (
+        <div className="flex items-center gap-2">
+          <Car className="h-4 w-4 text-primary" />
+          <span>Reg. Number</span>
+        </div>
+      ),
+      cell: (item: OutVehicleType) => (
+        <div className="font-mono">{item.registrationNumber}</div>
+      ),
     },
     {
-      title: 'In Date',
-      dataIndex: 'inTime',
       key: 'inTime',
-      render: (inTime) => new Date(inTime).toLocaleString(),
+      header: (
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-primary" />
+          <span>In Date</span>
+        </div>
+      ),
+      cell: (item: OutVehicleType) => {
+        try {
+          const date = new Date(item.outTime); // Using outTime as this is what's in the data
+          return (
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">
+                {format(date, 'MMM dd, yyyy h:mm a')}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {formatDistance(new Date(), date, { addSuffix: true })}
+              </span>
+            </div>
+          );
+        } catch (e) {
+          return item.outTime;
+        }
+      },
     },
     {
-      title: 'Action',
+      key: 'status',
+      header: (
+        <div className="flex items-center gap-2">
+          <LogOut className="h-4 w-4 text-primary" />
+          <span>Status</span>
+        </div>
+      ),
+      cell: () => <StatusBadge status="parked" text="Parked" />,
+    },
+    {
       key: 'action',
-      render: (_text, record) => (
-        <Space>
-          <button
-            onClick={() => {
-              setSelectedId(record.id);
-              setRemarkModalVisible(true);
-            }}
-            className="py-1 px-3 cursor-pointer text-white rounded-lg font-medium transition-all bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
-          >
-            Settle
-          </button>
-        </Space>
+      header: '',
+      cell: (item: OutVehicleType) => (
+        <Button
+          size="sm"
+          className="bg-green-600 hover:cursor-pointer hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 flex items-center gap-1 font-medium"
+          onClick={() => {
+            setSelectedId(item.id);
+            setRemarkModalVisible(true);
+          }}
+        >
+          <ArrowRightLeft className="h-3.5 w-3.5" />
+          Settle
+        </Button>
       ),
     },
   ];
 
   return (
-    <div>
-      <Table columns={columns} dataSource={data} rowKey="id" loading={loading} bordered />
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-      <Modal
-        title="Add Remark and Settle Vehicle"
-        visible={remarkModalVisible}
-        onOk={() => handleSettle(selectedId)}
-        onCancel={() => setRemarkModalVisible(false)}
-        okText="Settle"
-      >
-        <Input
-          placeholder="Enter remark"
-          value={remark}
-          onChange={(e) => setRemark(e.target.value)}
-        />
-      </Modal>
-    </div>
+    <>
+      <VehicleTableLayout
+        title="Parked Vehicles"
+        subtitle="Manage vehicles currently parked in your locations"
+        icon={<LogOut className="h-5 w-5 text-primary" />}
+        data={filteredData}
+        columns={columns}
+        loading={loading}
+        error={error}
+        onSearch={setSearchQuery}
+        searchQuery={searchQuery}
+        onRefresh={fetchOutVehicles}
+        emptyMessage="No parked vehicles found"
+      />
+
+      <RemarkDialog
+        isOpen={remarkModalVisible}
+        onClose={() => setRemarkModalVisible(false)}
+        onConfirm={handleSettle}
+        remark={remark}
+        setRemark={setRemark}
+        title="Settle Vehicle"
+        description="Add a remark to complete the parking transaction"
+        confirmText="Settle Vehicle"
+        loading={settling}
+      />
+    </>
   );
 };
 
