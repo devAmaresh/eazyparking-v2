@@ -19,6 +19,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
+
+    // Apply dark class to <html> for portal components like Dialog
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
   }, [theme]);
 
   const toggleTheme = () => {
@@ -28,11 +36,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <div
-        className={`${theme} ${
+        className={`${
           theme === "dark" ? "bg-black text-white" : "bg-white text-black"
         } min-h-screen`}
       >
-        
         {children}
       </div>
     </ThemeContext.Provider>
