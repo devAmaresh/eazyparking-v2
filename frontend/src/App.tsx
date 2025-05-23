@@ -6,107 +6,80 @@ import { ThemeContext, ThemeProvider } from "./context/ThemeContext";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
 import AdminLogin from "./pages/admin/adminlogin";
 import Logout from "./pages/Logout";
-import Bookings from "./pages/Bookings";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Book from "./pages/Book";
-import Reports from "./pages/Reports";
-import Setting from "./pages/Setting";
+
 import { ConfigProvider, theme as antdtheme } from "antd";
 import { Toaster } from "react-hot-toast";
 import NotFound from "./pages/NotFound";
 import AdminRoutes from "./pages/admin/AdminRoutes";
-
+import Settings from "./pages/Setting";
+import Bookings from "./pages/Bookings";
+import Reports from "./pages/Reports";
+import Dashboard from "./pages/Dashboard";
+import Book from "./pages/Book";
+import UserLayout from "./pages/UserLayout";
 
 const AppContent = () => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
-  
 
   return (
-      <ConfigProvider
-        theme={
-          theme == "dark"
-            ? {
-                algorithm: antdtheme.darkAlgorithm,
-              }
-            : {}
-        }
-      >
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            style: {
-              background: isDark ? "#333" : "#fff",
-              color: isDark ? "#fff" : "#000",
-            },
-          }}
-        />
+    <ConfigProvider
+      theme={
+        theme == "dark"
+          ? {
+              algorithm: antdtheme.darkAlgorithm,
+            }
+          : {}
+      }
+    >
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: isDark ? "#333" : "#fff",
+            color: isDark ? "#fff" : "#000",
+          },
+        }}
+      />
 
-        <ThemeSwitcher />
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute redirectPath="/login">
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/admin/login" element={<AdminLogin />} />
-
-            <Route
-              path="/admin/*"
-              element={
-                <ProtectedRoute redirectPath="/admin/login">
-                  <AdminRoutes />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route path="/logout" element={<Logout />} />
-            <Route path="*" element={<NotFound />} />
-            <Route
-              path="/bookings"
-              element={
-                <ProtectedRoute redirectPath="/login">
-                  <Bookings />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/bookings/:id"
-              element={
-                <ProtectedRoute redirectPath="/login">
-                  <Book />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute redirectPath="/login">
-                  <Setting />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reports"
-              element={
-                <ProtectedRoute redirectPath="/login">
-                  <Reports />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Router>
-      </ConfigProvider>
+      <ThemeSwitcher />
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute redirectPath="/admin/login">
+                <AdminRoutes />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/logout" element={<Logout />} />
+          <Route path="*" element={<NotFound />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute redirectPath="/login">
+                <UserLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="bookings" element={<Bookings />} />
+            <Route path="bookings/:id" element={<Book />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="*" element={<h1>404 Not Found</h1>} />
+          </Route>
+        </Routes>
+      </Router>
+    </ConfigProvider>
   );
 };
 

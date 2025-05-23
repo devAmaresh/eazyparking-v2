@@ -1,324 +1,400 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "../utils/backend";
-import { useNavigate } from "react-router-dom";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
-import FormControl from "@mui/material/FormControl";
-import Link from "@mui/material/Link";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
-import { Link as LinkR } from "react-router-dom";
-import MuiCard from "@mui/material/Card";
-import { styled } from "@mui/material/styles";
-import AppTheme from "../shared-theme/AppTheme";
-import ColorModeSelect from "../shared-theme/ColorModeSelect";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../utils/backend";
+import { Link as LinkR } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+// Shadcn components
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+  CardDescription,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Badge } from "@/components/ui/badge";
+
 import GoogleButton from "@/components/auth/GoogleButton";
-import toast from "react-hot-toast";
-import { Spin } from "antd";
+import { toast } from "react-hot-toast";
 
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "100%",
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: "auto",
-  boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  [theme.breakpoints.up("sm")]: {
-    width: "450px",
-  },
-  ...theme.applyStyles("dark", {
-    boxShadow:
-      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
-  }),
-}));
+// Icons
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  HomeIcon,
+  UserPlus,
+  User,
+  Phone,
+  CheckCircle2,
+} from "lucide-react";
 
-const SignUpContainer = styled(Stack)(({ theme }) => ({
-  // height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-  // minHeight: '100%',
-  minHeight: "100vh",
-  padding: theme.spacing(2),
-  [theme.breakpoints.up("sm")]: {
-    padding: theme.spacing(4),
-  },
-  "&::before": {
-    content: '""',
-    display: "block",
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "cover",
-    zIndex: -1,
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
-  },
-}));
+// Form validation schema
+const formSchema = z.object({
+  firstName: z.string().min(1, { message: "First name is required" }),
+  lastName: z.string().min(1, { message: "Last name is required" }),
+  email: z
+    .string()
+    .email({ message: "Please enter a valid email address" }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters long" }),
+  mobileNumber: z
+    .string()
+    .regex(/^[6-9]\d{9}$/, { message: "Enter a valid 10-digit mobile number" }),
+  allowEmails: z.boolean().default(false).optional(),
+});
 
-export default function SignUp(props: { disableCustomTheme?: boolean }) {
+type FormValues = z.infer<typeof formSchema>;
+
+export default function Register() {
   const navigate = useNavigate();
-  React.useEffect(() => {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
     const token = Cookies.get("token");
     if (token) {
       navigate("/dashboard");
     }
-  }, []);
-  const [loading, setLoading] = React.useState(false);
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState("");
-  const [mobileError, setMobileError] = React.useState(false);
-  const [mobileErrorMessage, setMobileErrorMessage] = React.useState("");
+  }, [navigate]);
 
-  const validateInputs = () => {
-    const email = document.getElementById("email") as HTMLInputElement;
-    const password = document.getElementById("password") as HTMLInputElement;
-    const firstName = document.getElementById("firstName") as HTMLInputElement;
-    const lastName = document.getElementById("lastName") as HTMLInputElement;
-    const mobile = document.getElementById("mobileNumber") as HTMLInputElement;
+  // Initialize form with zod resolver
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      mobileNumber: "",
+      allowEmails: false,
+    },
+  });
 
-    let isValid = true;
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage("Please enter a valid email address.");
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage("");
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 6 characters long.");
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage("");
-    }
-
-    if (!firstName || firstName.value.length < 1) {
-      setNameError(true);
-      setNameErrorMessage("First name is required.");
-      isValid = false;
-    } else if (!lastName || lastName.value.length < 1) {
-      setNameError(true);
-      setNameErrorMessage("Last name is required.");
-      isValid = false;
-    } else {
-      setNameError(false);
-      setNameErrorMessage("");
-    }
-
-    if (!mobile.value || !/^[6-9]\d{9}$/.test(mobile.value)) {
-      setMobileError(true);
-      setMobileErrorMessage("Enter a valid 10-digit mobile number.");
-      isValid = false;
-    } else {
-      setMobileError(false);
-      setMobileErrorMessage("");
-    }
-
-    return isValid;
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!validateInputs()) return;
-
-    const data = new FormData(event.currentTarget);
+  const onSubmit = async (values: FormValues) => {
+    setLoading(true);
 
     const userData = {
-      firstName: data.get("firstName"),
-      lastName: data.get("lastName"),
-      email: data.get("email"),
-      password: data.get("password"),
-      mobile: data.get("mobileNumber"),
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      password: values.password,
+      mobile: values.mobileNumber,
     };
 
     try {
-      setLoading(true);
       const response = await axios.post(
         `${BACKEND_URL}/api/auth/register`,
         userData
-      ); // replace URL
-      console.log("Signup successful:", response.data);
-
-      Cookies.set("token", response.data.token, { expires: 7 });
-
-      //navigate to login or show success
-      navigate("/dashboard");
-      toast.success("Account created successfully!");
-    } catch (error: any) {
-      console.error("Signup error:", error.response?.data || error.message);
-      toast.error(
-        "Signup failed: " +
-          (error.response?.data?.message || "Something went wrong.")
       );
+      Cookies.set("token", response.data.token, { expires: 7 });
+      toast.success("Account created successfully!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message || "Registration failed";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+      },
+    },
+  };
+
   return (
-    <AppTheme {...props}>
-      <CssBaseline enableColorScheme />
-      <ColorModeSelect />
-      <SignUpContainer direction="column" justifyContent="space-between">
-        <Card variant="outlined">
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
-          >
-            Sign up
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-          >
-            <div className="flex flex-col sm:flex-row gap-2">
-              <FormControl>
-                <FormLabel htmlFor="firstName">First name</FormLabel>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  placeholder="Jon"
-                  error={nameError}
-                  helperText={nameErrorMessage}
-                  color={nameError ? "error" : "primary"}
-                />
-              </FormControl>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-zinc-950 dark:to-indigo-950/20 p-4 md:p-8">
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-100 dark:bg-blue-900/20 rounded-full -mr-16 -mt-16 opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-indigo-100 dark:bg-indigo-900/20 rounded-full -ml-16 -mb-16 opacity-50"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-1/3 bg-gradient-to-r from-blue-200/30 to-indigo-200/30 dark:from-blue-800/10 dark:to-indigo-800/10 blur-3xl opacity-50"></div>
+      </div>
 
-              <FormControl>
-                <FormLabel htmlFor="lastName">Last name</FormLabel>
-                <TextField
-                  autoComplete="family-name"
-                  name="lastName"
-                  required
-                  fullWidth
-                  id="lastName"
-                  placeholder="Snow"
-                  error={nameError}
-                  helperText={nameErrorMessage}
-                  color={nameError ? "error" : "primary"}
-                />
-              </FormControl>
+      <motion.div
+        className="w-full max-w-md relative z-10"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <Card className="border border-blue-100 dark:border-blue-900/30 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm shadow-xl overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+
+          <CardHeader className="space-y-1 pb-6">
+            <motion.div variants={itemVariants} className="flex justify-center mb-2">
+              <div className="h-12 w-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/30 flex items-center justify-center">
+                <UserPlus className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <CardTitle className="text-2xl font-bold text-center text-zinc-900 dark:text-zinc-100">
+                Create an Account
+              </CardTitle>
+              <CardDescription className="text-center text-zinc-500 dark:text-zinc-400 mt-1.5">
+                Sign up to start using our parking services
+              </CardDescription>
+            </motion.div>
+          </CardHeader>
+
+          <CardContent className="pb-6">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                <motion.div
+                  variants={itemVariants}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-zinc-800 dark:text-zinc-200 flex items-center gap-2 text-sm font-medium">
+                          <User className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+                          First Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="John"
+                            autoComplete="given-name"
+                            className="h-11 bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-0"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-500 dark:text-red-400 text-xs font-medium" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-zinc-800 dark:text-zinc-200 flex items-center gap-2 text-sm font-medium">
+                          <User className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+                          Last Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Doe"
+                            autoComplete="family-name"
+                            className="h-11 bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-0"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-500 dark:text-red-400 text-xs font-medium" />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-zinc-800 dark:text-zinc-200 flex items-center gap-2 text-sm font-medium">
+                          <Mail className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+                          Email Address
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="your@email.com"
+                            type="email"
+                            autoComplete="email"
+                            className="h-11 bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-0"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-500 dark:text-red-400 text-xs font-medium" />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-zinc-800 dark:text-zinc-200 flex items-center gap-2 text-sm font-medium">
+                          <Lock className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+                          Password
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="••••••••"
+                            type="password"
+                            autoComplete="new-password"
+                            className="h-11 bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-0"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-500 dark:text-red-400 text-xs font-medium" />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="mobileNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-zinc-800 dark:text-zinc-200 flex items-center gap-2 text-sm font-medium">
+                          <Phone className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+                          Mobile Number
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="9999999999"
+                            type="tel"
+                            autoComplete="tel"
+                            className="h-11 bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-0"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-500 dark:text-red-400 text-xs font-medium" />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="allowEmails"
+                    render={({ field }) => (
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Checkbox
+                          id="allowEmails"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800/50 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                        />
+                        <Label
+                          htmlFor="allowEmails"
+                          className="text-sm text-zinc-600 dark:text-zinc-400"
+                        >
+                          I want to receive updates via email
+                        </Label>
+                      </div>
+                    )}
+                  />
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <Button
+                    type="submit"
+                    className="w-full h-11 gap-2 hover:cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-400 dark:hover:to-indigo-400 text-white dark:text-zinc-900 font-medium shadow-md shadow-blue-500/10 dark:shadow-blue-400/5 border border-blue-700/10 dark:border-blue-300/20"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Creating account...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Create Account</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+              </form>
+            </Form>
+
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <Separator className="w-full border-zinc-200 dark:border-zinc-800" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <Badge
+                    variant="outline"
+                    className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 font-normal px-2"
+                  >
+                    Or continue with
+                  </Badge>
+                </div>
+              </div>
+
+              <motion.div variants={itemVariants} className="mt-6">
+                <GoogleButton />
+              </motion.div>
             </div>
+          </CardContent>
 
-            <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                placeholder="your@email.com"
-                name="email"
-                autoComplete="email"
-                variant="outlined"
-                error={emailError}
-                helperText={emailErrorMessage}
-                color={passwordError ? "error" : "primary"}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
-              <TextField
-                required
-                fullWidth
-                name="password"
-                placeholder="••••••"
-                type="password"
-                id="password"
-                autoComplete="new-password"
-                variant="outlined"
-                error={passwordError}
-                helperText={passwordErrorMessage}
-                color={passwordError ? "error" : "primary"}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="mobileNumber">Mobile Number</FormLabel>
-              <TextField
-                required
-                fullWidth
-                id="mobileNumber"
-                placeholder="9999999999"
-                name="mobileNumber"
-                autoComplete="tel"
-                variant="outlined"
-                error={mobileError}
-                helperText={mobileErrorMessage}
-                color={mobileError ? "error" : "primary"}
-              />
-            </FormControl>
-
-            <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
-              label="I want to receive updates via email."
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-              disabled={loading}
+          <CardFooter className="border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-6 flex flex-col space-y-3">
+            <motion.div
+              variants={itemVariants}
+              className="flex items-center justify-between w-full"
             >
-              {loading ? <Spin /> : "Sign Up"}
-            </Button>
-          </Box>
-          <Divider>
-            <Typography sx={{ color: "text.secondary" }}>or</Typography>
-          </Divider>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <GoogleButton />
-            <Typography sx={{ textAlign: "center" }}>
-              Already have an account?{" "}
-              <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/login">
-                  <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">
-                    Sign In
-                  </span>
+              <div className="flex items-center gap-1.5">
+                <LinkR
+                  to="/"
+                  className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 hover:underline underline-offset-4"
+                >
+                  <HomeIcon className="h-3.5 w-3.5" />
+                  <span>Back to Home</span>
                 </LinkR>
-              </Link>
-            </Typography>
-            <Typography sx={{ textAlign: "center" }}>
-              Back to{" "}
-              <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/">
-                  <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">
-                    Home
-                  </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <LinkR
+                  to="/login"
+                  className="text-sm text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1.5 hover:underline underline-offset-4"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Already have an account</span>
                 </LinkR>
-              </Link>
-            </Typography>
-          </Box>
+              </div>
+            </motion.div>
+          </CardFooter>
         </Card>
-      </SignUpContainer>
-    </AppTheme>
+      </motion.div>
+    </div>
   );
 }

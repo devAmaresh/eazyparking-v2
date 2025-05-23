@@ -6,10 +6,8 @@ import { Link as LinkR } from "react-router-dom";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import { Spin } from "antd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-
 
 // Shadcn components
 import { Input } from "@/components/ui/input";
@@ -22,6 +20,7 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
+  CardDescription,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -32,9 +31,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Badge } from "@/components/ui/badge";
 
 import ForgotPassword from "../components/auth/ForgotPassword";
 import GoogleButton from "@/components/auth/GoogleButton";
+
+// Icons
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  AlertCircle,
+  Loader2,
+  CheckCircle2,
+  HomeIcon,
+  UserPlus,
+} from "lucide-react";
 
 // Form validation schema
 const formSchema = z.object({
@@ -49,7 +61,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function SignIn() {
   const navigate = useNavigate();
-  
+
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
@@ -120,46 +132,61 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-between bg-gradient-to-br from-white to-gray-100 p-4 dark:from-black dark:to-gray-900 sm:p-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-zinc-950 dark:to-indigo-950/20 p-4 md:p-8">
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-100 dark:bg-blue-900/20 rounded-full -mr-16 -mt-16 opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-indigo-100 dark:bg-indigo-900/20 rounded-full -ml-16 -mb-16 opacity-50"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-1/3 bg-gradient-to-r from-blue-200/30 to-indigo-200/30 dark:from-blue-800/10 dark:to-indigo-800/10 blur-3xl opacity-50"></div>
+      </div>
 
-      
       <motion.div
-        className="mx-auto w-full max-w-md"
+        className="w-full max-w-md relative z-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <Card className="border-none bg-white/95 backdrop-blur-sm dark:bg-gray-950/90 shadow-lg dark:shadow-gray-900/30">
-          <CardHeader>
+        <Card className="border border-blue-100 dark:border-blue-900/30 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm shadow-xl overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+
+          <CardHeader className="space-y-1 pb-6">
+            <motion.div variants={itemVariants} className="flex justify-center mb-2">
+              <div className="h-12 w-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/30 flex items-center justify-center">
+                <Lock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+            </motion.div>
             <motion.div variants={itemVariants}>
-              <CardTitle className="text-3xl font-bold text-center">
-                Sign in
+              <CardTitle className="text-2xl font-bold text-center text-zinc-900 dark:text-zinc-100">
+                Welcome Back
               </CardTitle>
+              <CardDescription className="text-center text-zinc-500 dark:text-zinc-400 mt-1.5">
+                Sign in to your account to continue
+              </CardDescription>
             </motion.div>
           </CardHeader>
-          <CardContent>
+
+          <CardContent className="pb-6">
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-5"
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <motion.div variants={itemVariants}>
                   <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel className="text-zinc-800 dark:text-zinc-200 flex items-center gap-2 text-sm font-medium">
+                          <Mail className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+                          Email Address
+                        </FormLabel>
                         <FormControl>
                           <Input
                             placeholder="your@email.com"
                             type="email"
                             autoComplete="email"
-                            className="bg-transparent"
+                            className="h-11 bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-0"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-500 dark:text-red-400 text-xs font-medium" />
                       </FormItem>
                     )}
                   />
@@ -171,17 +198,20 @@ export default function SignIn() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel className="text-zinc-800 dark:text-zinc-200 flex items-center gap-2 text-sm font-medium">
+                          <Lock className="h-3.5 w-3.5 text-blue-500 dark:text-blue-400" />
+                          Password
+                        </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="••••••"
+                            placeholder="••••••••"
                             type="password"
                             autoComplete="current-password"
-                            className="bg-transparent"
+                            className="h-11 bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-0"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-500 dark:text-red-400 text-xs font-medium" />
                       </FormItem>
                     )}
                   />
@@ -200,10 +230,11 @@ export default function SignIn() {
                           id="remember"
                           checked={field.value}
                           onCheckedChange={field.onChange}
+                          className="text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800/50 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
                         />
                         <Label
                           htmlFor="remember"
-                          className="text-sm text-gray-600 dark:text-gray-400"
+                          className="text-sm text-zinc-600 dark:text-zinc-400"
                         >
                           Remember me
                         </Label>
@@ -213,32 +244,53 @@ export default function SignIn() {
                   <button
                     type="button"
                     onClick={handleClickOpen}
-                    className="text-sm text-primary underline-offset-4 hover:underline"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline underline-offset-4 font-medium"
                   >
                     Forgot password?
                   </button>
                 </motion.div>
 
                 {error && (
-                  <motion.p
+                  <motion.div
                     variants={itemVariants}
-                    className="text-center text-sm text-red-500"
+                    className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 rounded-lg p-3 flex items-start gap-2.5"
                   >
-                    {error}
-                  </motion.p>
+                    <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 flex-shrink-0" />
+                    <p className="text-sm text-red-600 dark:text-red-400">
+                      {error}
+                    </p>
+                  </motion.div>
                 )}
+
                 {success && (
-                  <motion.p
+                  <motion.div
                     variants={itemVariants}
-                    className="text-center text-sm text-green-500"
+                    className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 rounded-lg p-3 flex items-start gap-2.5"
                   >
-                    {success}
-                  </motion.p>
+                    <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400 flex-shrink-0" />
+                    <p className="text-sm text-green-600 dark:text-green-400">
+                      {success}
+                    </p>
+                  </motion.div>
                 )}
 
                 <motion.div variants={itemVariants}>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? <Spin /> : "Sign In"}
+                  <Button
+                    type="submit"
+                    className="w-full h-11 gap-2 hover:cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-400 dark:hover:to-indigo-400 text-white dark:text-zinc-900 font-medium shadow-md shadow-blue-500/10 dark:shadow-blue-400/5 border border-blue-700/10 dark:border-blue-300/20"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Signing in...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Sign In</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
                   </Button>
                 </motion.div>
               </form>
@@ -247,12 +299,15 @@ export default function SignIn() {
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <Separator className="w-full" />
+                  <Separator className="w-full border-zinc-200 dark:border-zinc-800" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-gray-500 dark:bg-gray-950 dark:text-gray-400">
+                <div className="relative flex justify-center text-xs">
+                  <Badge
+                    variant="outline"
+                    className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 font-normal px-2"
+                  >
                     Or continue with
-                  </span>
+                  </Badge>
                 </div>
               </div>
 
@@ -261,35 +316,35 @@ export default function SignIn() {
               </motion.div>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
-            <motion.p
+
+          <CardFooter className="border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-6 flex flex-col space-y-3">
+            <motion.div
               variants={itemVariants}
-              className="text-center text-sm text-gray-600 dark:text-gray-400"
+              className="flex items-center justify-between w-full"
             >
-              Don&apos;t have an account?{" "}
-              <LinkR
-                to="/register"
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                Sign up
-              </LinkR>
-            </motion.p>
-            <motion.p
-              variants={itemVariants}
-              className="text-center text-sm text-gray-600 dark:text-gray-400"
-            >
-              Back to{" "}
-              <LinkR
-                to="/"
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                Home
-              </LinkR>
-            </motion.p>
+              <div className="flex items-center gap-1.5">
+                <LinkR
+                  to="/"
+                  className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 hover:underline underline-offset-4"
+                >
+                  <HomeIcon className="h-3.5 w-3.5" />
+                  <span>Back to Home</span>
+                </LinkR>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <LinkR
+                  to="/register"
+                  className="text-sm text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1.5 hover:underline underline-offset-4"
+                >
+                  <UserPlus className="h-3.5 w-3.5" />
+                  <span>Create Account</span>
+                </LinkR>
+              </div>
+            </motion.div>
           </CardFooter>
         </Card>
       </motion.div>
-      <div className="h-8" /> {/* Spacer */}
+
       <ForgotPassword open={open} handleClose={handleClose} />
     </div>
   );
