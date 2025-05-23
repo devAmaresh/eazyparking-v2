@@ -14,7 +14,7 @@ export default function Features() {
     >
       {/* Subtle background */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[url('/subtle-grid.svg')] bg-center opacity-[0.01] dark:opacity-[0.02]"></div>
+        <div className="absolute inset-0  bg-center opacity-[0.01] dark:opacity-[0.02]"></div>
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-50/40 to-violet-50/40 dark:from-blue-950/20 dark:to-violet-950/20 opacity-50"></div>
       </div>
 

@@ -8,7 +8,7 @@ export default function Hero() {
     <section className="py-[125px] relative overflow-hidden bg-gradient-to-b from-white to-slate-50 dark:from-black dark:to-slate-950">
       {/* Subtle background elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[url('/subtle-grid.svg')] bg-center opacity-[0.01] dark:opacity-[0.02]"></div>
+        <div className="absolute inset-0 bg-center opacity-[0.01] dark:opacity-[0.02]"></div>
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-200/20 dark:bg-blue-900/10 rounded-full filter blur-[100px]"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-200/20 dark:bg-violet-900/10 rounded-full filter blur-[100px]"></div>
       </div>

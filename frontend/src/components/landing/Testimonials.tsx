@@ -27,7 +27,7 @@ export default function Testimonials() {
     >
       {/* Background elements */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[url('/subtle-grid.svg')] bg-center opacity-[0.01] dark:opacity-[0.02]"></div>
+        <div className="absolute inset-0  bg-center opacity-[0.01] dark:opacity-[0.02]"></div>
         <div className="absolute top-20 right-20 w-72 h-72 bg-blue-200/20 dark:bg-blue-900/10 rounded-full filter blur-[80px]"></div>
         <div className="absolute bottom-20 left-20 w-72 h-72 bg-violet-200/20 dark:bg-violet-900/10 rounded-full filter blur-[80px]"></div>
       </div>

@@ -33,7 +33,6 @@ import {
 } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 
-import ForgotPassword from "../components/auth/ForgotPassword";
 import GoogleButton from "@/components/auth/GoogleButton";
 
 // Icons
@@ -65,10 +64,8 @@ export default function SignIn() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
-  const [open, setOpen] = React.useState(false);
 
-  const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+
 
   React.useEffect(() => {
     const token = Cookies.get("token");
@@ -149,7 +146,10 @@ export default function SignIn() {
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
 
           <CardHeader className="space-y-1 pb-6">
-            <motion.div variants={itemVariants} className="flex justify-center mb-2">
+            <motion.div
+              variants={itemVariants}
+              className="flex justify-center mb-2"
+            >
               <div className="h-12 w-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/30 flex items-center justify-center">
                 <Lock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
@@ -166,7 +166,10 @@ export default function SignIn() {
 
           <CardContent className="pb-6">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-5"
+              >
                 <motion.div variants={itemVariants}>
                   <FormField
                     control={form.control}
@@ -243,7 +246,7 @@ export default function SignIn() {
                   />
                   <button
                     type="button"
-                    onClick={handleClickOpen}
+                    
                     className="text-sm text-blue-600 dark:text-blue-400 hover:underline underline-offset-4 font-medium"
                   >
                     Forgot password?
@@ -344,8 +347,6 @@ export default function SignIn() {
           </CardFooter>
         </Card>
       </motion.div>
-
-      <ForgotPassword open={open} handleClose={handleClose} />
     </div>
   );
 }
