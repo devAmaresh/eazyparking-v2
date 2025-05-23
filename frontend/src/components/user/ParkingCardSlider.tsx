@@ -123,7 +123,7 @@ export const ParkingCardSlider: React.FC<ParkingCardSliderProps> = ({
   // Loading state with skeletons
   if (loading) {
     return (
-      <div className="w-full px-0 sm:px-2">
+      <div className="w-full p-10">
         {/* Search bar skeleton */}
         <div className="mb-6 relative">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
