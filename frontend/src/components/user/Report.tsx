@@ -4,31 +4,34 @@ import { BACKEND_URL } from "@/utils/backend";
 import Cookies from "js-cookie";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
-import { useReportData } from "./report/useReportData";
 
-// ShadCN UI Components
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-
-// Icons
-import { History, Calendar, ClipboardList, FileClock, Clock } from "lucide-react";
-
-// Components
+// Import components
 import { BookingsTable } from "./report/BookingsTable";
 import { ExportActions } from "./report/ExportActions";
+import { useReportData } from "./report/useReportData";
 import { StatsDisplay } from "./report/StatsDisplay";
+
+// Icons
+import {
+  History,
+  Calendar,
+  ClipboardList,
+  FileClock,
+  Clock,
+} from "lucide-react";
+import { Separator } from "../ui/separator";
 
 const Report = () => {
   const [profile, setProfile] = useState<any>(null);
-  const { 
-    bookings, 
-    ongoing, 
-    upcoming, 
-    past, 
-    loading, 
-    exportCSV, 
+  const {
+    bookings,
+    ongoing,
+    upcoming,
+    past,
+    loading,
+    exportCSV,
     exportPDF,
-    refresh
+    refresh,
   } = useReportData();
 
   useEffect(() => {
@@ -100,18 +103,18 @@ const Report = () => {
               </p>
             </div>
 
-            <ExportActions 
-              onExportCSV={exportCSV} 
-              onExportPDF={exportPDF} 
+            <ExportActions
+              onExportCSV={exportCSV}
+              onExportPDF={exportPDF}
               onRefresh={refresh}
-              disabled={loading || bookings.length === 0} 
+              disabled={loading || bookings.length === 0}
             />
           </div>
-          
+
           <Separator className="my-6 bg-blue-200/30 dark:bg-blue-800/30" />
-          
+
           {/* Stats Summary */}
-          <StatsDisplay 
+          <StatsDisplay
             ongoing={ongoing.length}
             upcoming={upcoming.length}
             past={past.length}
@@ -125,97 +128,90 @@ const Report = () => {
         variants={itemVariants}
         className="overflow-hidden bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-lg"
       >
-        <Card className="border-0 shadow-none">
-          <CardContent className="p-0">
-            <Tabs defaultValue="ongoing" className="w-full">
-              {/* Custom stylish tab header */}
-              <div className="flex justify-center border-b border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-zinc-50/80 via-blue-50/10 to-zinc-50/80 dark:from-zinc-900/80 dark:via-blue-900/10 dark:to-zinc-900/80 py-2">
-                <TabsList className="bg-zinc-100/90 dark:bg-zinc-800/90 p-1 border border-zinc-200/60 dark:border-zinc-700/50 shadow-sm backdrop-blur-sm rounded-lg">
-                  <TabsTrigger 
-                    value="ongoing" 
-                    className="flex items-center gap-1.5 rounded-md px-4 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm"
-                  >
-                    <Clock className="h-4 w-4" />
-                    <span>Ongoing</span>
-                    <div className="ml-1.5 flex items-center justify-center h-5 min-w-5 rounded-full bg-blue-100 dark:bg-blue-900/30 px-1.5 text-xs font-medium text-blue-600 dark:text-blue-400">
-                      {ongoing.length}
-                    </div>
-                  </TabsTrigger>
-                  
-                  <TabsTrigger 
-                    value="upcoming" 
-                    className="flex items-center gap-1.5 rounded-md px-4 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm"
-                  >
-                    <Calendar className="h-4 w-4" />
-                    <span>Upcoming</span>
-                    <div className="ml-1.5 flex items-center justify-center h-5 min-w-5 rounded-full bg-blue-100 dark:bg-blue-900/30 px-1.5 text-xs font-medium text-blue-600 dark:text-blue-400">
-                      {upcoming.length}
-                    </div>
-                  </TabsTrigger>
-                  
-                  <TabsTrigger 
-                    value="past" 
-                    className="flex items-center gap-1.5 rounded-md px-4 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-950 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm"
-                  >
-                    <History className="h-4 w-4" />
-                    <span>Past</span>
-                    <div className="ml-1.5 flex items-center justify-center h-5 min-w-5 rounded-full bg-blue-100 dark:bg-blue-900/30 px-1.5 text-xs font-medium text-blue-600 dark:text-blue-400">
-                      {past.length}
-                    </div>
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+        <Tabs defaultValue="ongoing" className="w-full">
+          {/* Updated tab header to match dashboard style */}
+          <div className="flex justify-center border-b border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-zinc-50/80 via-blue-50/10 to-zinc-50/80 dark:from-zinc-900/80 dark:via-blue-900/10 dark:to-zinc-900/80">
+            <TabsList className="h-16 bg-transparent rounded-none border-0 p-0 relative">
+              <TabsTrigger
+                value="ongoing"
+                className="relative h-full px-8 py-2 bg-transparent rounded-none border-0 data-[state=active]:shadow-none font-medium text-zinc-500 dark:text-zinc-400 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-400 transition-all gap-2 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                <Clock className="h-4 w-4" />
+                <span>Ongoing</span>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500 dark:bg-blue-400 transform scale-x-0 transition-transform duration-200 ease-out data-[state=active]:scale-x-100"></div>
+              </TabsTrigger>
 
-              <div className="p-6 bg-gradient-to-b from-white to-zinc-50/50 dark:from-zinc-900 dark:to-zinc-900/50">
-                <TabsContent 
-                  value="ongoing"
-                  className="animate-in fade-in-50 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0 mt-0"
-                >
-                  <BookingsTable
-                    bookings={ongoing}
-                    loading={loading}
-                    profile={profile}
-                    type="ongoing"
-                    icon={<Clock className="h-5 w-5 text-blue-500" />}
-                  />
-                </TabsContent>
+              <TabsTrigger
+                value="upcoming"
+                className="relative h-full px-8 py-2 bg-transparent rounded-none border-0 data-[state=active]:shadow-none font-medium text-zinc-500 dark:text-zinc-400 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-400 transition-all gap-2 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                <Calendar className="h-4 w-4" />
+                <span>Upcoming</span>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500 dark:bg-blue-400 transform scale-x-0 transition-transform duration-200 ease-out data-[state=active]:scale-x-100"></div>
+              </TabsTrigger>
 
-                <TabsContent 
-                  value="upcoming"
-                  className="animate-in fade-in-50 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0 mt-0"
-                >
-                  <BookingsTable
-                    bookings={upcoming}
-                    loading={loading}
-                    profile={profile}
-                    type="upcoming"
-                    icon={<Calendar className="h-5 w-5 text-blue-500" />}
-                  />
-                </TabsContent>
+              <TabsTrigger
+                value="past"
+                className="relative h-full px-8 py-2 bg-transparent rounded-none border-0 data-[state=active]:shadow-none font-medium text-zinc-500 dark:text-zinc-400 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-400 transition-all gap-2 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                <History className="h-4 w-4" />
+                <span>Past</span>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500 dark:bg-blue-400 transform scale-x-0 transition-transform duration-200 ease-out data-[state=active]:scale-x-100"></div>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-                <TabsContent 
-                  value="past"
-                  className="animate-in fade-in-50 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0 mt-0"
-                >
-                  <BookingsTable
-                    bookings={past}
-                    loading={loading}
-                    profile={profile}
-                    type="past"
-                    icon={<FileClock className="h-5 w-5 text-blue-500" />}
-                  />
-                </TabsContent>
-              </div>
-            </Tabs>
-          </CardContent>
-        </Card>
+          <div className="p-6 bg-gradient-to-b from-white to-zinc-50/50 dark:from-zinc-900 dark:to-zinc-900/50">
+            <TabsContent
+              value="ongoing"
+              className="mt-0 animate-in fade-in-50 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0"
+            >
+              <BookingsTable
+                bookings={ongoing}
+                loading={loading}
+                profile={profile}
+                type="ongoing"
+                icon={<Clock className="h-5 w-5 text-blue-500" />}
+              />
+            </TabsContent>
+
+            <TabsContent
+              value="upcoming"
+              className="mt-0 animate-in fade-in-50 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0"
+            >
+              <BookingsTable
+                bookings={upcoming}
+                loading={loading}
+                profile={profile}
+                type="upcoming"
+                icon={<Calendar className="h-5 w-5 text-blue-500" />}
+              />
+            </TabsContent>
+
+            <TabsContent
+              value="past"
+              className="mt-0 animate-in fade-in-50 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0"
+            >
+              <BookingsTable
+                bookings={past}
+                loading={loading}
+                profile={profile}
+                type="past"
+                icon={<FileClock className="h-5 w-5 text-blue-500" />}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
       </motion.div>
 
       {/* Footer with last updated info */}
       <motion.div variants={itemVariants} className="text-center">
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Last updated: {new Date().toLocaleString()} • 
-          <span className="text-blue-500 dark:text-blue-400 ml-1 hover:underline cursor-pointer" onClick={refresh}>
+          Last updated: {new Date().toLocaleString()} •
+          <span
+            className="text-blue-500 dark:text-blue-400 ml-1 hover:underline cursor-pointer"
+            onClick={refresh}
+          >
             Refresh data
           </span>
         </p>
