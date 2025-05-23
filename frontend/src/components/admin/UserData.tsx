@@ -113,9 +113,9 @@ const UserData = () => {
       const query = searchQuery.toLowerCase();
       const filtered = users.filter(
         (user) =>
-          `${user.firstName} ${user.lastName}`.toLowerCase().includes(query) ||
-          user.email.toLowerCase().includes(query) ||
-          user.mobileNumber.includes(query)
+          `${user.firstName} ${user.lastName}`?.toLowerCase().includes(query) ||
+          user.email?.toLowerCase().includes(query) ||
+          user.mobileNumber?.includes(query)
       );
       setFilteredUsers(filtered);
     }
@@ -394,22 +394,8 @@ const UserData = () => {
 
       {/* Users Table with Enhanced Styling */}
       <motion.div variants={itemVariants}>
-        <Card className="border border-zinc-200 dark:border-zinc-800 shadow-lg bg-white dark:bg-black overflow-hidden rounded-xl">
-          <CardHeader className="pb-3 bg-gradient-to-r from-zinc-50 to-zinc-100/70 dark:from-zinc-900 dark:to-zinc-800/70 border-b border-zinc-200 dark:border-zinc-800">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                <UserCircle2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                Registered Users
-              </CardTitle>
-              <Badge
-                variant="outline"
-                className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-800/30 px-2.5 py-1"
-              >
-                {filteredUsers.length}{" "}
-                {filteredUsers.length === 1 ? "user" : "users"}
-              </Badge>
-            </div>
-          </CardHeader>
+        <Card className="py-0 border border-zinc-200 dark:border-zinc-800 shadow-lg bg-white dark:bg-black overflow-hidden rounded-xl">
+          
 
           <CardContent className="p-0">
             <div className="rounded-md overflow-hidden">
@@ -617,8 +603,8 @@ const UserData = () => {
 
                 <TabsContent value="details" className="mt-0 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card className="border border-zinc-200 dark:border-zinc-800 shadow-md bg-white dark:bg-black overflow-hidden">
-                      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 border-b border-zinc-200 dark:border-zinc-800">
+                    <Card className="py-0 border border-zinc-200 dark:border-zinc-800 shadow-md bg-white dark:bg-black overflow-hidden">
+                      <CardHeader className="pt-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 border-b border-zinc-200 dark:border-zinc-800">
                         <CardTitle className="text-lg text-blue-900 dark:text-blue-100 flex items-center gap-2">
                           <UserCircle2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                           Basic Information
@@ -657,8 +643,8 @@ const UserData = () => {
                       </CardContent>
                     </Card>
 
-                    <Card className="border border-zinc-200 dark:border-zinc-800 shadow-md bg-white dark:bg-black overflow-hidden">
-                      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 border-b border-zinc-200 dark:border-zinc-800">
+                    <Card className="py-0 border border-zinc-200 dark:border-zinc-800 shadow-md bg-white dark:bg-black overflow-hidden">
+                      <CardHeader className="pt-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 border-b border-zinc-200 dark:border-zinc-800">
                         <CardTitle className="text-lg text-blue-900 dark:text-blue-100 flex items-center gap-2">
                           <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                           Account Statistics
@@ -714,8 +700,8 @@ const UserData = () => {
                 </TabsContent>
 
                 <TabsContent value="bookings" className="mt-0 space-y-6">
-                  <Card className="border border-zinc-200 dark:border-zinc-800 shadow-md bg-white dark:bg-black overflow-hidden">
-                    <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 border-b border-zinc-200 dark:border-zinc-800">
+                  <Card className="py-0 border border-zinc-200 dark:border-zinc-800 shadow-md bg-white dark:bg-black overflow-hidden">
+                    <CardHeader className="pt-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 border-b border-zinc-200 dark:border-zinc-800">
                       <div className="flex justify-between items-center">
                         <CardTitle className="text-lg text-blue-900 dark:text-blue-100 flex items-center gap-2">
                           <Car className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -846,8 +832,8 @@ const UserData = () => {
                   </Card>
 
                   {selectedUser.bookings.length > 0 && (
-                    <Card className="border border-zinc-200 dark:border-zinc-800 shadow-md bg-white dark:bg-black overflow-hidden">
-                      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 border-b border-zinc-200 dark:border-zinc-800">
+                    <Card className="py-0 border border-zinc-200 dark:border-zinc-800 shadow-md bg-white dark:bg-black overflow-hidden">
+                      <CardHeader className="pt-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 border-b border-zinc-200 dark:border-zinc-800">
                         <CardTitle className="text-lg text-blue-900 dark:text-blue-100 flex items-center gap-2">
                           <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                           Spending Analytics
