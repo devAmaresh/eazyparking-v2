@@ -28,7 +28,7 @@ export default function Features() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 text-transparent bg-clip-text"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold pb-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 text-transparent bg-clip-text"
           >
             Intelligent Parking Solutions
           </motion.h2>
