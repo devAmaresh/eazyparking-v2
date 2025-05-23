@@ -253,25 +253,23 @@ const ManageParkingLot = () => {
 
   return (
     <div className="space-y-8">
-      {/* Premium Header Section */}
-      <div className="relative overflow-hidden dark:bg-zinc-900 rounded-2xl p-8 shadow-xl">
-        {/* Abstract background elements */}
-        <div className="absolute top-0 left-0 right-0 bottom-0 opacity-10">
-          <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-indigo-500 blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-40 h-40 rounded-full bg-zinc-400 blur-3xl"></div>
-        </div>
+      {/* Premium Header Section with Dark/Light Mode Support */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-zinc-900 dark:to-indigo-950/30 rounded-2xl p-8 shadow-xl transition-colors duration-300">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-100 dark:bg-indigo-900/20 rounded-full -mr-20 -mt-20 opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-100 dark:bg-blue-900/20 rounded-full -ml-16 -mb-16 opacity-50"></div>
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
           <div className="max-w-2xl">
             <div className="flex items-center gap-3 mb-3">
-              <div className="bg-zinc-700/50 p-2.5 rounded-lg border border-zinc-600/30">
-                <ParkingSquare className="h-5 w-5 text-zinc-100" />
+              <div className="bg-indigo-500/10 dark:bg-indigo-500/20 p-2.5 rounded-lg border border-indigo-500/20 dark:border-indigo-400/20">
+                <ParkingSquare className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
-              <h1 className="text-xl font-semibold text-zinc-100 tracking-tight">
+              <h1 className="text-xl font-semibold text-indigo-950 dark:text-indigo-200 tracking-tight">
                 Manage Parking Lots
               </h1>
             </div>
-            <p className="text-zinc-400 text-sm font-medium">
+            <p className="text-indigo-900/70 dark:text-indigo-300/70 text-sm font-medium">
               View and manage all your parking locations from a centralized
               dashboard
             </p>
@@ -280,19 +278,19 @@ const ManageParkingLot = () => {
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <div className="relative w-full sm:w-64">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-zinc-500" />
+                <Search className="h-4 w-4 text-indigo-500/70 dark:text-indigo-400/70" />
               </div>
               <Input
                 placeholder="Search locations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 h-10 bg-zinc-800/50 border border-zinc-700/50 text-zinc-300 placeholder:text-zinc-500 rounded-lg backdrop-blur-md focus-visible:ring-1 focus-visible:ring-zinc-600 focus-visible:ring-offset-0 text-sm"
+                className="w-full pl-9 pr-3 py-2 h-10 bg-white/80 dark:bg-zinc-800/80 border border-indigo-100 dark:border-indigo-500/20 text-indigo-900 dark:text-indigo-200 placeholder:text-indigo-400/70 dark:placeholder:text-indigo-500/50 rounded-lg backdrop-blur-md focus-visible:ring-1 focus-visible:ring-indigo-500 focus-visible:ring-offset-0 text-sm shadow-sm transition-colors duration-200"
               />
             </div>
             <Button
               variant="outline"
               onClick={fetchParkingLots}
-              className="flex-shrink-0 flex items-center gap-2 py-2 h-10 px-4 bg-zinc-800/50 hover:bg-zinc-700/50 border border-zinc-700/50 text-zinc-300 rounded-lg backdrop-blur-md transition-all duration-200 text-sm"
+              className="flex-shrink-0 flex items-center gap-2 py-2 h-10 px-4 bg-white/80 dark:bg-zinc-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-lg backdrop-blur-md transition-all duration-200 text-sm shadow-sm"
             >
               <RotateCcw className="h-4 w-4" />
               <span className="font-medium">Refresh</span>

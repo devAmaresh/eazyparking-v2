@@ -27,6 +27,12 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { BarChart } from "@/components/ui/bar-chart";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 // icons
 import {
@@ -104,6 +110,8 @@ const DashboardContent: React.FC = () => {
   const [formattedEarningsData, setFormattedEarningsData] = useState<
     BarChartData[]
   >([]);
+  // Add state for active tab
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Modern color palette
   const pieColors = ["#6366F1", "#F97316", "#06B6D4"];
@@ -257,18 +265,62 @@ const DashboardContent: React.FC = () => {
     return null;
   };
 
-
   return (
     <div className="p-6 min-h-screen bg-background text-foreground transition-colors">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Overview of your parking management system
-        </p>
+      {/* Modern Dashboard Header */}
+      <div className="relative mb-8 p-6 rounded-2xl overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-zinc-900 dark:to-indigo-950/30 shadow-xl transition-all duration-300">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-100 dark:bg-indigo-900/20 rounded-full -mr-20 -mt-20 opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-100 dark:bg-blue-900/20 rounded-full -ml-16 -mb-16 opacity-50"></div>
+
+        <div className="relative z-10">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-indigo-950 dark:text-indigo-200">
+                Admin Dashboard
+              </h1>
+              <p className="text-indigo-900/70 dark:text-indigo-300/70 mt-1 font-medium">
+                Overview of your parking management system
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="bg-white/80 dark:bg-zinc-800/80 rounded-lg shadow-sm p-2 flex items-center gap-2 border border-indigo-100 dark:border-indigo-500/20 backdrop-blur-sm">
+                <div className="h-8 w-8 rounded-md bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                  <Calendar className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <div className="text-sm">
+                  <p className="text-zinc-500 dark:text-zinc-400 font-medium">
+                    Today
+                  </p>
+                  <p className="text-zinc-800 dark:text-zinc-200 font-medium">
+                    {new Date().toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+              </div>
+              <div className="bg-white/80 dark:bg-zinc-800/80 rounded-lg shadow-sm p-2 flex items-center gap-2 border border-emerald-100 dark:border-emerald-500/20 backdrop-blur-sm">
+                <div className="h-8 w-8 rounded-md bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                  <CircleDollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="text-sm">
+                  <p className="text-zinc-500 dark:text-zinc-400 font-medium">
+                    System
+                  </p>
+                  <p className="text-zinc-800 dark:text-zinc-200 font-medium">
+                    Active
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Modern Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         {summaryCards.map((item, index) => (
           <Card
             key={index}
@@ -292,7 +344,7 @@ const DashboardContent: React.FC = () => {
                 <CardContent className="relative z-10">
                   <div className="flex items-start justify-between mb-4">
                     <div
-                      className={`${item.color} p-2 rounded-lg bg-background/80 backdrop-blur-sm`}
+                      className={`${item.color} p-2 rounded-lg bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm shadow-sm border border-white/50 dark:border-zinc-700/50`}
                     >
                       {item.icon}
                     </div>
@@ -317,229 +369,737 @@ const DashboardContent: React.FC = () => {
         ))}
       </div>
 
-      {/* Dashboard Analytics Header */}
-      <div className="mt-8 mb-6">
-        <h2 className="text-2xl font-semibold tracking-tight">
-          Dashboard Analytics
-        </h2>
-        <p className="text-muted-foreground mt-1">
-          Comprehensive view of your parking system analytics
-        </p>
+      {/* Analytics Tabs Section */}
+      <div className="mt-8 mb-6 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-zinc-900/50 dark:to-indigo-950/10 p-6 rounded-xl border border-blue-100/50 dark:border-indigo-900/30">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-indigo-950 dark:text-indigo-200">
+              Dashboard Analytics
+            </h2>
+            <p className="text-indigo-900/70 dark:text-indigo-300/70 mt-1">
+              Comprehensive view of your parking system analytics
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* All Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Pie Chart */}
-        <Card className="border shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <div>
-              <CardTitle>Vehicle Occupancy Distribution</CardTitle>
-              <CardDescription>
-                Current distribution of vehicles by status
-              </CardDescription>
-            </div>
-            <CircleDot className="h-5 w-5 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="pt-0">
-            {loading ? (
-              <div className="flex flex-col items-center space-y-4 py-12">
-                <Skeleton className="h-[250px] w-[250px] rounded-full" />
+      {/* Improved Tabbed Content */}
+      <Tabs
+        defaultValue="overview"
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm pt-1 pb-3 -mt-1">
+          <TabsList className="bg-white/80 dark:bg-zinc-800/80 border border-indigo-100 dark:border-indigo-900/30 p-1 h-auto rounded-lg mx-auto w-fit">
+            <TabsTrigger
+              value="overview"
+              className="rounded-md data-[state=active]:bg-indigo-500/10 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm px-4 py-2 text-sm"
+            >
+              <div className="flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-layout-dashboard"
+                >
+                  <rect width="7" height="9" x="3" y="3" rx="1" />
+                  <rect width="7" height="5" x="14" y="3" rx="1" />
+                  <rect width="7" height="9" x="14" y="12" rx="1" />
+                  <rect width="7" height="5" x="3" y="16" rx="1" />
+                </svg>
+                <span>Overview</span>
               </div>
-            ) : (
-              <div className="h-[350px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={occupancyData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={120}
-                      innerRadius={80}
-                      paddingAngle={6}
-                      cornerRadius={6}
-                      label={false}
-                      labelLine={false}
-                      animationDuration={1500}
-                      animationEasing="ease-in-out"
-                      className="drop-shadow-md"
-                    >
-                      {occupancyData.map((_entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={pieColors[index % pieColors.length]}
-                          strokeWidth={0}
-                          className="transition-opacity duration-300 hover:opacity-80"
+            </TabsTrigger>
+            <TabsTrigger
+              value="occupancy"
+              className="rounded-md data-[state=active]:bg-indigo-500/10 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm px-4 py-2 text-sm"
+            >
+              <div className="flex items-center gap-2">
+                <CircleDot className="h-4 w-4" />
+                <span>Occupancy</span>
+              </div>
+            </TabsTrigger>
+            <TabsTrigger
+              value="trends"
+              className="rounded-md data-[state=active]:bg-indigo-500/10 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm px-4 py-2 text-sm"
+            >
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                <span>Trends</span>
+              </div>
+            </TabsTrigger>
+            <TabsTrigger
+              value="revenue"
+              className="rounded-md data-[state=active]:bg-indigo-500/10 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400 data-[state=active]:shadow-sm px-4 py-2 text-sm"
+            >
+              <div className="flex items-center gap-2">
+                <CircleDollarSign className="h-4 w-4" />
+                <span>Revenue</span>
+              </div>
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        {/* Overview Tab Content */}
+        <TabsContent
+          value="overview"
+          className="mt-2 space-y-6 animate-in fade-in-50 duration-300"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Pie Chart */}
+            <Card className="border shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle>Vehicle Occupancy Distribution</CardTitle>
+                  <CardDescription>
+                    Current distribution of vehicles by status
+                  </CardDescription>
+                </div>
+                <CircleDot className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0">
+                {loading ? (
+                  <div className="flex flex-col items-center space-y-4 py-12">
+                    <Skeleton className="h-[250px] w-[250px] rounded-full" />
+                  </div>
+                ) : (
+                  <div className="h-[350px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={occupancyData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={120}
+                          innerRadius={80}
+                          paddingAngle={6}
+                          cornerRadius={6}
+                          label={false}
+                          labelLine={false}
+                          animationDuration={1500}
+                          animationEasing="ease-in-out"
+                          className="drop-shadow-md"
+                        >
+                          {occupancyData.map((_entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={pieColors[index % pieColors.length]}
+                              strokeWidth={0}
+                              className="transition-opacity duration-300 hover:opacity-80"
+                            />
+                          ))}
+                        </Pie>
+                        <Legend
+                          layout="horizontal"
+                          align="center"
+                          verticalAlign="bottom"
+                          iconType="circle"
+                          iconSize={10}
+                          wrapperStyle={{
+                            paddingTop: 30,
+                            fontFamily: "var(--font-sans)",
+                            fontSize: "14px",
+                          }}
+                          formatter={(value, _entry, index) => (
+                            <div className="flex flex-col items-center">
+                              <span className="font-medium text-sm">{value}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {occupancyData[index]?.value || 0} vehicles (
+                                {(
+                                  ((occupancyData[index]?.value || 0) /
+                                    occupancyData.reduce(
+                                      (acc, item) => acc + item.value,
+                                      0
+                                    )) *
+                                  100
+                                ).toFixed(0)}
+                                %)
+                              </span>
+                            </div>
+                          )}
                         />
-                      ))}
-                    </Pie>
-                    <Legend
-                      layout="horizontal"
-                      align="center"
-                      verticalAlign="bottom"
-                      iconType="circle"
-                      iconSize={10}
-                      wrapperStyle={{
-                        paddingTop: 30,
-                        fontFamily: "var(--font-sans)",
-                        fontSize: "14px",
-                      }}
-                      formatter={(value, _entry, index) => (
-                        <div className="flex flex-col items-center">
-                          <span className="font-medium text-sm">{value}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {occupancyData[index]?.value || 0} vehicles (
-                            {(
-                              ((occupancyData[index]?.value || 0) /
-                                occupancyData.reduce(
-                                  (acc, item) => acc + item.value,
-                                  0
-                                )) *
-                              100
-                            ).toFixed(0)}
-                            %)
-                          </span>
-                        </div>
-                      )}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-        {/* Line Chart */}
-        <Card className="border shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <div>
-              <CardTitle>Vehicle Trends Over Time</CardTitle>
-              <CardDescription>
-                Daily trends of vehicle status changes
-              </CardDescription>
-            </div>
-            <TrendingUp className="h-5 w-5 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="pt-0">
-            {loading ? (
-              <div className="space-y-4 py-12">
-                <Skeleton className="h-[300px] w-full" />
-              </div>
-            ) : (
-              <div className="h-[350px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={trendData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke={theme === "dark" ? "#333" : "#eee"}
-                    />
-                    <XAxis
-                      dataKey="date"
-                      tickFormatter={formatDateToDDMMYYYY}
-                      tick={{ fontSize: 12 }}
-                      stroke="currentColor"
-                      opacity={0.6}
-                    />
-                    <YAxis
-                      stroke="currentColor"
-                      opacity={0.6}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend
-                      iconType="circle"
-                      iconSize={8}
-                      wrapperStyle={{
-                        paddingTop: 20,
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="in"
-                      name="Upcoming"
-                      stroke={lineColors.in}
-                      strokeWidth={3}
-                      dot={{
-                        r: 4,
-                        strokeWidth: 0,
-                        fill: lineColors.in,
-                      }}
-                      activeDot={{ r: 6, strokeWidth: 0 }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="out"
-                      name="Parked"
-                      stroke={lineColors.out}
-                      strokeWidth={3}
-                      dot={{
-                        r: 4,
-                        strokeWidth: 0,
-                        fill: lineColors.out,
-                      }}
-                      activeDot={{ r: 6, strokeWidth: 0 }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="history"
-                      name="Settled"
-                      stroke={lineColors.history}
-                      strokeWidth={3}
-                      dot={{
-                        r: 4,
-                        strokeWidth: 0,
-                        fill: lineColors.history,
-                      }}
-                      activeDot={{ r: 6, strokeWidth: 0 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            {/* Line Chart */}
+            <Card className="border shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle>Vehicle Trends Over Time</CardTitle>
+                  <CardDescription>
+                    Daily trends of vehicle status changes
+                  </CardDescription>
+                </div>
+                <TrendingUp className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0">
+                {loading ? (
+                  <div className="space-y-4 py-12">
+                    <Skeleton className="h-[300px] w-full" />
+                  </div>
+                ) : (
+                  <div className="h-[350px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={trendData}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke={theme === "dark" ? "#333" : "#eee"}
+                        />
+                        <XAxis
+                          dataKey="date"
+                          tickFormatter={formatDateToDDMMYYYY}
+                          tick={{ fontSize: 12 }}
+                          stroke="currentColor"
+                          opacity={0.6}
+                        />
+                        <YAxis
+                          stroke="currentColor"
+                          opacity={0.6}
+                          tick={{ fontSize: 12 }}
+                        />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Legend
+                          iconType="circle"
+                          iconSize={8}
+                          wrapperStyle={{
+                            paddingTop: 20,
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="in"
+                          name="Upcoming"
+                          stroke={lineColors.in}
+                          strokeWidth={3}
+                          dot={{
+                            r: 4,
+                            strokeWidth: 0,
+                            fill: lineColors.in,
+                          }}
+                          activeDot={{ r: 6, strokeWidth: 0 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="out"
+                          name="Parked"
+                          stroke={lineColors.out}
+                          strokeWidth={3}
+                          dot={{
+                            r: 4,
+                            strokeWidth: 0,
+                            fill: lineColors.out,
+                          }}
+                          activeDot={{ r: 6, strokeWidth: 0 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="history"
+                          name="Settled"
+                          stroke={lineColors.history}
+                          strokeWidth={3}
+                          dot={{
+                            r: 4,
+                            strokeWidth: 0,
+                            fill: lineColors.history,
+                          }}
+                          activeDot={{ r: 6, strokeWidth: 0 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-        {/* Bar Chart - Full Width with ShadCN UI */}
-        <Card className="border shadow-sm lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <div>
-              <CardTitle>Monthly Revenue Analytics</CardTitle>
-              <CardDescription>
-                Total earnings breakdown by month
-              </CardDescription>
-            </div>
-            <CircleDollarSign className="h-5 w-5 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="pt-0">
-            {loading ? (
-              <div className="space-y-4 py-12">
-                <Skeleton className="h-[300px] w-full" />
-              </div>
-            ) : (
-              <div className="h-[350px] w-full">
-                <BarChart
-                  data={formattedEarningsData}
-                  valueFormatter={(value) => `₹${value.toLocaleString()}`}
-                  showAnimation={true}
-                  color={barColor}
-                  onClick={(item) => {
-                    toast.success(
-                      `${item.name}: ₹${item.value.toLocaleString()}`
+            {/* Bar Chart - Full Width */}
+            <Card className="border shadow-sm hover:shadow-md transition-shadow lg:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle>Monthly Revenue Analytics</CardTitle>
+                  <CardDescription>
+                    Total earnings breakdown by month
+                  </CardDescription>
+                </div>
+                <CircleDollarSign className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0">
+                {loading ? (
+                  <div className="space-y-4 py-12">
+                    <Skeleton className="h-[300px] w-full" />
+                  </div>
+                ) : (
+                  <div className="h-[350px] w-full">
+                    <BarChart
+                      data={formattedEarningsData}
+                      valueFormatter={(value) => `₹${value.toLocaleString()}`}
+                      showAnimation={true}
+                      color={barColor}
+                      onClick={(item) => {
+                        toast.success(
+                          `${item.name}: ₹${item.value.toLocaleString()}`
+                        );
+                      }}
+                      className="h-full"
+                    />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Occupancy Tab Content */}
+        <TabsContent
+          value="occupancy"
+          className="mt-2 animate-in fade-in-50 duration-300"
+        >
+          <div className="grid grid-cols-1 gap-6">
+            <Card className="border shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle>Vehicle Occupancy Distribution</CardTitle>
+                  <CardDescription>
+                    Current distribution of vehicles by status
+                  </CardDescription>
+                </div>
+                <CircleDot className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0">
+                {loading ? (
+                  <div className="flex flex-col items-center space-y-4 py-12">
+                    <Skeleton className="h-[250px] w-[250px] rounded-full" />
+                  </div>
+                ) : (
+                  <div className="h-[500px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={occupancyData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={150}
+                          innerRadius={100}
+                          paddingAngle={6}
+                          cornerRadius={6}
+                          label={(entry) => `${entry.name}: ${entry.value}`}
+                          labelLine={true}
+                          animationDuration={1500}
+                          animationEasing="ease-in-out"
+                          className="drop-shadow-md"
+                        >
+                          {occupancyData.map((_entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={pieColors[index % pieColors.length]}
+                              strokeWidth={0}
+                              className="transition-opacity duration-300 hover:opacity-80"
+                            />
+                          ))}
+                        </Pie>
+                        <Legend
+                          layout="horizontal"
+                          align="center"
+                          verticalAlign="bottom"
+                          iconType="circle"
+                          iconSize={10}
+                          wrapperStyle={{
+                            paddingTop: 30,
+                            fontFamily: "var(--font-sans)",
+                            fontSize: "14px",
+                          }}
+                          formatter={(value, _entry, index) => (
+                            <div className="flex flex-col items-center">
+                              <span className="font-medium text-sm">{value}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {occupancyData[index]?.value || 0} vehicles (
+                                {(
+                                  ((occupancyData[index]?.value || 0) /
+                                    occupancyData.reduce(
+                                      (acc, item) => acc + item.value,
+                                      0
+                                    )) *
+                                  100
+                                ).toFixed(0)}
+                                %)
+                              </span>
+                            </div>
+                          )}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Occupancy Details Table for Extra Context */}
+            {!loading && (
+              <Card className="border shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <CardTitle>Occupancy Breakdown</CardTitle>
+                  <CardDescription>
+                    Detailed view of current vehicle status
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+                    <table className="w-full text-sm">
+                      <thead className="bg-zinc-50 dark:bg-zinc-800/50">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-medium">Status</th>
+                          <th className="px-4 py-3 text-left font-medium">Count</th>
+                          <th className="px-4 py-3 text-left font-medium">
+                            Percentage
+                          </th>
+                          <th className="px-4 py-3 text-left font-medium">
+                            Indicator
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {occupancyData.map((item, index) => {
+                          const percentage = (
+                            (item.value / occupancyData.reduce(
+                              (acc, i) => acc + i.value,
+                              0
+                            )) *
+                            100
+                          ).toFixed(1);
+
+                          return (
+                            <tr
+                              key={index}
+                              className="border-t border-zinc-200 dark:border-zinc-800"
+                            >
+                              <td className="px-4 py-3 font-medium">{item.name}</td>
+                              <td className="px-4 py-3">{item.value}</td>
+                              <td className="px-4 py-3">{percentage}%</td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="h-3 w-3 rounded-full"
+                                    style={{
+                                      backgroundColor:
+                                        pieColors[index % pieColors.length],
+                                    }}
+                                  />
+                                  <div className="w-24 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+                                    <div
+                                      className="h-full rounded-full"
+                                      style={{
+                                        width: `${percentage}%`,
+                                        backgroundColor:
+                                          pieColors[index % pieColors.length],
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Trends Tab Content */}
+        <TabsContent
+          value="trends"
+          className="mt-2 animate-in fade-in-50 duration-300"
+        >
+          <div className="grid grid-cols-1 gap-6">
+            <Card className="border shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle>Vehicle Trends Over Time</CardTitle>
+                  <CardDescription>
+                    Daily trends of vehicle status changes
+                  </CardDescription>
+                </div>
+                <TrendingUp className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pt-0">
+                {loading ? (
+                  <div className="space-y-4 py-12">
+                    <Skeleton className="h-[400px] w-full" />
+                  </div>
+                ) : (
+                  <div className="h-[500px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={trendData}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke={theme === "dark" ? "#333" : "#eee"}
+                        />
+                        <XAxis
+                          dataKey="date"
+                          tickFormatter={formatDateToDDMMYYYY}
+                          tick={{ fontSize: 12 }}
+                          stroke="currentColor"
+                          opacity={0.6}
+                        />
+                        <YAxis
+                          stroke="currentColor"
+                          opacity={0.6}
+                          tick={{ fontSize: 12 }}
+                        />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Legend
+                          iconType="circle"
+                          iconSize={8}
+                          wrapperStyle={{
+                            paddingTop: 20,
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="in"
+                          name="Upcoming"
+                          stroke={lineColors.in}
+                          strokeWidth={3}
+                          dot={{
+                            r: 4,
+                            strokeWidth: 0,
+                            fill: lineColors.in,
+                          }}
+                          activeDot={{ r: 6, strokeWidth: 0 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="out"
+                          name="Parked"
+                          stroke={lineColors.out}
+                          strokeWidth={3}
+                          dot={{
+                            r: 4,
+                            strokeWidth: 0,
+                            fill: lineColors.out,
+                          }}
+                          activeDot={{ r: 6, strokeWidth: 0 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="history"
+                          name="Settled"
+                          stroke={lineColors.history}
+                          strokeWidth={3}
+                          dot={{
+                            r: 4,
+                            strokeWidth: 0,
+                            fill: lineColors.history,
+                          }}
+                          activeDot={{ r: 6, strokeWidth: 0 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Trend Analysis Summary Card */}
+            {!loading && trendData.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  {
+                    title: "Upcoming Vehicles",
+                    dataKey: "in",
+                    icon: <Car className="h-5 w-5" />,
+                    color: lineColors.in,
+                    bgColor: "bg-purple-50 dark:bg-purple-900/20",
+                  },
+                  {
+                    title: "Parked Vehicles",
+                    dataKey: "out",
+                    icon: <ParkingCircle className="h-5 w-5" />,
+                    color: lineColors.out,
+                    bgColor: "bg-pink-50 dark:bg-pink-900/20",
+                  },
+                  {
+                    title: "Settled Vehicles",
+                    dataKey: "history",
+                    icon: <History className="h-5 w-5" />,
+                    color: lineColors.history,
+                    bgColor: "bg-emerald-50 dark:bg-emerald-900/20",
+                  },
+                ].map((item, index) => {
+                  const currentTotal = trendData.reduce(
+                    (sum, dataPoint) =>
+                      sum + (dataPoint[item.dataKey as keyof TrendDataItem] as number),
+                    0
+                  );
+                  const avgPerDay = (currentTotal / trendData.length).toFixed(1);
+
+                  // We're commenting out these unused variables to avoid TypeScript warnings
+                  // If needed for future growth calculations, uncomment them
+                  // const latestDataPoint = trendData[trendData.length - 1][
+                  //   item.dataKey as keyof TrendDataItem
+                  // ] as number;
+                                    
+                  // const previousDataPoint =
+                  //   trendData[trendData.length - 2]?.[
+                  //     item.dataKey as keyof TrendDataItem
+                  //   ] as number || 0;
+                  
+                                    return (
+                                      <Card key={index} className={`border ${item.bgColor}`}>
+                                        <CardContent className="pt-6">
+                                          <div className="flex items-center justify-between mb-4">
+                                            <div
+                                              className="p-2 rounded-lg"
+                                              style={{ color: item.color }}
+                                            >
+                                              {item.icon}
+                                            </div>
+                                            <div
+                                              className="text-xs font-medium px-2 py-1 rounded-full"
+                                              style={{
+                                                backgroundColor: item.color + "20",
+                                                color: item.color,
+                                              }}
+                                            >
+                                              {avgPerDay} avg/day
+                                            </div>
+                                          </div>
+                                          <h3 className="font-medium text-sm text-muted-foreground">
+                                            {item.title}
+                                          </h3>
+                                          <div className="text-2xl font-bold mt-1" style={{ color: item.color }}>
+                                            {currentTotal}
+                                          </div>
+                                        </CardContent>
+                                      </Card>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          </TabsContent>
+                  
+                          {/* Revenue Tab Content */}
+                          <TabsContent
+                            value="revenue"
+                            className="mt-2 animate-in fade-in-50 duration-300"
+                          >
+                            <div className="grid grid-cols-1 gap-6">
+                              <Card className="border shadow-sm hover:shadow-md transition-shadow">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                  <div>
+                                    <CardTitle>Monthly Revenue Analytics</CardTitle>
+                                    <CardDescription>
+                                      Total earnings breakdown by month
+                                    </CardDescription>
+                                  </div>
+                                  <CircleDollarSign className="h-5 w-5 text-muted-foreground" />
+                                </CardHeader>
+                                <CardContent className="pt-0">
+                                  {loading ? (
+                                    <div className="space-y-4 py-12">
+                                      <Skeleton className="h-[400px] w-full" />
+                                    </div>
+                                  ) : (
+                                    <div className="h-[500px] w-full">
+                                      <BarChart
+                                        data={formattedEarningsData}
+                                        valueFormatter={(value) => `₹${value.toLocaleString()}`}
+                                        showAnimation={true}
+                                        color={barColor}
+                                        className="h-full"
+                                      />
+                                    </div>
+                                  )}
+                                </CardContent>
+                              </Card>
+                  
+                              {/* Revenue Summary */}
+                              {!loading && earningsData.length > 0 && (
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle>Revenue Insights</CardTitle>
+                                    <CardDescription>
+                                      Key metrics based on earnings data
+                                    </CardDescription>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                      <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                                        <div className="flex items-center justify-between mb-3">
+                                          <h3 className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                                            Total Revenue
+                                          </h3>
+                                          <CircleDollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                        </div>
+                                        <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                                          ₹
+                                          {earningsData
+                                            .reduce((sum, item) => sum + item.earnings, 0)
+                                            .toLocaleString()}
+                                        </p>
+                                      </div>
+                                      <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-lg">
+                                        <div className="flex items-center justify-between mb-3">
+                                          <h3 className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                                            Average Monthly
+                                          </h3>
+                                          <CircleDollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                        </div>
+                                        <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+                                          ₹
+                                          {(
+                                            earningsData.reduce((sum, item) => sum + item.earnings, 0) /
+                                            Math.max(earningsData.length, 1)
+                                          ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                        </p>
+                                      </div>
+                                      <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg">
+                                        <div className="flex items-center justify-between mb-3">
+                                          <h3 className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                                            Highest Month
+                                          </h3>
+                                          <CircleDollarSign className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                                        </div>
+                                        <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+                                          ₹
+                                          {Math.max(
+                                            ...earningsData.map((item) => item.earnings)
+                                          ).toLocaleString()}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              )}
+                            </div>
+                          </TabsContent>
+                        </Tabs>
+                      </div>
                     );
-                  }}
-                  className="h-full"
-                />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default DashboardContent;
+                  };
+                  
+                  export default DashboardContent;
