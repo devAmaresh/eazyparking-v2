@@ -1,9 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
   PieChart,
   Pie,
   Cell,
@@ -13,6 +9,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Legend,
+  XAxis,
+  YAxis,
 } from "recharts";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -35,6 +33,9 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// ShadCN Bar Chart components - Added for replacing Recharts
+import { BarChart } from "@/components/ui/bar-chart";
 
 // Icons
 import {
@@ -346,7 +347,6 @@ const UserDashboard = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                   <motion.div variants={itemVariants} className="group">
                     <Card className="rounded-xl overflow-hidden border-indigo-100 dark:border-indigo-800/30 shadow-md hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-900 group-hover:-translate-y-1">
-                  
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start">
                           <div className="space-y-1">
@@ -388,7 +388,6 @@ const UserDashboard = () => {
 
                   <motion.div variants={itemVariants} className="group">
                     <Card className="rounded-xl overflow-hidden border-blue-100 dark:border-blue-800/30 shadow-md hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-900 group-hover:-translate-y-1">
-                    
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start">
                           <div className="space-y-1">
@@ -413,7 +412,6 @@ const UserDashboard = () => {
 
                   <motion.div variants={itemVariants} className="group">
                     <Card className="rounded-xl overflow-hidden border-emerald-100 dark:border-emerald-800/30 shadow-md hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-900 group-hover:-translate-y-1">
-                      
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start">
                           <div className="space-y-1">
@@ -456,7 +454,6 @@ const UserDashboard = () => {
 
                   <motion.div variants={itemVariants} className="group">
                     <Card className="rounded-xl overflow-hidden border-amber-100 dark:border-amber-800/30 shadow-md hover:shadow-lg transition-all duration-300 bg-white dark:bg-zinc-900 group-hover:-translate-y-1">
-                    
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start">
                           <div className="space-y-1">
@@ -482,10 +479,10 @@ const UserDashboard = () => {
 
                 {/* Overview Charts Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Monthly Booking History Chart */}
+                  {/* Monthly Booking History Chart - Replace Recharts with ShadCN UI */}
                   <motion.div variants={itemVariants}>
-                    <Card className="rounded-xl overflow-hidden border-blue-100 dark:border-blue-800/30 shadow-md h-full bg-white dark:bg-zinc-900">
-                      <CardHeader className="pb-2 border-b border-blue-100/50 dark:border-blue-800/20 bg-blue-50/60 dark:bg-blue-950/20">
+                    <Card className="rounded-xl py-0 overflow-hidden border-blue-100 dark:border-blue-800/30 shadow-md h-full bg-white dark:bg-zinc-900">
+                      <CardHeader className="pt-4 border-b border-blue-100/50 dark:border-blue-800/20 bg-blue-50/60 dark:bg-blue-950/20">
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-lg font-medium flex items-center gap-1.5 text-blue-900 dark:text-blue-200">
                             <ChartBar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -514,53 +511,17 @@ const UserDashboard = () => {
                             </p>
                           </div>
                         ) : (
-                          <div className="h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                              <BarChart
-                                data={bookingHistory}
-                                margin={{
-                                  top: 20,
-                                  right: 20,
-                                  bottom: 10,
-                                  left: 10,
-                                }}
-                              >
-                                <CartesianGrid
-                                  strokeDasharray="3 3"
-                                  stroke={
-                                    isDark
-                                      ? "rgba(113, 128, 150, 0.2)"
-                                      : "rgba(203, 213, 225, 0.5)"
-                                  }
-                                  vertical={false}
-                                />
-                                <XAxis
-                                  dataKey="month"
-                                  stroke={isDark ? "#94a3b8" : "#64748b"}
-                                  tickLine={false}
-                                  axisLine={false}
-                                  padding={{ left: 10, right: 10 }}
-                                />
-                                <YAxis
-                                  stroke={isDark ? "#94a3b8" : "#64748b"}
-                                  tickLine={false}
-                                  axisLine={false}
-                                  width={30}
-                                />
-                                <Tooltip
-                                  content={<CustomTooltip theme={theme} />}
-                                />
-                                <Bar
-                                  dataKey="bookings"
-                                  fill="#3b82f6"
-                                  radius={[6, 6, 0, 0]}
-                                  maxBarSize={60}
-                                  background={{
-                                    fill: isDark ? "#1e293b40" : "#f1f5f940",
-                                  }}
-                                />
-                              </BarChart>
-                            </ResponsiveContainer>
+                          <div className="h-[300px] w-full">
+                            {/* ShadCN UI Bar Chart replacement */}
+                            <BarChart
+                              data={bookingHistory.map((item) => ({
+                                name: item.month,
+                                value: Number(item.bookings),
+                              }))}
+                              valueFormatter={(value) => `${value} bookings`}
+                              className="h-[300px] "
+                              showAnimation={true}
+                            />
                           </div>
                         )}
                       </CardContent>
@@ -569,10 +530,10 @@ const UserDashboard = () => {
 
                   {/* Spending Over Time Chart */}
                   <motion.div variants={itemVariants}>
-                    <Card className="rounded-xl overflow-hidden border-emerald-100 dark:border-emerald-800/30 shadow-md h-full bg-white dark:bg-zinc-900">
-                      <CardHeader className="pb-2 border-b border-emerald-100/50 dark:border-emerald-800/20 bg-emerald-50/60 dark:bg-emerald-950/20">
+                    <Card className="py-0 rounded-xl overflow-hidden border-emerald-100 dark:border-emerald-800/30 shadow-md h-full bg-white dark:bg-zinc-900">
+                      <CardHeader className="pt-4 pb-2 border-b border-emerald-100/50 dark:border-emerald-800/20 bg-emerald-50/60 dark:bg-emerald-950/20">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg font-medium flex items-center gap-1.5 text-emerald-900 dark:text-emerald-200">
+                          <CardTitle className=" text-lg font-medium flex items-center gap-1.5 text-emerald-900 dark:text-emerald-200">
                             <LineChartIcon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                             Spending Over Time
                           </CardTitle>
@@ -676,8 +637,8 @@ const UserDashboard = () => {
 
                 {/* Parking Insights Card */}
                 <motion.div variants={itemVariants}>
-                  <Card className="rounded-xl overflow-hidden border-indigo-100 dark:border-indigo-800/30 shadow-md bg-white dark:bg-zinc-900">
-                    <CardHeader className="pb-2 border-b border-indigo-100/50 dark:border-indigo-800/20 bg-indigo-50/60 dark:bg-indigo-950/20">
+                  <Card className="py-0 rounded-xl overflow-hidden border-indigo-100 dark:border-indigo-800/30 shadow-md bg-white dark:bg-zinc-900">
+                    <CardHeader className="pt-4 pb-2 border-b border-indigo-100/50 dark:border-indigo-800/20 bg-indigo-50/60 dark:bg-indigo-950/20">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg font-medium flex items-center gap-1.5 text-indigo-900 dark:text-indigo-200">
                           <History className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
@@ -789,8 +750,8 @@ const UserDashboard = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Time Spent Distribution */}
                   <motion.div variants={itemVariants}>
-                    <Card className="rounded-xl overflow-hidden border-violet-100 dark:border-violet-800/30 shadow-md h-full bg-white dark:bg-zinc-900">
-                      <CardHeader className="pb-2 border-b border-violet-100/50 dark:border-violet-800/20 bg-violet-50/60 dark:bg-violet-950/20">
+                    <Card className="py-0 rounded-xl overflow-hidden border-violet-100 dark:border-violet-800/30 shadow-md h-full bg-white dark:bg-zinc-900">
+                      <CardHeader className="pt-4 pb-2 border-b border-violet-100/50 dark:border-violet-800/20 bg-violet-50/60 dark:bg-violet-950/20">
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-lg font-medium flex items-center gap-1.5 text-violet-900 dark:text-violet-200">
                             <PieChartIcon className="h-4 w-4 text-violet-600 dark:text-violet-400" />
@@ -872,8 +833,8 @@ const UserDashboard = () => {
 
                   {/* Activity Summary and Tips */}
                   <motion.div variants={itemVariants}>
-                    <Card className="rounded-xl overflow-hidden border-indigo-100 dark:border-indigo-800/30 shadow-md h-full bg-white dark:bg-zinc-900">
-                      <CardHeader className="pb-2 border-b border-indigo-100/50 dark:border-indigo-800/20 bg-indigo-50/60 dark:bg-indigo-950/20">
+                    <Card className="pt-0 rounded-xl overflow-hidden border-indigo-100 dark:border-indigo-800/30 shadow-md h-full bg-white dark:bg-zinc-900">
+                      <CardHeader className="pt-4 pb-2 border-b border-indigo-100/50 dark:border-indigo-800/20 bg-indigo-50/60 dark:bg-indigo-950/20">
                         <CardTitle className="text-lg font-medium flex items-center gap-1.5 text-indigo-900 dark:text-indigo-200">
                           <History className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                           Parking Behavior & Tips
