@@ -7,7 +7,7 @@ import ManageCategory from "./ManageCategory";
 import { Card, CardContent } from "@/components/ui/card";
 
 // Icons
-import { Plus, List, Tag } from "lucide-react";
+import { Plus, List } from "lucide-react";
 
 const VehicleCategory = () => {
   const [activeTab, setActiveTab] = useState("manage");
@@ -23,7 +23,6 @@ const VehicleCategory = () => {
     <div className="p-6 min-h-screen bg-background text-foreground transition-colors">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <Tag className="h-7 w-7 text-primary" />
           Vehicle Categories
         </h1>
         <p className="text-muted-foreground mt-1">

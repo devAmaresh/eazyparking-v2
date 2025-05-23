@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -12,11 +12,9 @@ import {
   Users,
   Menu,
   ChevronsLeft,
-  Sun,
-  Moon,
+
   Car,
 } from "lucide-react";
-import { ThemeContext } from "@/context/ThemeContext"; // Adjust the path as needed
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -29,16 +27,9 @@ const menuItems = [
   { label: "Reports", path: "/admin/reports", icon: BarChart2 },
   { label: "Reg Users", path: "/admin/registered-users", icon: Users },
   { label: "Settings", path: "/admin/settings", icon: Settings },
-  {
-    label: "Logout",
-    path: "/logout",
-    icon: LogOut,
-    className: "mt-auto text-red-500 dark:text-red-400",
-  },
 ];
 
 export default function Sidebar() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -108,7 +99,7 @@ export default function Sidebar() {
               to="/admin/dashboard"
               className="text-2xl mx-auto font-bold  text-black dark:text-white"
             >
-              <Car className="h-8 w-8" />
+              <Car className="h-8 w-8 text-gradient-to-r from-blue-600 to-violet-600 dark:from-blue-400 dark:to-violet-400" />
             </NavLink>
           )}
 
@@ -151,8 +142,7 @@ export default function Sidebar() {
                   "flex h-10 items-center gap-2 rounded-lg px-3 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200",
                   isActive &&
                     "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium",
-                  collapsed && !isMobile && "justify-center px-0",
-                  item.className
+                  collapsed && !isMobile && "justify-center px-0"
                 )
               }
             >
@@ -166,47 +156,20 @@ export default function Sidebar() {
           ))}
         </div>
 
-        {/* Theme Toggle */}
-        <div
-          className={cn(
-            "mt-auto mb-4",
-            collapsed && !isMobile ? "px-2" : "px-3"
-          )}
-        >
-          <div
-            className={cn(
-              "flex items-center rounded-lg transition-colors",
-              collapsed && !isMobile
-                ? "justify-center h-10"
-                : "h-10 px-3 bg-gray-50 dark:bg-gray-800/50 justify-between"
-            )}
-          >
-            {(!collapsed || isMobile) && (
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Theme
-              </span>
-            )}
-            <button
-              onClick={toggleTheme}
+        
+          <div className="mt-auto flex items-center justify-between px-2 py-2">
+            <NavLink
+              to="/logout"
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-md",
-                theme === "dark"
-                  ? "text-yellow-400 hover:bg-gray-800"
-                  : "text-blue-500 hover:bg-gray-100"
+                "flex items-center w-full gap-2 rounded-lg p-3 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200",
+                collapsed && !isMobile && "justify-center px-0"
               )}
-              aria-label={`Switch to ${
-                theme === "dark" ? "light" : "dark"
-              } theme`}
             >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </button>
+              <LogOut className="h-5 w-5" />
+              {(!collapsed || isMobile) && <span>Logout</span>}
+            </NavLink>
           </div>
         </div>
-      </div>
     </>
   );
 }

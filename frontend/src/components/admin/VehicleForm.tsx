@@ -104,16 +104,31 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [timeInputValue, setTimeInputValue] = useState(""); // State to control time input
   const navigate = useNavigate();
 
-  // Initialize form
+  // Initialize form with explicit initial values to avoid controlled/uncontrolled warning
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      userId: "",
+      vehicleCategoryId: "",
       vehicleCompanyName: "",
       registrationNumber: "",
+      inTime: undefined,
     },
   });
+
+  // Watch the inTime value to update the time input when date changes
+  const selectedDate = form.watch("inTime");
+  
+  // Update time input whenever selected date changes
+  useEffect(() => {
+    if (selectedDate) {
+      const formattedTime = format(selectedDate, "HH:mm");
+      setTimeInputValue(formattedTime);
+    }
+  }, [selectedDate]);
 
   useEffect(() => {
     fetchUsers();
@@ -164,6 +179,20 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
       return;
     }
 
+    // Extra validation for date/time
+    if (!values.inTime || isNaN(values.inTime.getTime())) {
+      toast.error("Please select a valid date and time");
+      return;
+    }
+
+    // Ensure the date is at least 1 minute in the future
+    const now = new Date();
+    const minTime = new Date(now.getTime() + 60 * 1000);
+    if (values.inTime < minTime) {
+      toast.error("Booking time must be at least 1 minute in the future");
+      return;
+    }
+
     const payload = {
       parkingLotId,
       customerId: values.userId,
@@ -180,7 +209,14 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Booking successful!");
-      form.reset();
+      form.reset({
+        userId: "",
+        vehicleCategoryId: "",
+        vehicleCompanyName: "",
+        registrationNumber: "",
+        inTime: undefined,
+      });
+      setTimeInputValue("");
       navigate("/admin/bookings");
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || "Booking failed!";
@@ -380,7 +416,28 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                           <Calendar
                             mode="single"
                             selected={field.value}
-                            onSelect={field.onChange}
+                            onSelect={(date) => {
+                              if (date) {
+                                // Preserve the current time when changing the date
+                                const newDate = new Date(date);
+                                
+                                if (field.value) {
+                                  // If there's already a time set, preserve it
+                                  newDate.setHours(field.value.getHours());
+                                  newDate.setMinutes(field.value.getMinutes());
+                                } else {
+                                  // Set a default time (e.g., current time + 1 hour)
+                                  const now = new Date();
+                                  newDate.setHours(now.getHours() + 1);
+                                  newDate.setMinutes(0);
+                                  
+                                  // Update the time input
+                                  setTimeInputValue(format(newDate, "HH:mm"));
+                                }
+                                
+                                field.onChange(newDate);
+                              }
+                            }}
                             disabled={(date) => {
                               // Allow same day if it's today, only disable past days
                               const today = new Date();
@@ -398,18 +455,32 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                               <Input
                                 type="time"
                                 className="w-full dark:bg-zinc-700 dark:border-zinc-600"
-                                value={
-                                  field.value
-                                    ? format(field.value, "HH:mm")
-                                    : ""
-                                }
+                                value={timeInputValue}
                                 onChange={(e) => {
-                                  const [hours, minutes] =
-                                    e.target.value.split(":");
-                                  const newDate = field.value || new Date();
-                                  newDate.setHours(parseInt(hours));
-                                  newDate.setMinutes(parseInt(minutes));
-                                  field.onChange(newDate);
+                                  try {
+                                    // Always update the controlled input value
+                                    setTimeInputValue(e.target.value);
+                                    
+                                    // Only proceed if we have a selected date and valid time
+                                    if (field.value && e.target.value) {
+                                      const [hours, minutes] = e.target.value.split(":");
+                                      
+                                      if (hours && minutes) {
+                                        // Create a new date object to avoid mutating the original
+                                        const newDate = new Date(field.value);
+                                        newDate.setHours(parseInt(hours, 10));
+                                        newDate.setMinutes(parseInt(minutes, 10));
+                                        
+                                        // Validate the date before setting it
+                                        if (!isNaN(newDate.getTime())) {
+                                          field.onChange(newDate);
+                                        }
+                                      }
+                                    }
+                                  } catch (error) {
+                                    console.error("Error setting time:", error);
+                                    // Don't update if there's an error
+                                  }
                                 }}
                               />
                             </div>
