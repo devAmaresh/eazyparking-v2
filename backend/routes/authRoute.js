@@ -33,6 +33,7 @@ router.post('/register', async (req, res) => {
                 email,
                 password: hashedPassword,
                 mobileNumber,
+                profileImage: `https://api.dicebear.com/6.x/initials/svg?seed=${firstName} ${lastName}`,
             },
         });
 
