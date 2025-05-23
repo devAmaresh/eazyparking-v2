@@ -55,8 +55,6 @@ import {
   UserRound,
   MapPin,
   Tag,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 declare module "jspdf" {
