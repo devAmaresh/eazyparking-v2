@@ -110,7 +110,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#000000] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Modern grid background */}
-      <div className="absolute inset-0 w-full h-full dark:bg-[url('/grid.svg')] dark:bg-[length:30px_30px] bg-[url('/grid-light.svg')] bg-[length:25px_25px] opacity-[0.03] dark:opacity-[0.07]"></div>
+      <div className="absolute inset-0 w-full h-full dark:bg-[length:30px_30px] bg-[length:25px_25px] opacity-[0.03] dark:opacity-[0.07]"></div>
       
       {/* Accent colors */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
