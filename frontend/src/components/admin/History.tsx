@@ -3,14 +3,26 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-hot-toast';
 import { BACKEND_URL } from '@/utils/backend';
-import { VehicleTableLayout, StatusBadge } from './VehicleTableLayout';
+import { VehicleTableLayout, StatusBadge, ParkingIdDisplay } from './VehicleTableLayout';
 import { format, formatDistance } from 'date-fns';
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 // Icons
-import { Calendar, FileText, HistoryIcon, User, Car, FileDown, ReceiptText, Download } from 'lucide-react';
+import { 
+  Calendar, 
+  FileText, 
+  HistoryIcon, 
+  User, 
+  FileDown, 
+  ReceiptText, 
+  Download,
+  CarFront,
+  ClipboardCheck,
+  BadgeCheck
+} from 'lucide-react';
 
 interface HistoryVehicleType {
   id: string;
@@ -74,6 +86,7 @@ const History: React.FC = () => {
     }
   }, [searchQuery, data]);
   
+  // Enhanced PDF generation
   const generatePDF = () => {
     setDownloading(true);
     
@@ -143,26 +156,28 @@ const History: React.FC = () => {
     }
   };
 
-  // Download button that will appear in the header
+  // Enhanced download button with motion
   const downloadButton = (
-    <Button 
-      onClick={generatePDF} 
-      disabled={downloading || loading || filteredData.length === 0}
-      className="flex items-center gap-2 bg-primary hover:bg-primary/90 hover:cursor-pointer"
-      size="sm"
-    >
-      {downloading ? (
-        <>
-          <FileDown className="h-4 w-4 animate-bounce" />
-          <span>Generating...</span>
-        </>
-      ) : (
-        <>
-          <Download className="h-4 w-4" />
-          <span>Download PDF</span>
-        </>
-      )}
-    </Button>
+    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+      <Button 
+        onClick={generatePDF} 
+        disabled={downloading || loading || filteredData.length === 0}
+        className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-400 dark:hover:to-indigo-400 text-white dark:text-zinc-900 font-medium shadow-md shadow-blue-500/10 dark:shadow-blue-400/5 border border-blue-700/10 dark:border-blue-300/20"
+        size="sm"
+      >
+        {downloading ? (
+          <>
+            <FileDown className="h-4 w-4 animate-bounce" />
+            <span>Generating...</span>
+          </>
+        ) : (
+          <>
+            <Download className="h-4 w-4" />
+            <span>Download PDF</span>
+          </>
+        )}
+      </Button>
+    </motion.div>
   );
 
   const columns = [
@@ -170,49 +185,57 @@ const History: React.FC = () => {
       key: 'index',
       header: '#',
       cell: (_: any, index: number) => (
-        <div className="font-medium text-muted-foreground">{index + 1}</div>
+        <div className="flex items-center justify-center">
+          <div className="h-6 w-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-xs text-blue-700 dark:text-blue-300 font-medium">
+            {index + 1}
+          </div>
+        </div>
       ),
     },
     {
       key: 'parkingNumber',
       header: (
         <div className="flex items-center gap-2">
-          <FileText className="h-4 w-4 text-primary" />
-          <span>Parking Number</span>
+          <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <span className="font-medium">Parking Number</span>
         </div>
       ),
       cell: (item: HistoryVehicleType) => (
-        <div className="font-medium">{item.parkingNumber}</div>
+        <div className="font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1 rounded-md inline-block border border-blue-100 dark:border-blue-800/30">
+          <ParkingIdDisplay id={item.parkingNumber} />
+        </div>
       ),
     },
     {
       key: 'ownerName',
       header: (
         <div className="flex items-center gap-2">
-          <User className="h-4 w-4 text-primary" />
-          <span>Owner</span>
+          <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <span className="font-medium">Owner</span>
         </div>
       ),
-      cell: (item: HistoryVehicleType) => <div>{item.ownerName}</div>,
+      cell: (item: HistoryVehicleType) => <div className="font-medium">{item.ownerName}</div>,
     },
     {
       key: 'registrationNumber',
       header: (
         <div className="flex items-center gap-2">
-          <Car className="h-4 w-4 text-primary" />
-          <span>Reg. Number</span>
+          <CarFront className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <span className="font-medium">Reg. Number</span>
         </div>
       ),
       cell: (item: HistoryVehicleType) => (
-        <div className="font-mono">{item.registrationNumber}</div>
+        <div className="font-mono text-sm bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-md inline-block border border-zinc-200 dark:border-zinc-700">
+          {item.registrationNumber}
+        </div>
       ),
     },
     {
       key: 'settledTime',
       header: (
         <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-primary" />
-          <span>Settled Time</span>
+          <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <span className="font-medium">Settled Time</span>
         </div>
       ),
       cell: (item: HistoryVehicleType) => {
@@ -220,10 +243,13 @@ const History: React.FC = () => {
           const date = new Date(item.settledTime);
           return (
             <div className="flex flex-col">
-              <span className="text-sm font-medium">
-                {format(date, 'MMM dd, yyyy h:mm a')}
+              <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+                {format(date, 'MMM dd, yyyy')}
               </span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-blue-600/70 dark:text-blue-500/70 mt-0.5">
+                {format(date, 'h:mm a')}
+              </span>
+              <span className="text-xs text-blue-600/80 dark:text-blue-500/80 mt-0.5">
                 {formatDistance(new Date(), date, { addSuffix: true })}
               </span>
             </div>
@@ -237,12 +263,15 @@ const History: React.FC = () => {
       key: 'remark',
       header: (
         <div className="flex items-center gap-2">
-          <ReceiptText className="h-4 w-4 text-primary" />
-          <span>Remark</span>
+          <ReceiptText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <span className="font-medium">Remark</span>
         </div>
       ),
       cell: (item: HistoryVehicleType) => (
-        <div className="max-w-[200px] truncate" title={item.remark}>
+        <div 
+          className="max-w-[200px] truncate bg-blue-50/50 dark:bg-blue-900/10 px-2.5 py-1.5 rounded-md border border-blue-100/50 dark:border-blue-800/20 text-sm" 
+          title={item.remark}
+        >
           {item.remark || <span className="text-muted-foreground italic text-xs">No remark</span>}
         </div>
       ),
@@ -251,11 +280,20 @@ const History: React.FC = () => {
       key: 'status',
       header: (
         <div className="flex items-center gap-2">
-          <HistoryIcon className="h-4 w-4 text-primary" />
-          <span>Status</span>
+          <ClipboardCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <span className="font-medium">Status</span>
         </div>
       ),
-      cell: () => <StatusBadge status="completed" text="Completed" />,
+      cell: () => (
+        <motion.div whileHover={{ scale: 1.05 }}>
+          <StatusBadge 
+            status="completed" 
+            text="Completed" 
+            className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/30"
+            icon={<BadgeCheck className="h-3.5 w-3.5 mr-1" />}
+          />
+        </motion.div>
+      ),
     }
   ];
 
@@ -263,7 +301,7 @@ const History: React.FC = () => {
     <VehicleTableLayout
       title="Completed Bookings"
       subtitle="View history of all completed parking transactions"
-      icon={<HistoryIcon className="h-5 w-5 text-primary" />}
+      icon={<HistoryIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
       data={filteredData}
       columns={columns}
       loading={loading}
@@ -273,6 +311,8 @@ const History: React.FC = () => {
       onRefresh={fetchHistory}
       emptyMessage="No history records found"
       actionComponent={downloadButton}
+      themeColor="blue"
+      cardClassName="bg-gradient-to-r from-blue-50/50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10"
     />
   );
 };
