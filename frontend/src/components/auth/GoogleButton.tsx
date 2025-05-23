@@ -39,7 +39,7 @@ const GoogleButton = () => {
   };
   const { theme } = useContext(ThemeContext);
   return (
-    <div className="bg-white dark:bg-[#0C111C] text-center mx-auto">
+    <div className="text-center mx-auto">
       {loading && (
         <Spin
           fullscreen
