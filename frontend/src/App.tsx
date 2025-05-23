@@ -18,7 +18,6 @@ import { ConfigProvider, theme as antdtheme } from "antd";
 import { Toaster } from "react-hot-toast";
 import NotFound from "./pages/NotFound";
 import AdminRoutes from "./pages/admin/AdminRoutes";
-import { DarkModeFix } from "./components/ui/dark-mode-fix";
 
 
 const AppContent = () => {
@@ -47,7 +46,6 @@ const AppContent = () => {
         />
 
         <ThemeSwitcher />
-        <DarkModeFix />
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
