@@ -38,6 +38,12 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Icons
 import {
@@ -511,152 +517,165 @@ const Report = () => {
     }
 
     return (
-      <div className="space-y-4">
-        <div className="rounded-md border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50 hover:bg-muted">
-                <TableHead className="w-[100px]">
-                  <div
-                    className="flex items-center gap-1 hover:cursor-pointer"
-                    onClick={() => handleSort("key")}
-                  >
-                    <span>Parking #</span>
-                    <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                </TableHead>
-                <TableHead>
-                  <div
-                    className="flex items-center gap-1 hover:cursor-pointer"
-                    onClick={() => handleSort("name")}
-                  >
-                    <UserRound className="h-3.5 w-3.5 text-primary mr-1" />
-                    <span>Customer</span>
-                    <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                </TableHead>
-                <TableHead>
-                  <div
-                    className="flex items-center gap-1 hover:cursor-pointer"
-                    onClick={() => handleSort("registrationNumber")}
-                  >
-                    <Car className="h-3.5 w-3.5 text-primary mr-1" />
-                    <span>Vehicle Info</span>
-                    <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                </TableHead>
-                <TableHead>
-                  <div
-                    className="flex items-center gap-1 hover:cursor-pointer"
-                    onClick={() => handleSort("category")}
-                  >
-                    <Tag className="h-3.5 w-3.5 text-primary mr-1" />
-                    <span>Category</span>
-                    <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                </TableHead>
-                <TableHead>
-                  <div
-                    className="flex items-center gap-1 hover:cursor-pointer"
-                    onClick={() => handleSort("location")}
-                  >
-                    <MapPin className="h-3.5 w-3.5 text-primary mr-1" />
-                    <span>Location</span>
-                    <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                </TableHead>
-                <TableHead>
-                  <div
-                    className="flex items-center gap-1 hover:cursor-pointer"
-                    onClick={() => handleSort("inTime")}
-                  >
-                    <Clock className="h-3.5 w-3.5 text-primary mr-1" />
-                    <span>In Time</span>
-                    <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                </TableHead>
-                {includeOutTime && (
-                  <TableHead>
+      <TooltipProvider>
+        <div className="space-y-4">
+          <div className="rounded-md border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50 hover:bg-muted">
+                  <TableHead className="w-[100px]">
                     <div
                       className="flex items-center gap-1 hover:cursor-pointer"
-                      onClick={() => handleSort("outTime")}
+                      onClick={() => handleSort("key")}
                     >
-                      <Clock className="h-3.5 w-3.5 text-primary mr-1" />
-                      <span>Out Time</span>
+                      <span>Parking #</span>
                       <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
                     </div>
                   </TableHead>
-                )}
-                <TableHead className="text-right">
-                  <div
-                    className="flex items-center justify-end gap-1 hover:cursor-pointer"
-                    onClick={() => handleSort("totalSpent")}
-                  >
-                    <span>Amount</span>
-                    <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedData.map((booking) => (
-                <TableRow key={booking.key} className="group hover:bg-muted/50">
-                  <TableCell className="font-medium">{booking.key}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span>{booking.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {booking.company}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-mono text-sm">
-                      {booking.registrationNumber}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className="bg-primary/10 text-primary border-primary/20"
+                  <TableHead>
+                    <div
+                      className="flex items-center gap-1 hover:cursor-pointer"
+                      onClick={() => handleSort("name")}
                     >
-                      {booking.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{booking.location}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span>{booking.inTime}</span>
+                      <UserRound className="h-3.5 w-3.5 text-primary mr-1" />
+                      <span>Customer</span>
+                      <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
                     </div>
-                  </TableCell>
+                  </TableHead>
+                  <TableHead>
+                    <div
+                      className="flex items-center gap-1 hover:cursor-pointer"
+                      onClick={() => handleSort("registrationNumber")}
+                    >
+                      <Car className="h-3.5 w-3.5 text-primary mr-1" />
+                      <span>Vehicle Info</span>
+                      <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div
+                      className="flex items-center gap-1 hover:cursor-pointer"
+                      onClick={() => handleSort("category")}
+                    >
+                      <Tag className="h-3.5 w-3.5 text-primary mr-1" />
+                      <span>Category</span>
+                      <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div
+                      className="flex items-center gap-1 hover:cursor-pointer"
+                      onClick={() => handleSort("location")}
+                    >
+                      <MapPin className="h-3.5 w-3.5 text-primary mr-1" />
+                      <span>Location</span>
+                      <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div
+                      className="flex items-center gap-1 hover:cursor-pointer"
+                      onClick={() => handleSort("inTime")}
+                    >
+                      <Clock className="h-3.5 w-3.5 text-primary mr-1" />
+                      <span>In Time</span>
+                      <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                  </TableHead>
                   {includeOutTime && (
+                    <TableHead>
+                      <div
+                        className="flex items-center gap-1 hover:cursor-pointer"
+                        onClick={() => handleSort("outTime")}
+                      >
+                        <Clock className="h-3.5 w-3.5 text-primary mr-1" />
+                        <span>Out Time</span>
+                        <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                      </div>
+                    </TableHead>
+                  )}
+                  <TableHead className="text-right">
+                    <div
+                      className="flex items-center justify-end gap-1 hover:cursor-pointer"
+                      onClick={() => handleSort("totalSpent")}
+                    >
+                      <span>Amount</span>
+                      <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedData.map((booking) => (
+                  <TableRow key={booking.key} className="group hover:bg-muted/50">
+                    <TableCell className="font-medium">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-help font-mono">
+                            {booking.key.slice(0, 4)}...
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="font-mono">{booking.key}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span>{booking.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {booking.company}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-mono text-sm">
+                        {booking.registrationNumber}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className="bg-primary/10 text-primary border-primary/20"
+                      >
+                        {booking.category}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{booking.location}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span>{booking.outTime}</span>
+                        <span>{booking.inTime}</span>
                       </div>
                     </TableCell>
-                  )}
-                  <TableCell className="text-right font-medium">
-                    {booking.totalSpent}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    {includeOutTime && (
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span>{booking.outTime}</span>
+                        </div>
+                      </TableCell>
+                    )}
+                    <TableCell className="text-right font-medium">
+                      {booking.totalSpent}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          
+          <PaginationControls totalPages={totalPages} />
+          
+          <div className="flex justify-between items-center text-sm text-muted-foreground">
+            <span>
+              Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} to{" "}
+              {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
+            </span>
+            <span>Page {currentPage} of {totalPages}</span>
+          </div>
         </div>
-        
-        <PaginationControls totalPages={totalPages} />
-        
-        <div className="flex justify-between items-center text-sm text-muted-foreground">
-          <span>
-            Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} to{" "}
-            {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
-          </span>
-          <span>Page {currentPage} of {totalPages}</span>
-        </div>
-      </div>
+      </TooltipProvider>
     );
   };
 
