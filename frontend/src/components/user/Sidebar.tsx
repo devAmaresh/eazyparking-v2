@@ -21,7 +21,6 @@ const menuItems = [
   // { label: 'Slots', path: '/slots', icon: ParkingSquare },
   { label: "Reports", path: "/reports", icon: BarChart2 },
   { label: "Settings", path: "/settings", icon: Settings },
-  { label: "Logout", path: "/logout", icon: LogOut },
 ];
 
 export default function Sidebar() {
