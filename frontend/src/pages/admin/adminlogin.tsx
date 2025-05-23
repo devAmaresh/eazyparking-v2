@@ -4,68 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "@/utils/backend";
 import { Link as LinkR } from "react-router-dom";
 import * as React from "react";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import CssBaseline from "@mui/material/CssBaseline";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
-import FormControl from "@mui/material/FormControl";
-import Link from "@mui/material/Link";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
-import MuiCard from "@mui/material/Card";
-import { styled } from "@mui/material/styles";
-import ForgotPassword from "@/components/auth/ForgotPassword";
-import AppTheme from "@/shared-theme/AppTheme";
-import ColorModeSelect from "@/shared-theme/ColorModeSelect";
-import { Spin, Button as AButton } from "antd";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "100%",
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: "auto",
-  [theme.breakpoints.up("sm")]: {
-    maxWidth: "450px",
-  },
-  boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  ...theme.applyStyles("dark", {
-    boxShadow:
-      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
-  }),
-}));
-
-const SignInContainer = styled(Stack)(({ theme }) => ({
-  height: "calc((1 - var(--template-frame-height, 0)) * 100dvh)",
-  minHeight: "100%",
-  padding: theme.spacing(2),
-  [theme.breakpoints.up("sm")]: {
-    padding: theme.spacing(4),
-  },
-  "&::before": {
-    content: '""',
-    display: "block",
-    position: "absolute",
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
-    backgroundRepeat: "no-repeat",
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
-  },
-}));
-
-export default function SignIn(props: { disableCustomTheme?: boolean }) {
+export default function AdminLogin() {
   const navigate = useNavigate();
+
   React.useEffect(() => {
     if (Cookies.get("adminToken")) {
       navigate("/admin/dashboard");
@@ -75,45 +25,25 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+  const [demoLoading, setDemoLoading] = React.useState(false);
+  const [rememberMe, setRememberMe] = React.useState(false);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
   const validateInputs = () => {
-    let isValid = true;
-
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setEmailError(true);
-      setEmailErrorMessage("Please enter a valid email address.");
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage("");
+      setError("Please enter a valid email address.");
+      return false;
     }
-
     if (!password || password.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 6 characters long.");
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage("");
+      setError("Password must be at least 6 characters long.");
+      return false;
     }
-
-    return isValid;
+    return true;
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     setError("");
     setSuccess("");
 
@@ -135,13 +65,13 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       setLoading(false);
     }
   };
-  const [dloading, setDLoading] = React.useState(false);
+
   const handleDemoLogin = async () => {
     setError("");
     setSuccess("");
 
     try {
-      setDLoading(true);
+      setDemoLoading(true);
       const res = await axios.post(`${BACKEND_URL}/api/admin/auth/login`, {
         email: "admin@gmail.com",
         password: "12345678",
@@ -152,137 +82,223 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     } catch (err: any) {
       setError(err?.response?.data?.message || "Login failed");
     } finally {
-      setDLoading(false);
+      setDemoLoading(false);
+    }
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.3,
+        staggerChildren: 0.2
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 300, damping: 24 }
     }
   };
 
   return (
-    <AppTheme {...props}>
-      <CssBaseline enableColorScheme />
-      <SignInContainer direction="column" justifyContent="space-between">
-        <ColorModeSelect />
-        <Card variant="outlined">
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
+    <div className="min-h-screen bg-white dark:bg-[#000000] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Modern grid background */}
+      <div className="absolute inset-0 w-full h-full dark:bg-[url('/grid.svg')] dark:bg-[length:30px_30px] bg-[url('/grid-light.svg')] bg-[length:25px_25px] opacity-[0.03] dark:opacity-[0.07]"></div>
+      
+      {/* Accent colors */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Accent dots/circles - minimal and modern */}
+        <div className="absolute top-[15%] right-[10%] w-[8px] h-[8px] rounded-full bg-indigo-500 dark:bg-[#0070F3]" />
+        <div className="absolute top-[15%] right-[10%] w-[16px] h-[16px] rounded-full bg-indigo-500/20 dark:bg-[#0070F3]/20" />
+        <div className="absolute top-[15%] right-[10%] w-[32px] h-[32px] rounded-full bg-indigo-500/10 dark:bg-[#0070F3]/10" />
+        
+        <div className="absolute bottom-[15%] left-[10%] w-[8px] h-[8px] rounded-full bg-blue-500 dark:bg-[#FF0080]" />
+        <div className="absolute bottom-[15%] left-[10%] w-[16px] h-[16px] rounded-full bg-blue-500/20 dark:bg-[#FF0080]/20" />
+        <div className="absolute bottom-[15%] left-[10%] w-[32px] h-[32px] rounded-full bg-blue-500/10 dark:bg-[#FF0080]/10" />
+        
+        {/* Modern accent line */}
+        <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-indigo-500 via-blue-500 to-sky-500 dark:from-[#0070F3] dark:via-[#6C63FF] dark:to-[#FF0080]"></div>
+      </div>
+
+      {/* Back to Home button */}
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.5 }}
+        className="absolute top-4 left-4 z-10"
+      >
+        <LinkR to="/">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-800 dark:bg-[#111] dark:border-[#333] dark:hover:bg-[#222] dark:text-white"
           >
-            Admin Login
-          </Typography>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Button>
+        </LinkR>
+      </motion.div>
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              width: "100%",
-              gap: 2,
-            }}
-          >
-            <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
-              <TextField
-                error={emailError}
-                helperText={emailErrorMessage}
-                id="email"
-                type="email"
-                name="email"
-                placeholder="your@email.com"
-                autoComplete="email"
-                autoFocus
-                required
-                fullWidth
-                variant="standard"
-                color={emailError ? "error" : "primary"}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </FormControl>
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="w-full max-w-md relative z-10"
+      >
+        <motion.div variants={itemVariants}>
+          <Card className="bg-white dark:bg-[#111] border-slate-200 dark:border-[#222] shadow-xl dark:shadow-[0_10px_30px_-15px_rgba(0,0,0,0.7)] overflow-hidden rounded-xl">
+            <CardHeader className="space-y-1 text-center pb-6 relative z-10 border-b border-slate-100 dark:border-[#222]">
+              <motion.div variants={itemVariants}>
+                <CardTitle className="text-3xl font-bold text-slate-800 dark:text-white">
+                  Admin Login
+                </CardTitle>
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <CardDescription className="text-slate-600 dark:text-slate-400">
+                  Enter your credentials to access the admin dashboard
+                </CardDescription>
+              </motion.div>
+            </CardHeader>
 
-            <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
-              <TextField
-                error={passwordError}
-                helperText={passwordErrorMessage}
-                name="password"
-                placeholder="••••••"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                required
-                fullWidth
-                variant="standard"
-                color={passwordError ? "error" : "primary"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </FormControl>
+            <CardContent className="space-y-6 relative z-10 pt-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <motion.div variants={itemVariants} className="space-y-2">
+                  <Label
+                    htmlFor="email"
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                  >
+                    Email Address
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="admin@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-slate-50 border-slate-200 focus:border-indigo-500 text-slate-900 placeholder:text-slate-400 dark:bg-[#171717] dark:border-[#333] dark:focus:border-[#0070F3] dark:text-white dark:placeholder:text-slate-600"
+                    required
+                  />
+                </motion.div>
 
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
-            <ForgotPassword open={open} handleClose={handleClose} />
+                <motion.div variants={itemVariants} className="space-y-2">
+                  <Label
+                    htmlFor="password"
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                  >
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-slate-50 border-slate-200 focus:border-indigo-500 text-slate-900 placeholder:text-slate-400 dark:bg-[#171717] dark:border-[#333] dark:focus:border-[#0070F3] dark:text-white dark:placeholder:text-slate-600"
+                    required
+                  />
+                </motion.div>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={loading}
-            >
-              {loading ? <Spin /> : "Sign in"}
-            </Button>
+                <motion.div variants={itemVariants} className="flex items-center space-x-2">
+                  <Checkbox
+                    id="remember"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
+                    className="border-slate-300 text-indigo-600 dark:border-[#444] dark:data-[state=checked]:bg-[#0070F3] dark:data-[state=checked]:border-[#0070F3]"
+                  />
+                  <Label
+                    htmlFor="remember"
+                    className="text-sm text-slate-600 dark:text-slate-400"
+                  >
+                    Remember me for 7 days
+                  </Label>
+                </motion.div>
 
-            <AButton
-              onClick={handleDemoLogin}
-              size="large"
-              loading={dloading}
-              disabled={dloading}
-            >
-              <span className="font-[500]" style={{ fontSize: "0.875rem" }}>
-                Demo Login
-              </span>
-            </AButton>
+                {(error || success) && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  >
+                    <Alert
+                      className={`${
+                        error 
+                          ? "border-red-200 bg-red-50 text-red-600 dark:border-red-900/30 dark:bg-[#301010] dark:text-red-400" 
+                          : "border-green-200 bg-green-50 text-green-600 dark:border-green-900/30 dark:bg-[#0F2318] dark:text-green-400"
+                      }`}
+                    >
+                      <AlertDescription>
+                        {error || success}
+                      </AlertDescription>
+                    </Alert>
+                  </motion.div>
+                )}
 
-            <Link
-              component="button"
-              type="button"
-              onClick={handleClickOpen}
-              variant="body2"
-              sx={{ alignSelf: "center" }}
-            >
-              <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">
-                Forgot your password?
-              </span>
-            </Link>
+                <motion.div variants={itemVariants}>
+                  <Button
+                    type="submit"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-md shadow-sm dark:bg-[#0070F3] dark:hover:bg-[#005ACC] transition-colors"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      "Sign in"
+                    )}
+                  </Button>
+                </motion.div>
+              </form>
 
-            {error && (
-              <Typography color="error" align="center">
-                {error}
-              </Typography>
-            )}
-            {success && (
-              <Typography color="green" align="center">
-                {success}
-              </Typography>
-            )}
-          </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Typography sx={{ textAlign: "center" }}>
-              Back to{" "}
-              <Link variant="body2" sx={{ alignSelf: "center" }}>
-                <LinkR to="/">
-                  <span className="text-black dark:text-zinc-300 underline underline-offset-2 hover:no-underline">
-                    Home
+              <motion.div variants={itemVariants} className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-slate-200 dark:border-[#222]" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white dark:bg-[#111] px-2 text-slate-500 dark:text-slate-500">
+                    Or
                   </span>
-                </LinkR>
-              </Link>
-            </Typography>
-          </Box>
-        </Card>
-      </SignInContainer>
-    </AppTheme>
+                </div>
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <Button
+                  onClick={handleDemoLogin}
+                  variant="outline"
+                  className="w-full border-slate-200 bg-white hover:bg-slate-50 text-slate-800 dark:border-[#333] dark:bg-[#171717] dark:hover:bg-[#1c1c1c] dark:text-white font-medium py-2.5 rounded-md transition-colors"
+                  disabled={demoLoading}
+                >
+                  {demoLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Loading Demo...
+                    </>
+                  ) : (
+                    "Demo Login"
+                  )}
+                </Button>
+              </motion.div>
+
+              <motion.div variants={itemVariants} className="text-center">
+                <button
+                  type="button"
+                  className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white underline decoration-slate-300 underline-offset-4 hover:decoration-slate-500 dark:decoration-[#333] dark:hover:decoration-slate-400 transition-colors"
+                >
+                  Forgot your password?
+                </button>
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 }

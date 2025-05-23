@@ -38,7 +38,7 @@ const VehicleCategory = () => {
             className="w-full"
           >
             <div className="flex justify-center border-b px-2">
-              <TabsList className="h-10 p-1 dark:bg-black backdrop-blur-sm rounded-md">
+              <TabsList className="h-10  rounded-md">
                 <TabsTrigger
                   value="manage"
                   className="rounded-md hover:cursor-pointer px-5 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm font-medium text-muted-foreground data-[state=active]:text-foreground transition-all gap-1.5"

@@ -4,8 +4,6 @@ import InVehicle from "./InVehicle";
 import OutVehicle from "./OutVehicle";
 import History from "./History";
 
-// UI Components
-import { Card, CardContent } from "@/components/ui/card";
 
 // Icons
 import { Car, LogOut, History as HistoryIcon } from "lucide-react";
@@ -25,18 +23,16 @@ const ManageVehicle = () => {
         </p>
       </div>
 
-      <Card className="bg-card border shadow-sm overflow-hidden">
-        <CardContent className="p-0">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
           >
             <div className="flex justify-center">
-              <TabsList className="h-11 p-1 bg-muted/30 backdrop-blur-sm rounded-t-lg border border-border/40 border-b-0">
+              <TabsList className="h-11 dark:bg-zinc-800 backdrop-blur-sm rounded-t-lg border border-border/40 border-b-0">
                 <TabsTrigger
                   value="in"
-                  className="relative hover:cursor-pointer px-6 py-2.5 rounded-t-md data-[state=active]:bg-white dark:data-[state=active]:bg-background font-medium text-muted-foreground data-[state=active]:text-primary transition-all gap-2"
+                  className="hover:cursor-pointer"
                 >
                   <Car className="h-4 w-4" />
                   <span>In-Vehicle</span>
@@ -44,7 +40,7 @@ const ManageVehicle = () => {
                 </TabsTrigger>
                 <TabsTrigger
                   value="out"
-                  className="relative hover:cursor-pointer px-6 py-2.5 rounded-t-md data-[state=active]:bg-white dark:data-[state=active]:bg-background font-medium text-muted-foreground data-[state=active]:text-primary transition-all gap-2"
+                  className="hover:cursor-pointer"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Out-Vehicle</span>
@@ -52,7 +48,7 @@ const ManageVehicle = () => {
                 </TabsTrigger>
                 <TabsTrigger
                   value="history"
-                  className="hover:cursor-pointer relative px-6 py-2.5 rounded-t-md data-[state=active]:bg-white dark:data-[state=active]:bg-background font-medium text-muted-foreground data-[state=active]:text-primary transition-all gap-2"
+                  className="hover:cursor-pointer"
                 >
                   <HistoryIcon className="h-4 w-4" />
                   <span>History</span>
@@ -73,8 +69,7 @@ const ManageVehicle = () => {
               </TabsContent>
             </div>
           </Tabs>
-        </CardContent>
-      </Card>
+
     </div>
   );
 };
