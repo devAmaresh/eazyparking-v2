@@ -1,7 +1,7 @@
 import { Link as LinkR } from "react-router-dom";
 import * as React from "react";
 import axios from "axios";
-import { BACKEND_URL } from "../utils/backend";
+import { BACKEND_URL } from "@/utils/backend";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -17,9 +17,9 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
-import AppTheme from "../shared-theme/AppTheme";
-import ColorModeSelect from "../shared-theme/ColorModeSelect";
-import { GoogleIcon } from "../components/auth/CustomIcons";
+import AppTheme from "@/shared-theme/AppTheme";
+import ColorModeSelect from "@/shared-theme/ColorModeSelect";
+import { GoogleIcon } from "@/components/auth/CustomIcons";
 import Cookies from "js-cookie";
 
 const Card = styled(MuiCard)(({ theme }) => ({

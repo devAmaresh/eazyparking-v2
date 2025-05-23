@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { BACKEND_URL } from "../utils/backend";
+import { BACKEND_URL } from "@/utils/backend";
 import { Link as LinkR } from "react-router-dom";
 import * as React from "react";
 import Box from "@mui/material/Box";
@@ -17,9 +17,9 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
-import ForgotPassword from "../components/auth/ForgotPassword";
-import AppTheme from "../shared-theme/AppTheme";
-import ColorModeSelect from "../shared-theme/ColorModeSelect";
+import ForgotPassword from "@/components/auth/ForgotPassword";
+import AppTheme from "@/shared-theme/AppTheme";
+import ColorModeSelect from "@/shared-theme/ColorModeSelect";
 import { Spin, Button as AButton } from "antd";
 
 const Card = styled(MuiCard)(({ theme }) => ({
