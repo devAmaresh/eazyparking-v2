@@ -14,7 +14,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ type }) => {
       title: "No Ongoing Bookings",
       description: "You don't have any active parking sessions right now.",
       ctaLabel: "Make a booking",
-      ctaHref: "/booking",
+      ctaHref: "/bookings",
       ctaIcon: <Car className="h-4 w-4 mr-2" />,
       animation: "parking",
     },
