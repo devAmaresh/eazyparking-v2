@@ -100,7 +100,7 @@ const UserActions = () => {
             </div>
 
             <div className="mt-10">
-              <Link to="/locations">
+              <Link to="/login">
                 <Button className="h-12 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-600/20 group">
                   Find Parking Now
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />

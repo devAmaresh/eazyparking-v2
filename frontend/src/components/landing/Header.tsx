@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-
+import Logo from "@/components/logo";
 // Icons
 import { MenuIcon, X } from "lucide-react";
 
@@ -31,11 +31,9 @@ const Header = ({ isMobile }: HeaderProps) => {
     { name: "Contact", href: "#contact" },
   ];
 
-
-
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 px-6 py-3 transition-all duration-300 ${
         scrolled
           ? "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-md"
           : "bg-transparent"
@@ -46,14 +44,11 @@ const Header = ({ isMobile }: HeaderProps) => {
     >
       <nav className="max-w-screen-xl mx-auto flex justify-between items-center">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
+        <Link to="/" className="flex items-center gap-2 group text-xl">
           <div className="relative">
             <div className="absolute inset-0 bg-blue-500 rounded-lg blur-sm group-hover:blur-md transition-all duration-300"></div>
-           
           </div>
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-            EazyParking
-          </span>
+          <Logo />
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -73,8 +68,6 @@ const Header = ({ isMobile }: HeaderProps) => {
 
         {/* Theme Toggle & Login Buttons */}
         <div className="flex items-center gap-3">
-          
-
           {isMobile ? (
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}

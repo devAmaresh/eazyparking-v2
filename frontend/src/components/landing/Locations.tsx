@@ -88,7 +88,7 @@ const Locations = ({
     },
     {
       name: "Pune",
-      image: "https://images.pexels.com/photos/831475/pexels-photo-831475.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      image: "https://img.freepik.com/free-photo/horizontal-picture-car-parking-underground-garage-interior-with-neon-lights-autocars-parked-buildings-urban-constructions-space-transportation-vehicle-night-city-concept_343059-3077.jpg",
       locations: 15,
       rating: 4.8,
       description:
@@ -191,7 +191,7 @@ const Locations = ({
                 initial={{ opacity: 0, x: 100 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -100 }}
-                transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+                transition={{ duration: 0.5, type: "tween",ease: "easeInOut" }}
               >
                 <div className="relative bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-xl border border-zinc-200 dark:border-zinc-800">
                   <div className="grid grid-cols-1 md:grid-cols-2">

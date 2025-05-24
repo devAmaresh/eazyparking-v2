@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ThemeContext } from "@/context/ThemeContext";
-import {useContext } from "react";
+import { useContext } from "react";
 // Icons
 import { MapPin, Clock, Shield, ChevronRight } from "lucide-react";
 
@@ -33,11 +33,8 @@ const Hero = ({ scrollY }: HeroProps) => {
           >
             <div className="flex items-center gap-2 mb-6">
               <div className="px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium border border-blue-100 dark:border-blue-800/30">
-                New Feature
+                Reimagining Urban Parking
               </div>
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                Real-time parking availability
-              </span>
             </div>
 
             <motion.h1
@@ -49,7 +46,11 @@ const Hero = ({ scrollY }: HeroProps) => {
                 transform: `translateY(${scrollY * 0.1}px)`,
               }}
             >
-              Parking Made Simple & Stress-Free
+              <div className="">Book Your Spot</div>
+              <div className="text-black dark:text-white mt-2">
+                Park with Ease.
+              </div>
+              <div className="mt-2 h-1 w-24 bg-gradient-to-r from-blue-500 to-violet-500 dark:from-blue-400 dark:to-violet-400 rounded-full" />
             </motion.h1>
 
             <motion.p

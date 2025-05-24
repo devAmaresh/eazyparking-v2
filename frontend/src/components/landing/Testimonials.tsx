@@ -83,7 +83,7 @@ export default function Testimonials() {
             <span>Customer Stories</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 pb-1 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
             What Our Users Say
           </h2>
           
@@ -101,7 +101,7 @@ export default function Testimonials() {
                 initial={{ opacity: 0, x: 100 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -100 }}
-                transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+                transition={{ duration: 0.2, type: "tween",ease: "backInOut" }}
                 className="relative"
               >
                 {/* Quote mark decoration */}

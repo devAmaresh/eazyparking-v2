@@ -112,7 +112,7 @@ const Features = () => {
 
               {/* Icon container */}
               <div className="relative mb-5">
-                <div className="absolute -inset-1 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full opacity-20 group-hover:opacity-30 blur-sm transition-opacity duration-300"></div>
+                
                 <div className="relative w-14 h-14 rounded-full bg-white dark:bg-zinc-800 shadow-md flex items-center justify-center">
                   {feature.icon}
                 </div>
