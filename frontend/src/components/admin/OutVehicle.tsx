@@ -15,7 +15,10 @@ import {
   FileText, 
   ArrowRightLeft, 
   CarFront,
-  ParkingSquare
+  ParkingSquare,
+  ChevronDown,
+  ChevronUp,
+  ArrowUpDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -24,7 +27,7 @@ interface OutVehicleType {
   parkingNumber: string;
   ownerName: string;
   registrationNumber: string;
-  outTime: string;
+  inTime: string;
 }
 
 const OutVehicle: React.FC = () => {
@@ -37,6 +40,8 @@ const OutVehicle: React.FC = () => {
   const [selectedId, setSelectedId] = useState('');
   const [remark, setRemark] = useState('');
   const [settling, setSettling] = useState(false);
+  // Add sort state - can be 'none', 'asc', or 'desc'
+  const [sortDirection, setSortDirection] = useState<'none' | 'asc' | 'desc'>('none');
 
   const fetchOutVehicles = async () => {
     const token = Cookies.get('adminToken');
@@ -70,17 +75,55 @@ const OutVehicle: React.FC = () => {
 
   useEffect(() => {
     if (searchQuery) {
-      const filtered = data.filter(
+      let filtered = data.filter(
         (vehicle) =>
           vehicle.parkingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
           vehicle.ownerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           vehicle.registrationNumber.toLowerCase().includes(searchQuery.toLowerCase())
       );
+      
+      // Apply sorting if active
+      if (sortDirection !== 'none') {
+        filtered = [...filtered].sort((a, b) => {
+          const dateA = new Date(a.inTime).getTime();
+          const dateB = new Date(b.inTime).getTime();
+          
+          return sortDirection === 'asc' 
+            ? dateA - dateB  // Ascending order (oldest first)
+            : dateB - dateA; // Descending order (newest first)
+        });
+      }
+      
       setFilteredData(filtered);
     } else {
-      setFilteredData(data);
+      // Also apply sorting when no search is active
+      if (sortDirection !== 'none') {
+        const sorted = [...data].sort((a, b) => {
+          const dateA = new Date(a.inTime).getTime();
+          const dateB = new Date(b.inTime).getTime();
+          
+          return sortDirection === 'asc' 
+            ? dateA - dateB
+            : dateB - dateA;
+        });
+        setFilteredData(sorted);
+      } else {
+        setFilteredData(data);
+      }
     }
-  }, [searchQuery, data]);
+  }, [searchQuery, data, sortDirection]);
+
+  // Handle column sorting
+  const toggleSort = () => {
+    // Cycle through: none -> asc -> desc -> none
+    if (sortDirection === 'none') {
+      setSortDirection('asc');
+    } else if (sortDirection === 'asc') {
+      setSortDirection('desc');
+    } else {
+      setSortDirection('none');
+    }
+  };
 
   const handleSettle = async () => {
     const token = Cookies.get('adminToken');
@@ -166,14 +209,27 @@ const OutVehicle: React.FC = () => {
     {
       key: 'inTime',
       header: (
-        <div className="flex items-center gap-2">
+        <div 
+          className="flex items-center gap-2 cursor-pointer hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+          onClick={toggleSort}
+          title="Click to sort"
+        >
           <Calendar className="h-4 w-4 text-amber-600 dark:text-amber-400" />
           <span className="font-medium">In Date</span>
+          {sortDirection === 'none' && (
+            <ArrowUpDown className="h-3.5 w-3.5 text-amber-500/70 dark:text-amber-400/70" />
+          )}
+          {sortDirection === 'asc' && (
+            <ChevronUp className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+          )}
+          {sortDirection === 'desc' && (
+            <ChevronDown className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+          )}
         </div>
       ),
       cell: (item: OutVehicleType) => {
         try {
-          const date = new Date(item.outTime); // Using outTime as this is what's in the data
+          const date = new Date(item.inTime);
           return (
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">
@@ -188,7 +244,7 @@ const OutVehicle: React.FC = () => {
             </div>
           );
         } catch (e) {
-          return item.outTime;
+          return item.inTime;
         }
       },
     },

@@ -21,7 +21,10 @@ import {
   Download,
   CarFront,
   ClipboardCheck,
-  BadgeCheck
+  BadgeCheck,
+  ChevronDown,
+  ChevronUp,
+  ArrowUpDown,
 } from 'lucide-react';
 
 interface HistoryVehicleType {
@@ -40,6 +43,8 @@ const History: React.FC = () => {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [downloading, setDownloading] = useState(false);
+  // Add sort state - can be 'none', 'asc', or 'desc'
+  const [sortDirection, setSortDirection] = useState<'none' | 'asc' | 'desc'>('none');
 
   const fetchHistory = async () => {
     const token = Cookies.get('adminToken');
@@ -72,19 +77,39 @@ const History: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (searchQuery) {
-      const filtered = data.filter(
-        (vehicle) =>
-          vehicle.parkingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          vehicle.ownerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          vehicle.registrationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          vehicle.remark.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredData(filtered);
-    } else {
-      setFilteredData(data);
+    let filtered = data.filter((vehicle) =>
+      vehicle.parkingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicle.ownerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicle.registrationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicle.remark.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    
+    // Apply sorting if active
+    if (sortDirection !== 'none') {
+      filtered = [...filtered].sort((a, b) => {
+        const dateA = new Date(a.settledTime).getTime();
+        const dateB = new Date(b.settledTime).getTime();
+        
+        return sortDirection === 'asc' 
+          ? dateA - dateB  // Ascending order (oldest first)
+          : dateB - dateA; // Descending order (newest first)
+      });
     }
-  }, [searchQuery, data]);
+    
+    setFilteredData(filtered);
+  }, [searchQuery, data, sortDirection]);
+  
+  // Handle column sorting
+  const toggleSort = () => {
+    // Cycle through: none -> asc -> desc -> none
+    if (sortDirection === 'none') {
+      setSortDirection('asc');
+    } else if (sortDirection === 'asc') {
+      setSortDirection('desc');
+    } else {
+      setSortDirection('none');
+    }
+  };
   
   // Enhanced PDF generation
   const generatePDF = () => {
@@ -233,9 +258,22 @@ const History: React.FC = () => {
     {
       key: 'settledTime',
       header: (
-        <div className="flex items-center gap-2">
+        <div 
+          className="flex items-center gap-2 cursor-pointer hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+          onClick={toggleSort}
+          title="Click to sort"
+        >
           <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           <span className="font-medium">Settled Time</span>
+          {sortDirection === 'none' && (
+            <ArrowUpDown className="h-3.5 w-3.5 text-blue-500/70 dark:text-blue-400/70" />
+          )}
+          {sortDirection === 'asc' && (
+            <ChevronUp className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+          )}
+          {sortDirection === 'desc' && (
+            <ChevronDown className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+          )}
         </div>
       ),
       cell: (item: HistoryVehicleType) => {

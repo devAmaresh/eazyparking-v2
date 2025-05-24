@@ -8,7 +8,18 @@ import { format, formatDistance } from 'date-fns';
 import { motion } from 'framer-motion';
 
 // Icons
-import { Car, Calendar, User, FileText, Clock, CarFront, TimerIcon } from 'lucide-react';
+import { 
+  Car, 
+  Calendar, 
+  User, 
+  FileText, 
+  Clock, 
+  CarFront, 
+  TimerIcon,
+  ChevronDown,
+  ChevronUp,
+  ArrowUpDown,
+} from 'lucide-react';
 
 interface InVehicleType {
   id: string;
@@ -24,6 +35,8 @@ const InVehicle: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  // Add sort state - can be 'none', 'asc', or 'desc'
+  const [sortDirection, setSortDirection] = useState<'none' | 'asc' | 'desc'>('none');
 
   const fetchInVehicles = async () => {
     const token = Cookies.get('adminToken');
@@ -57,17 +70,55 @@ const InVehicle: React.FC = () => {
 
   useEffect(() => {
     if (searchQuery) {
-      const filtered = data.filter(
+      let filtered = data.filter(
         (vehicle) =>
           vehicle.parkingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
           vehicle.ownerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           vehicle.registrationNumber.toLowerCase().includes(searchQuery.toLowerCase())
       );
+      
+      // Apply sorting if active
+      if (sortDirection !== 'none') {
+        filtered = [...filtered].sort((a, b) => {
+          const dateA = new Date(a.inTime).getTime();
+          const dateB = new Date(b.inTime).getTime();
+          
+          return sortDirection === 'asc' 
+            ? dateA - dateB  // Ascending order (oldest first)
+            : dateB - dateA; // Descending order (newest first)
+        });
+      }
+      
       setFilteredData(filtered);
     } else {
-      setFilteredData(data);
+      // Also apply sorting when no search is active
+      if (sortDirection !== 'none') {
+        const sorted = [...data].sort((a, b) => {
+          const dateA = new Date(a.inTime).getTime();
+          const dateB = new Date(b.inTime).getTime();
+          
+          return sortDirection === 'asc' 
+            ? dateA - dateB
+            : dateB - dateA;
+        });
+        setFilteredData(sorted);
+      } else {
+        setFilteredData(data);
+      }
     }
-  }, [searchQuery, data]);
+  }, [searchQuery, data, sortDirection]);
+  
+  // Handle column sorting
+  const toggleSort = () => {
+    // Cycle through: none -> asc -> desc -> none
+    if (sortDirection === 'none') {
+      setSortDirection('asc');
+    } else if (sortDirection === 'asc') {
+      setSortDirection('desc');
+    } else {
+      setSortDirection('none');
+    }
+  };
 
   // Format date with relative time (enhanced styling)
   const formatInTime = (dateString: string) => {
@@ -166,9 +217,22 @@ const InVehicle: React.FC = () => {
     {
       key: 'inTime',
       header: (
-        <div className="flex items-center gap-2">
+        <div 
+          className="flex items-center gap-2 cursor-pointer hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+          onClick={toggleSort}
+          title="Click to sort"
+        >
           <Calendar className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           <span className="font-medium">Arrival Time</span>
+          {sortDirection === 'none' && (
+            <ArrowUpDown className="h-3.5 w-3.5 text-emerald-500/70 dark:text-emerald-400/70" />
+          )}
+          {sortDirection === 'asc' && (
+            <ChevronUp className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+          )}
+          {sortDirection === 'desc' && (
+            <ChevronDown className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+          )}
         </div>
       ),
       cell: (item: InVehicleType) => formatInTime(item.inTime),
