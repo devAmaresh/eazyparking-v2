@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 // Icons
-import { MenuIcon, X, Sun, Moon, ChevronDown } from "lucide-react";
+import { MenuIcon, X } from "lucide-react";
 
 interface HeaderProps {
   isMobile: boolean;

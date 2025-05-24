@@ -5,28 +5,20 @@ import { motion } from "framer-motion";
 
 // ShadCN UI Components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
 
 // Icons
 import { ParkingSquare, Plus, List, MapPin } from "lucide-react";
 
 const AdminParkingLot = () => {
   const [activeTab, setActiveTab] = useState("manage-parking-lot");
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  const handleParkingLotAdded = () => {
-    // Switch to manage tab and toggle refresh trigger when a new parking lot is added
-    setActiveTab("manage-parking-lot");
-    setRefreshTrigger((prev) => prev + 1);
-  };
 
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+      transition: { staggerChildren: 0.1 },
+    },
   };
 
   const itemVariants = {
@@ -34,12 +26,12 @@ const AdminParkingLot = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 }
-    }
+      transition: { type: "spring", stiffness: 100 },
+    },
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="p-6 min-h-screen bg-background text-foreground transition-colors"
       initial="hidden"
       animate="visible"
@@ -71,12 +63,11 @@ const AdminParkingLot = () => {
       </motion.div> */}
 
       {/* Main Content with Animated Tabs */}
-      <motion.div variants={itemVariants} className="overflow-hidden bg-white dark:bg-black rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-lg">
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
+      <motion.div
+        variants={itemVariants}
+        className="overflow-hidden bg-white dark:bg-black rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-lg"
+      >
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center bg-gradient-to-r from-zinc-50/80 to-zinc-100/80 dark:from-zinc-900/80 dark:to-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800">
             <TabsList className="h-16 bg-transparent rounded-none border-0 p-0 relative">
               <TabsTrigger
@@ -103,20 +94,23 @@ const AdminParkingLot = () => {
               value="manage-parking-lot"
               className="m-0 animate-in fade-in-50 duration-300 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0 data-[state=inactive]:duration-150"
             >
-              <ManageParkingLot key={refreshTrigger} />
+              <ManageParkingLot />
             </TabsContent>
             <TabsContent
               value="add-parking-lot"
               className="m-0 animate-in fade-in-50 duration-300 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0 data-[state=inactive]:duration-150"
             >
-              <AddParkingLot onParkingLotAdded={handleParkingLotAdded} />
+              <AddParkingLot />
             </TabsContent>
           </div>
         </Tabs>
       </motion.div>
 
       {/* Feature Highlights */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+      <motion.div
+        variants={itemVariants}
+        className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8"
+      >
         <div className="bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/30 p-4 rounded-xl shadow-sm flex items-start gap-3 transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
           <div className="p-2.5 rounded-lg bg-blue-100 dark:bg-blue-900/30">
             <MapPin className="h-5 w-5" />
@@ -139,13 +133,24 @@ const AdminParkingLot = () => {
               Slot Configuration
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-              Configure parking slots and capacities based on location requirements
+              Configure parking slots and capacities based on location
+              requirements
             </p>
           </div>
         </div>
         <div className="bg-sky-50 dark:bg-sky-950/30 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800/30 p-4 rounded-xl shadow-sm flex items-start gap-3 transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
           <div className="p-2.5 rounded-lg bg-sky-100 dark:bg-sky-900/30">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
@@ -155,7 +160,8 @@ const AdminParkingLot = () => {
               Real-time Monitoring
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-              Track space availability and bookings in real-time for all locations
+              Track space availability and bookings in real-time for all
+              locations
             </p>
           </div>
         </div>

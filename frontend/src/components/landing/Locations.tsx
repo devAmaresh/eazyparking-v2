@@ -15,7 +15,7 @@ import {
 
 interface LocationsProps {
   currentCityIndex: number;
-  setCurrentCityIndex: (index: number) => void;
+  setCurrentCityIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const Locations = ({
