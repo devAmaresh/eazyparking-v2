@@ -2,7 +2,14 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 
 // Icons
-import { BarChart3, Users, MapPin, PieChart, Settings, CheckCircle } from "lucide-react";
+import {
+  BarChart3,
+  Users,
+  MapPin,
+  PieChart,
+  Settings,
+  CheckCircle,
+} from "lucide-react";
 
 const AdminPreview = () => {
   const ref = useRef(null);
@@ -130,15 +137,18 @@ const AdminPreview = () => {
                     </div>
                   </div>
 
-                  {/* Fake chart - replace with actual chart component if needed */}
-                  <div className="h-32 flex items-end gap-2">
+                  {/* Bar Chart Container */}
+                  <div className="h-40 flex justify-evenly w-full gap-3">
                     {[35, 45, 30, 60, 75, 50, 65].map((height, index) => (
-                      <div key={index} className="flex-1 flex flex-col items-center gap-1">
+                      <div
+                        key={index}
+                        className="flex flex-col items-center justify-end h-full"
+                      >
                         <div
-                          className="w-full bg-blue-500/80 dark:bg-blue-600/80 rounded-t transition-all duration-300 hover:bg-blue-600"
+                          className="w-6 rounded-t bg-blue-500 dark:bg-blue-400 transition-all duration-300"
                           style={{ height: `${height}%` }}
                         ></div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                        <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                           {["M", "T", "W", "T", "F", "S", "S"][index]}
                         </div>
                       </div>
@@ -232,9 +242,9 @@ const AdminPreview = () => {
             </h2>
 
             <p className="text-lg text-zinc-600 dark:text-zinc-300 mb-8">
-              Take control of your parking operations with our comprehensive admin
-              dashboard. Monitor activity, manage users, and optimize revenue with
-              ease.
+              Take control of your parking operations with our comprehensive
+              admin dashboard. Monitor activity, manage users, and optimize
+              revenue with ease.
             </p>
 
             <div className="space-y-6">
@@ -243,7 +253,9 @@ const AdminPreview = () => {
                   key={index}
                   className="flex gap-3 items-start"
                   initial={{ opacity: 0, y: 10 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                  animate={
+                    isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }
+                  }
                   transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                 >
                   <div className="mt-1 bg-blue-100 dark:bg-blue-900/30 rounded-full p-2">
