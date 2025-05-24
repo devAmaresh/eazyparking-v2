@@ -88,7 +88,7 @@ const CustomTooltip = ({ active, payload, label, theme }: any) => {
             />
             <span className="font-medium">{entry.name}: </span>
             <span className="ml-1">
-              {entry.dataKey === "value" ? "$" : ""}
+              {entry.dataKey === "value" ? "₹" : ""}
               {entry.value}
             </span>
           </div>
@@ -462,7 +462,7 @@ const UserDashboard = () => {
                               Total Spent
                             </p>
                             <h3 className="text-xl font-bold text-zinc-800 dark:text-zinc-100">
-                              ${Number(totalSpent).toLocaleString()}
+                              ₹{Number(totalSpent).toLocaleString()}
                             </h3>
                             <p className="text-sm text-zinc-500 dark:text-zinc-400">
                               On parking services
@@ -541,7 +541,7 @@ const UserDashboard = () => {
                             variant="outline"
                             className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/30"
                           >
-                            ${Number(totalSpent).toLocaleString()} total
+                            ₹{Number(totalSpent).toLocaleString()} total
                           </Badge>
                         </div>
                         <CardDescription className="text-emerald-700/70 dark:text-emerald-400/70">
@@ -609,7 +609,7 @@ const UserDashboard = () => {
                                 />
                                 <YAxis
                                   stroke={isDark ? "#94a3b8" : "#64748b"}
-                                  tickFormatter={(value) => `$${value}`}
+                                  tickFormatter={(value) => `₹${value}`}
                                   tickLine={false}
                                   axisLine={false}
                                   width={45}
@@ -681,7 +681,7 @@ const UserDashboard = () => {
                             </div>
                           </div>
                           <div className="text-xl font-bold text-blue-900 dark:text-blue-200 mt-1">
-                            $
+                            ₹
                             {totalBookings > 0
                               ? (totalSpent / totalBookings).toFixed(2)
                               : "0.00"}
@@ -927,7 +927,7 @@ const UserDashboard = () => {
                               {totalBookings > 2 ? (
                                 <>
                                   Based on your usage patterns, you could save
-                                  approximately $
+                                  approximately ₹
                                   {(totalSpent * 0.15).toFixed(2)} by booking
                                   during off-peak hours or using discount
                                   packages.
