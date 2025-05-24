@@ -135,12 +135,12 @@ const Header = ({ isMobile }: HeaderProps) => {
                   </Button>
                 </Link>
                 <Link
-                  to="/register"
+                  to="/admin/login"
                   className="w-full"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/10">
-                    Sign Up
+                    Admin
                   </Button>
                 </Link>
               </div>
