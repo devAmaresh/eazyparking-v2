@@ -6,6 +6,7 @@ import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
 import Cookies from "js-cookie";
 import { format } from "date-fns";
+
 import { motion, AnimatePresence } from "framer-motion";
 
 // ShadCN UI Components
@@ -38,6 +39,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart } from "@/components/ui/bar-chart";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Icons
 import {
@@ -56,6 +63,9 @@ import {
   RefreshCw,
   FileDown,
   FileSpreadsheet,
+  ChevronDown,
+  ChevronUp,
+  ArrowUpDown,
 } from "lucide-react";
 
 // Types
@@ -99,7 +109,9 @@ const UserData = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingCsv, setExportingCsv] = useState(false);
-  // const { theme } = useContext(ThemeContext);
+  // Add sorting states
+  const [sortField, setSortField] = useState<string | null>(null); // Field being sorted
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('none'); // Sort direction
   const [activeTab, setActiveTab] = useState("details");
 
   useEffect(() => {
@@ -108,18 +120,86 @@ const UserData = () => {
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
-      setFilteredUsers(users);
+      // Apply sorting even when no search is active
+      if (sortField && sortDirection !== 'none') {
+        setFilteredUsers(sortUsers([...users], sortField, sortDirection));
+      } else {
+        setFilteredUsers(users);
+      }
     } else {
       const query = searchQuery.toLowerCase();
-      const filtered = users.filter(
+      let filtered = users.filter(
         (user) =>
           `${user.firstName} ${user.lastName}`?.toLowerCase().includes(query) ||
           user.email?.toLowerCase().includes(query) ||
           user.mobileNumber?.includes(query)
       );
+      
+      // Apply sorting to filtered results if sorting is active
+      if (sortField && sortDirection !== 'none') {
+        filtered = sortUsers(filtered, sortField, sortDirection);
+      }
+      
       setFilteredUsers(filtered);
     }
-  }, [searchQuery, users]);
+  }, [searchQuery, users, sortField, sortDirection]);
+
+  // Sorting function
+  const sortUsers = (usersToSort: User[], field: string, direction: 'asc' | 'desc'): User[] => {
+    return [...usersToSort].sort((a, b) => {
+      let valueA, valueB;
+      
+      // Determine how to extract the values based on the field
+      switch(field) {
+        case 'name':
+          valueA = `${a.firstName} ${a.lastName}`.toLowerCase();
+          valueB = `${b.firstName} ${b.lastName}`.toLowerCase();
+          break;
+        case 'email':
+          valueA = a.email.toLowerCase();
+          valueB = b.email.toLowerCase();
+          break;
+        case 'mobileNumber':
+          valueA = a.mobileNumber;
+          valueB = b.mobileNumber;
+          break;
+        case 'regDate':
+          valueA = new Date(a.regDate).getTime();
+          valueB = new Date(b.regDate).getTime();
+          break;
+        case 'totalSpent':
+          valueA = a.totalSpent || 0;
+          valueB = b.totalSpent || 0;
+          break;
+        default:
+          return 0;
+      }
+      
+      // Compare based on direction
+      if (direction === 'asc') {
+        return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+      } else {
+        return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
+      }
+    });
+  };
+
+  // Handle column header click to toggle sorting
+  const handleSortClick = (field: string) => {
+    // If clicking on the same field, cycle through directions
+    if (sortField === field) {
+      if (sortDirection === 'none') setSortDirection('asc');
+      else if (sortDirection === 'asc') setSortDirection('desc');
+      else {
+        setSortField(null);
+        setSortDirection('none');
+      }
+    } else {
+      // If clicking on a new field, start with ascending
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -395,8 +475,6 @@ const UserData = () => {
       {/* Users Table with Enhanced Styling */}
       <motion.div variants={itemVariants}>
         <Card className="py-0 border border-zinc-200 dark:border-zinc-800 shadow-lg bg-white dark:bg-black overflow-hidden rounded-xl">
-          
-
           <CardContent className="p-0">
             <div className="rounded-md overflow-hidden">
               {loading ? (
@@ -421,37 +499,92 @@ const UserData = () => {
                 <Table>
                   <TableHeader className="bg-zinc-50/80 dark:bg-zinc-900/80">
                     <TableRow className="hover:bg-transparent border-b border-zinc-200 dark:border-zinc-800">
-                      <TableHead className="w-[250px] text-blue-800 dark:text-blue-200 font-medium">
+                      <TableHead 
+                        className="w-[250px] text-blue-800 dark:text-blue-200 font-medium cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800/70 transition-colors"
+                        onClick={() => handleSortClick('name')}
+                      >
                         <div className="flex items-center gap-2">
                           <UserCircle2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                           <span>User</span>
+                          {sortField === 'name' && (
+                            sortDirection === 'asc' ? 
+                              <ChevronUp className="h-3.5 w-3.5 text-blue-500" /> : 
+                              <ChevronDown className="h-3.5 w-3.5 text-blue-500" />
+                          )}
+                          {sortField !== 'name' && (
+                            <ArrowUpDown className="h-3 w-3 text-blue-400/50 dark:text-blue-500/50" />
+                          )}
                         </div>
                       </TableHead>
-                      <TableHead className="text-blue-800 dark:text-blue-200 font-medium">
+                      <TableHead 
+                        className="text-blue-800 dark:text-blue-200 font-medium cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800/70 transition-colors"
+                        onClick={() => handleSortClick('email')}
+                      >
                         <div className="flex items-center gap-2">
                           <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                           <span>Email</span>
+                          {sortField === 'email' && (
+                            sortDirection === 'asc' ? 
+                              <ChevronUp className="h-3.5 w-3.5 text-blue-500" /> : 
+                              <ChevronDown className="h-3.5 w-3.5 text-blue-500" />
+                          )}
+                          {sortField !== 'email' && (
+                            <ArrowUpDown className="h-3 w-3 text-blue-400/50 dark:text-blue-500/50" />
+                          )}
                         </div>
                       </TableHead>
-                      <TableHead className="hidden md:table-cell text-blue-800 dark:text-blue-200 font-medium">
+                      <TableHead 
+                        className="hidden md:table-cell text-blue-800 dark:text-blue-200 font-medium cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800/70 transition-colors"
+                        onClick={() => handleSortClick('mobileNumber')}
+                      >
                         <div className="flex items-center gap-2">
                           <Phone className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                           <span>Phone</span>
+                          {sortField === 'mobileNumber' && (
+                            sortDirection === 'asc' ? 
+                              <ChevronUp className="h-3.5 w-3.5 text-blue-500" /> : 
+                              <ChevronDown className="h-3.5 w-3.5 text-blue-500" />
+                          )}
+                          {sortField !== 'mobileNumber' && (
+                            <ArrowUpDown className="h-3 w-3 text-blue-400/50 dark:text-blue-500/50" />
+                          )}
                         </div>
                       </TableHead>
-                      <TableHead className="hidden lg:table-cell text-blue-800 dark:text-blue-200 font-medium">
+                      <TableHead 
+                        className="hidden lg:table-cell text-blue-800 dark:text-blue-200 font-medium cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800/70 transition-colors"
+                        onClick={() => handleSortClick('regDate')}
+                      >
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                           <span>Registered</span>
+                          {sortField === 'regDate' && (
+                            sortDirection === 'asc' ? 
+                              <ChevronUp className="h-3.5 w-3.5 text-blue-500" /> : 
+                              <ChevronDown className="h-3.5 w-3.5 text-blue-500" />
+                          )}
+                          {sortField !== 'regDate' && (
+                            <ArrowUpDown className="h-3 w-3 text-blue-400/50 dark:text-blue-500/50" />
+                          )}
                         </div>
                       </TableHead>
-                      <TableHead className="text-right text-blue-800 dark:text-blue-200 font-medium">
+                      <TableHead 
+                        className="text-right text-blue-800 dark:text-blue-200 font-medium cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800/70 transition-colors"
+                        onClick={() => handleSortClick('totalSpent')}
+                      >
                         <div className="flex items-center gap-2 justify-end">
                           <CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                           <span>Spent</span>
+                          {sortField === 'totalSpent' && (
+                            sortDirection === 'asc' ? 
+                              <ChevronUp className="h-3.5 w-3.5 text-blue-500" /> : 
+                              <ChevronDown className="h-3.5 w-3.5 text-blue-500" />
+                          )}
+                          {sortField !== 'totalSpent' && (
+                            <ArrowUpDown className="h-3 w-3 text-blue-400/50 dark:text-blue-500/50" />
+                          )}
                         </div>
                       </TableHead>
-                      <TableHead className="w-[100px] text-right text-blue-800 dark:text-blue-200 font-medium">
+                      <TableHead className="text-center text-blue-800 dark:text-blue-200 font-medium">
                         Actions
                       </TableHead>
                     </TableRow>
@@ -499,20 +632,34 @@ const UserData = () => {
                             transition={{ duration: 0.2, delay: index * 0.05 }}
                           >
                             <TableCell>
-                              <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 dark:from-blue-600 dark:to-indigo-600 flex items-center justify-center text-white font-medium text-sm shadow-sm">
-                                  {user.firstName.charAt(0)}
-                                  {user.lastName.charAt(0)}
-                                </div>
-                                <div>
-                                  <div className="font-medium text-zinc-900 dark:text-zinc-100">
-                                    {user.firstName} {user.lastName}
-                                  </div>
-                                  <div className="text-xs text-zinc-500 dark:text-zinc-400 md:hidden">
-                                    {user.email}
-                                  </div>
-                                </div>
-                              </div>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="font-medium text-zinc-900 dark:text-zinc-100 cursor-default">
+                                      {user.firstName} {user.lastName}
+                                      <div className="text-xs text-zinc-500 dark:text-zinc-400 md:hidden mt-0.5">
+                                        {user.email}
+                                      </div>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right" align="start" className="p-0 overflow-hidden">
+                                    <div className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                                      <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 dark:from-blue-600 dark:to-indigo-600 flex items-center justify-center text-white font-medium text-lg shadow-sm">
+                                        {user.firstName.charAt(0)}
+                                        {user.lastName.charAt(0)}
+                                      </div>
+                                      <div>
+                                        <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                                          {user.firstName} {user.lastName}
+                                        </div>
+                                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                                          {user.email}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </TableCell>
 
                             <TableCell className="hidden md:table-cell text-zinc-700 dark:text-zinc-300">
