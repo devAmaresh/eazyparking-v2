@@ -1,168 +1,283 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { CheckCircle2, ArrowRight } from "lucide-react";
-import { Button } from "../ui/button";
+import { motion, useInView } from "framer-motion";
 
-export default function AdminPreview() {
-  const containerRef = useRef(null);
+// Icons
+import { BarChart3, Users, MapPin, PieChart, Settings, CheckCircle } from "lucide-react";
 
-  // Add parallax scrolling effect
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
+const AdminPreview = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
 
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
-  const imageY = useTransform(scrollYProgress, [0, 0.5, 1], ["5%", "0%", "-5%"]);
-  const contentY = useTransform(scrollYProgress, [0, 0.5, 1], ["-5%", "0%", "5%"]);
+  const features = [
+    {
+      icon: <BarChart3 className="h-5 w-5 text-blue-500 dark:text-blue-400" />,
+      title: "Real-time Analytics",
+      description:
+        "Monitor parking space usage and revenue in real-time with comprehensive analytics dashboards.",
+    },
+    {
+      icon: <Users className="h-5 w-5 text-blue-500 dark:text-blue-400" />,
+      title: "User Management",
+      description:
+        "Easily manage user accounts, bookings, and permissions from a central dashboard.",
+    },
+    {
+      icon: <MapPin className="h-5 w-5 text-blue-500 dark:text-blue-400" />,
+      title: "Location Control",
+      description:
+        "Add, modify, and manage parking locations, spots, and availability status.",
+    },
+    {
+      icon: <PieChart className="h-5 w-5 text-blue-500 dark:text-blue-400" />,
+      title: "Revenue Reporting",
+      description:
+        "Generate detailed revenue reports, with options to export data for accounting purposes.",
+    },
+    {
+      icon: <Settings className="h-5 w-5 text-blue-500 dark:text-blue-400" />,
+      title: "System Configuration",
+      description:
+        "Customize system settings, pricing models, and user permissions to fit your needs.",
+    },
+  ];
 
   return (
-    <section
-      ref={containerRef}
-      className="py-24 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-black relative overflow-hidden"
-    >
-      {/* Background elements with parallax */}
-      <motion.div
-        style={{ y: backgroundY }}
-        className="absolute inset-0 -z-10"
-      >
-        <div className="absolute right-0 top-0 w-96 h-96 bg-blue-200/20 dark:bg-blue-900/10 rounded-full filter blur-[100px]"></div>
-        <div className="absolute left-0 bottom-0 w-96 h-96 bg-violet-200/20 dark:bg-violet-900/10 rounded-full filter blur-[100px]"></div>
-      </motion.div>
+    <section ref={ref} className="py-20 relative">
+      {/* Background decoration */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-1/3 right-0 w-80 h-80 bg-indigo-100/40 dark:bg-indigo-900/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-blue-100/40 dark:bg-blue-900/10 rounded-full blur-3xl"></div>
+      </div>
 
-      <div className="container mx-auto px-6 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
-          {/* Image Block with parallax */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Dashboard Preview */}
           <motion.div
-            style={{ y: imageY }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-6 order-2 lg:order-1"
+            className="relative"
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="relative">
-              {/* Main image with styling */}
-              <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src="https://img.freepik.com/free-photo/person-preparing-get-driver-license_23-2150167566.jpg?ga=GA1.1.111555767.1744038035&semt=ais_country_boost&w=740"
-                    alt="Admin Dashboard"
-                    className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-700"
-                  />
+            <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-3xl blur-xl"></div>
+            <div className="relative overflow-hidden border border-zinc-200 dark:border-zinc-700 rounded-2xl shadow-2xl bg-white dark:bg-zinc-900">
+              {/* Top bar */}
+              <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800">
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                  <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
+                  <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                </div>
+                <div className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
+                  EazyParking Admin Dashboard
+                </div>
+                <div className="w-20"></div>
+              </div>
+
+              {/* Dashboard content */}
+              <div className="p-4">
+                {/* Stats cards */}
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  {[
+                    {
+                      label: "Today's Bookings",
+                      value: "156",
+                      color:
+                        "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300",
+                    },
+                    {
+                      label: "Available Spaces",
+                      value: "43",
+                      color:
+                        "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300",
+                    },
+                    {
+                      label: "Revenue",
+                      value: "₹12,450",
+                      color:
+                        "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300",
+                    },
+                  ].map((stat, index) => (
+                    <motion.div
+                      key={index}
+                      className={`${stat.color} rounded-xl border border-zinc-100 dark:border-zinc-800 p-4 flex flex-col justify-center items-center`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={
+                        isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                      }
+                      transition={{ duration: 0.4, delay: 0.1 + index * 0.1 }}
+                    >
+                      <div className="text-xl font-bold">{stat.value}</div>
+                      <div className="text-xs">{stat.label}</div>
+                    </motion.div>
+                  ))}
                 </div>
 
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none"></div>
-
-                {/* Floating UI element */}
+                {/* Chart */}
                 <motion.div
+                  className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 mb-4 border border-zinc-100 dark:border-zinc-700"
                   initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.7, delay: 0.5 }}
-                  className="absolute bottom-6 left-6 right-6"
+                  animate={
+                    isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                  }
+                  transition={{ duration: 0.4, delay: 0.3 }}
                 >
-                  <div className="bg-white/10 backdrop-blur-xl rounded-xl p-4 border border-white/20 shadow-lg">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-white font-medium text-sm">
-                          Admin Dashboard
-                        </p>
-                        <p className="text-white/80 text-xs">
-                          Real-time management & control
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="h-3 w-3 bg-green-400 rounded-full animate-pulse"></div>
-                        <span className="text-white/90 text-xs">Live</span>
-                      </div>
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                      Parking Usage Analytics
                     </div>
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Last 7 days
+                    </div>
+                  </div>
+
+                  {/* Fake chart - replace with actual chart component if needed */}
+                  <div className="h-32 flex items-end gap-2">
+                    {[35, 45, 30, 60, 75, 50, 65].map((height, index) => (
+                      <div key={index} className="flex-1 flex flex-col items-center gap-1">
+                        <div
+                          className="w-full bg-blue-500/80 dark:bg-blue-600/80 rounded-t transition-all duration-300 hover:bg-blue-600"
+                          style={{ height: `${height}%` }}
+                        ></div>
+                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {["M", "T", "W", "T", "F", "S", "S"][index]}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Recent bookings */}
+                <motion.div
+                  className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 border border-zinc-100 dark:border-zinc-700"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={
+                    isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                  }
+                  transition={{ duration: 0.4, delay: 0.4 }}
+                >
+                  <div className="text-sm font-medium mb-3 text-zinc-800 dark:text-zinc-200">
+                    Recent Bookings
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      {
+                        user: "Amit Sharma",
+                        location: "Central Plaza, A12",
+                        time: "10:30 AM",
+                        status: "Active",
+                      },
+                      {
+                        user: "Priya Patel",
+                        location: "Market Square, B04",
+                        time: "11:45 AM",
+                        status: "Upcoming",
+                      },
+                      {
+                        user: "Rahul Singh",
+                        location: "Tech Park, C22",
+                        time: "2:15 PM",
+                        status: "Completed",
+                      },
+                    ].map((booking, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center p-2 bg-white dark:bg-zinc-900 rounded-md border border-zinc-100 dark:border-zinc-700 text-xs"
+                      >
+                        <div className="font-medium text-zinc-800 dark:text-zinc-200">
+                          {booking.user}
+                        </div>
+                        <div className="text-zinc-500 dark:text-zinc-400">
+                          {booking.location}
+                        </div>
+                        <div className="text-zinc-500 dark:text-zinc-400">
+                          {booking.time}
+                        </div>
+                        <div
+                          className={`px-2 py-0.5 rounded-full text-xs ${
+                            booking.status === "Active"
+                              ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300"
+                              : booking.status === "Upcoming"
+                              ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                              : "bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
+                          }`}
+                        >
+                          {booking.status}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
               </div>
-
-              {/* Decorative elements */}
-              <div className="absolute -top-6 -left-6 -z-10 w-24 h-24 bg-blue-100 dark:bg-blue-900/20 rounded-lg blur-lg"></div>
-              <div className="absolute -bottom-6 -right-6 -z-10 w-32 h-32 bg-violet-100 dark:bg-violet-900/20 rounded-lg blur-lg"></div>
             </div>
           </motion.div>
 
-          {/* Text Block with parallax */}
+          {/* Content */}
           <motion.div
-            style={{ y: contentY }}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="lg:col-span-6 order-1 lg:order-2 space-y-8"
+            initial={{ opacity: 0, x: 20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="inline-block px-4 py-1.5 bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium mb-1 border border-blue-200 dark:border-blue-800/50">
-              For Parking Administrators
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/30 mb-6">
+              <span className="flex h-2 w-2 rounded-full bg-blue-500"></span>
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                Admin Panel
+              </span>
             </div>
 
-            <h2 className="text-4xl md:text-5xl font-bold leading-tight bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-blue-100 bg-clip-text text-transparent">
-              Powerful Admin Controls
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-zinc-900 dark:text-zinc-100">
+              Powerful Tools for <br />
+              <span className="text-blue-600 dark:text-blue-400">
+                Parking Management
+              </span>
             </h2>
 
-            <p className="text-lg text-slate-600 dark:text-slate-300 max-w-xl">
-              Streamline parking operations with sophisticated tools designed for
-              efficiency, clarity, and speed. Everything you need to manage your
-              parking spaces effectively.
+            <p className="text-lg text-zinc-600 dark:text-zinc-300 mb-8">
+              Take control of your parking operations with our comprehensive admin
+              dashboard. Monitor activity, manage users, and optimize revenue with
+              ease.
             </p>
 
-            <div className="space-y-6 pt-2">
-              {[
-                {
-                  title: "Book Slot on User Arrival",
-                  desc: "Admins can quickly allocate slots to walk-in users with no prior booking.",
-                },
-                {
-                  title: "Real-time Space Management",
-                  desc: "Get a live view and control of parking occupancy and availability.",
-                },
-                {
-                  title: "Reporting & Analytics",
-                  desc: "Track trends, revenue, and usage with detailed insights.",
-                },
-              ].map(({ title, desc }, index) => (
+            <div className="space-y-6">
+              {features.map((feature, index) => (
                 <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
-                  className="flex items-start space-x-4 group"
                   key={index}
+                  className="flex gap-3 items-start"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                  transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                 >
-                  <div className="flex-shrink-0 rounded-full p-1 bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-300 group-hover:text-blue-600 dark:group-hover:text-blue-200 transition-colors">
-                    <CheckCircle2 className="w-6 h-6" />
+                  <div className="mt-1 bg-blue-100 dark:bg-blue-900/30 rounded-full p-2">
+                    {feature.icon}
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">
-                      {title}
+                  <div>
+                    <h3 className="font-medium text-zinc-900 dark:text-zinc-100 mb-1">
+                      {feature.title}
                     </h3>
-                    <p className="text-slate-600 dark:text-slate-400">{desc}</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                      {feature.description}
+                    </p>
                   </div>
                 </motion.div>
               ))}
             </div>
 
             <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.6 }}
+              className="mt-8 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700"
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.4, delay: 0.8 }}
             >
-              <Button className="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full px-6 py-6 shadow-lg shadow-blue-500/20 dark:shadow-blue-700/10 hover:shadow-xl hover:shadow-blue-500/30 dark:hover:shadow-blue-700/20 transition-all duration-300">
-                <span className="flex items-center gap-2">
-                  Learn about admin features{" "}
-                  <ArrowRight size={16} />
-                </span>
-              </Button>
+              <CheckCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
+              <p>
+                Admin accounts include access to all premium features, detailed
+                analytics, and priority support.
+              </p>
             </motion.div>
           </motion.div>
         </div>
       </div>
     </section>
   );
-}
+};
+
+export default AdminPreview;

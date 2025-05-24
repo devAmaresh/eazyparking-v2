@@ -1,186 +1,162 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
-import { Button } from "../ui/button";
-import { NavHashLink as Link } from "react-router-hash-link";
-import { useLocation, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+
+// Icons
+import { MenuIcon, X, Sun, Moon, ChevronDown } from "lucide-react";
 
 interface HeaderProps {
   isMobile: boolean;
 }
 
-export default function Header({ isMobile }: HeaderProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [scrolled, setScrolled] = useState<boolean>(false);
-  const location = useLocation();
+const Header = ({ isMobile }: HeaderProps) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => {
-    const token = Cookies.get("token");
-    setIsLoggedIn(!!token);
-  }, [location]); // re-check login status on route change
-
-  // Add scroll listener to detect when page is scrolled
+  // Track scroll to change header appearance
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 20;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
-      }
+      setScrolled(window.scrollY > 20);
     };
-
     window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [scrolled]);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  const isActive = (targetPath: string) => location.hash === targetPath;
-  const toggleMenu = (): void => setIsMenuOpen(!isMenuOpen);
-  const navigate = useNavigate();
+  const navItems = [
+    { name: "Home", href: "#hero" },
+    { name: "Features", href: "#features" },
+    { name: "Locations", href: "#locations" },
+    { name: "Testimonials", href: "#testimonials" },
+    { name: "Contact", href: "#contact" },
+  ];
+
+
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <motion.header
+      className={`fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300 ${
         scrolled
-          ? "bg-white/70 dark:bg-black/70 backdrop-blur-xl shadow-md border-b border-gray-100/50 dark:border-gray-800/50 py-3"
-          : "bg-white/40 dark:bg-black/30 backdrop-blur-sm py-5"
+          ? "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-md"
+          : "bg-transparent"
       }`}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 100, damping: 20 }}
     >
-      <div className="container mx-auto px-6 sm:px-8 flex justify-between items-center">
-        <Link
-          to="/"
-          className="text-2xl font-bold tracking-tighter text-black dark:text-white"
-        >
-          EAZY
-          <span className="bg-gradient-to-r from-blue-600 to-violet-600 dark:from-blue-400 dark:to-violet-400 bg-clip-text text-transparent font-extrabold">
-            PARKING
+      <nav className="max-w-screen-xl mx-auto flex justify-between items-center">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="relative">
+            <div className="absolute inset-0 bg-blue-500 rounded-lg blur-sm group-hover:blur-md transition-all duration-300"></div>
+           
+          </div>
+          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
+            EazyParking
           </span>
         </Link>
 
-        {isMobile ? (
-          <button
-            onClick={toggleMenu}
-            className="p-2 rounded-full bg-gray-100/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        ) : (
-          <nav className="flex items-center space-x-1 sm:space-x-2">
-            {["features", "locations", "testimonials", "contact"].map(
-              (item) => (
-                <Link
-                  key={item}
-                  smooth
-                  to={`#${item}`}
-                  className={`px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-                    isActive(`#${item}`)
-                      ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
-                      : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/60"
-                  }`}
-                >
-                  {item.charAt(0).toUpperCase() + item.slice(1)}
-                </Link>
-              )
-            )}
-
-            <div className="ml-2 pl-2 border-l border-gray-200 dark:border-gray-700">
-              {isLoggedIn ? (
-                <Button
-                  onClick={() => navigate("/dashboard")}
-                  className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-full px-5 py-2 text-sm font-medium shadow-sm hover:shadow transition-all duration-200"
-                >
-                  Dashboard
-                </Button>
-              ) : (
-                <div className="flex space-x-2">
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="rounded-full border-2 border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 px-4 py-1.5 text-sm font-medium transition-all duration-200"
-                  >
-                    <Link to="/login">Login</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 dark:from-blue-500 dark:to-violet-500 text-white rounded-full px-4 py-1.5 text-sm font-medium shadow-sm hover:shadow transition-all duration-200"
-                  >
-                    <Link to="/admin/login">Admin</Link>
-                  </Button>
-                </div>
-              )}
-            </div>
-          </nav>
+        {/* Desktop Navigation Links */}
+        {!isMobile && (
+          <div className="hidden md:flex items-center gap-8">
+            {navItems.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-200"
+              >
+                {item.name}
+              </a>
+            ))}
+          </div>
         )}
-      </div>
 
-      {isMobile && isMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className="border-t border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-black/95 backdrop-blur-xl shadow-lg"
-        >
-          <nav className="flex flex-col py-3 px-6 space-y-1">
-            {["features", "locations", "testimonials", "contact"].map(
-              (item) => (
-                <Link
-                  key={item}
-                  to={`#${item}`}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`py-3 px-4 text-sm font-medium rounded-lg transition-colors ${
-                    isActive(`#${item}`)
-                      ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60"
-                  }`}
-                >
-                  {item.charAt(0).toUpperCase() + item.slice(1)}
-                </Link>
-              )
-            )}
+        {/* Theme Toggle & Login Buttons */}
+        <div className="flex items-center gap-3">
+          
 
-            <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-800 grid gap-2">
-              {isLoggedIn ? (
-                <Button
-                  onClick={() => {
-                    navigate("/dashboard");
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg py-3 font-medium shadow-sm"
-                >
-                  Dashboard
-                </Button>
+          {isMobile ? (
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+              className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+            >
+              {isMenuOpen ? (
+                <X className="h-5 w-5 text-zinc-600 dark:text-zinc-300" />
               ) : (
-                <>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="w-full rounded-lg border-2 border-gray-200 dark:border-gray-700 py-3 font-medium"
-                  >
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                      Login
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 dark:from-blue-500 dark:to-violet-500 text-white rounded-lg py-3 font-medium shadow-sm"
-                  >
-                    <Link
-                      to="/admin/login"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Admin Login
-                    </Link>
-                  </Button>
-                </>
+                <MenuIcon className="h-5 w-5 text-zinc-600 dark:text-zinc-300" />
               )}
+            </button>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link to="/login">
+                <Button
+                  variant="outline"
+                  className="border-blue-200 dark:border-blue-800/30 hover:border-blue-300 dark:hover:border-blue-700"
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link to="/admin/login">
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/10 border border-blue-700/10">
+                  Admin
+                </Button>
+              </Link>
             </div>
-          </nav>
-        </motion.div>
-      )}
-    </header>
+          )}
+        </div>
+      </nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobile && isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden mt-4 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden"
+          >
+            <div className="flex flex-col py-2">
+              {navItems.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="py-3 px-6 text-zinc-600 dark:text-zinc-300 hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </a>
+              ))}
+              <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
+              <div className="flex flex-col gap-2 px-4 py-2">
+                <Link
+                  to="/login"
+                  className="w-full"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Button
+                    variant="outline"
+                    className="w-full border-blue-200 dark:border-blue-800/30"
+                  >
+                    Login
+                  </Button>
+                </Link>
+                <Link
+                  to="/register"
+                  className="w-full"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/10">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
-}
+};
+
+export default Header;
