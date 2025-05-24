@@ -79,14 +79,7 @@ const AppContent = () => {
             <Route path="reports" element={<Reports />} />
             <Route path="*" element={<h1>404 Not Found</h1>} />
           </Route>
-          <Route
-            path="/booking-status"
-            element={
-              <ProtectedRoute redirectPath="/login">
-                <BookingStatus />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/booking-status" element={<BookingStatus />} />
         </Routes>
       </Router>
     </ConfigProvider>

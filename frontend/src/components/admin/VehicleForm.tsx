@@ -93,14 +93,17 @@ const formSchema = z.object({
     .date({
       required_error: "Please select a date and time",
     })
-    .refine((date) => {
-      const now = new Date();
-      // Add 1 minute to current time
-      const minTime = new Date(now.getTime() + 60 * 1000);
-      return date >= minTime;
-    }, {
-      message: "Booking time must be at least 1 minute in the future",
-    }),
+    .refine(
+      (date) => {
+        const now = new Date();
+        // Add 1 minute to current time
+        const minTime = new Date(now.getTime() + 60 * 1000);
+        return date >= minTime;
+      },
+      {
+        message: "Booking time must be at least 1 minute in the future",
+      }
+    ),
 });
 
 const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
@@ -124,7 +127,7 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
 
   // Watch the inTime value to update the time input when date changes
   const selectedDate = form.watch("inTime");
-  
+
   // Update time input whenever selected date changes
   useEffect(() => {
     if (selectedDate) {
@@ -208,7 +211,7 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
 
     try {
       setSubmitting(true);
-      await axios.post(`${BACKEND_URL}/api/admin/book`, payload, {
+      const res = await axios.post(`${BACKEND_URL}/api/admin/book`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Booking successful!");
@@ -220,7 +223,7 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
         inTime: undefined,
       });
       setTimeInputValue("");
-      navigate("/admin/bookings");
+      navigate(`/booking-status?token=${res.data.verifytoken}`);
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || "Booking failed!";
       toast.error(errorMessage);
@@ -234,8 +237,8 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+      transition: { staggerChildren: 0.1 },
+    },
   };
 
   const itemVariants = {
@@ -243,12 +246,12 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 }
-    }
+      transition: { type: "spring", stiffness: 100 },
+    },
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="min-h-screen p-6 bg-gradient-to-br from-white to-blue-50/30 dark:from-black dark:to-blue-950/10 text-foreground"
       initial="hidden"
       animate="visible"
@@ -274,13 +277,15 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
             {/* Decorative elements */}
             <div className="absolute top-0 right-0 w-40 h-40 bg-blue-100 dark:bg-blue-900/20 rounded-full -mr-20 -mt-20 opacity-50"></div>
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-100 dark:bg-indigo-900/20 rounded-full -ml-16 -mb-16 opacity-50"></div>
-            
+
             <div className="relative z-10 flex items-center gap-4">
               <div className="p-3 bg-white/70 dark:bg-zinc-900/70 rounded-xl border border-blue-200 dark:border-blue-800/30 shadow-sm backdrop-blur-sm">
                 <ParkingSquare className="h-7 w-7 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-blue-950 dark:text-blue-200">Vehicle Booking</h1>
+                <h1 className="text-2xl font-bold text-blue-950 dark:text-blue-200">
+                  Vehicle Booking
+                </h1>
                 <p className="text-blue-900/70 dark:text-blue-300/70 font-medium">
                   Complete the form below to book a parking slot
                 </p>
@@ -298,7 +303,9 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                   <CarFront className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-2xl text-blue-950 dark:text-blue-200">Book a Vehicle</CardTitle>
+                  <CardTitle className="text-2xl text-blue-950 dark:text-blue-200">
+                    Book a Vehicle
+                  </CardTitle>
                   <CardDescription className="text-blue-700/70 dark:text-blue-300/70">
                     Fill in the details to reserve a parking slot
                   </CardDescription>
@@ -396,7 +403,10 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                   </motion.div>
 
                   {/* Vehicle Details - Two Columns with glass morphism effect */}
-                  <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
+                  <motion.div
+                    variants={itemVariants}
+                    className="grid grid-cols-2 gap-4"
+                  >
                     {/* Vehicle Company */}
                     <FormField
                       control={form.control}
@@ -472,8 +482,8 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent 
-                              className="w-auto p-0 border-blue-100 dark:border-blue-900/30 bg-white dark:bg-zinc-900" 
+                            <PopoverContent
+                              className="w-auto p-0 border-blue-100 dark:border-blue-900/30 bg-white dark:bg-zinc-900"
                               align="start"
                             >
                               <Calendar
@@ -483,21 +493,25 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                                   if (date) {
                                     // Preserve the current time when changing the date
                                     const newDate = new Date(date);
-                                    
+
                                     if (field.value) {
                                       // If there's already a time set, preserve it
                                       newDate.setHours(field.value.getHours());
-                                      newDate.setMinutes(field.value.getMinutes());
+                                      newDate.setMinutes(
+                                        field.value.getMinutes()
+                                      );
                                     } else {
                                       // Set a default time (e.g., current time + 1 hour)
                                       const now = new Date();
                                       newDate.setHours(now.getHours() + 1);
                                       newDate.setMinutes(0);
-                                      
+
                                       // Update the time input
-                                      setTimeInputValue(format(newDate, "HH:mm"));
+                                      setTimeInputValue(
+                                        format(newDate, "HH:mm")
+                                      );
                                     }
-                                    
+
                                     field.onChange(newDate);
                                   }
                                 }}
@@ -514,7 +528,9 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                               />
                               <div className="p-3 border-t border-blue-100 dark:border-blue-900/30">
                                 <div className="flex items-center gap-2">
-                                  <Label className="text-blue-700 dark:text-blue-300">Time:</Label>
+                                  <Label className="text-blue-700 dark:text-blue-300">
+                                    Time:
+                                  </Label>
                                   <Input
                                     type="time"
                                     className="w-full bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 focus:ring-2 focus:ring-blue-500/30 focus:ring-offset-0 rounded-lg"
@@ -523,17 +539,24 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                                       try {
                                         // Always update the controlled input value
                                         setTimeInputValue(e.target.value);
-                                        
+
                                         // Only proceed if we have a selected date and valid time
                                         if (field.value && e.target.value) {
-                                          const [hours, minutes] = e.target.value.split(":");
-                                          
+                                          const [hours, minutes] =
+                                            e.target.value.split(":");
+
                                           if (hours && minutes) {
                                             // Create a new date object to avoid mutating the original
-                                            const newDate = new Date(field.value);
-                                            newDate.setHours(parseInt(hours, 10));
-                                            newDate.setMinutes(parseInt(minutes, 10));
-                                            
+                                            const newDate = new Date(
+                                              field.value
+                                            );
+                                            newDate.setHours(
+                                              parseInt(hours, 10)
+                                            );
+                                            newDate.setMinutes(
+                                              parseInt(minutes, 10)
+                                            );
+
                                             // Validate the date before setting it
                                             if (!isNaN(newDate.getTime())) {
                                               field.onChange(newDate);
@@ -541,7 +564,10 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                                           }
                                         }
                                       } catch (error) {
-                                        console.error("Error setting time:", error);
+                                        console.error(
+                                          "Error setting time:",
+                                          error
+                                        );
                                         // Don't update if there's an error
                                       }
                                     }}
@@ -559,35 +585,35 @@ const VehicleForm = ({ parkingLotId }: { parkingLotId: string }) => {
                     />
                   </motion.div>
 
-                      <motion.div variants={itemVariants}>
-                        <CardFooter className="flex justify-end gap-3 px-0 pt-6 border-t border-blue-100 dark:border-blue-900/30">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => navigate("/admin/bookings")}
-                            disabled={submitting}
-                            className="bg-white dark:bg-transparent border-blue-200 dark:border-blue-800/30 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                          >
-                            Cancel
-                          </Button>
-                          <Button 
-                            type="submit" 
-                            disabled={submitting} 
-                            className="gap-2 hover:cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-400 dark:hover:to-indigo-400 text-white dark:text-zinc-900 font-medium shadow-md shadow-blue-500/10 dark:shadow-blue-400/5 border border-blue-700/10 dark:border-blue-300/20"
-                          >
-                            <CheckCircle2 className="h-4 w-4" /> 
-                            {submitting ? "Booking..." : "Book Now"}
-                          </Button>
-                        </CardFooter>
-                      </motion.div>
-                                  </form>
-                                </Form>
-                              </CardContent>
-                            </Card>
-                          </motion.div>
-                        </div>
-                      </motion.div>
-                    );
-                  };
-                  
-                  export default VehicleForm;
+                  <motion.div variants={itemVariants}>
+                    <CardFooter className="flex justify-end gap-3 px-0 pt-6 border-t border-blue-100 dark:border-blue-900/30">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => navigate("/admin/bookings")}
+                        disabled={submitting}
+                        className="bg-white dark:bg-transparent border-blue-200 dark:border-blue-800/30 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={submitting}
+                        className="gap-2 hover:cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-400 dark:hover:to-indigo-400 text-white dark:text-zinc-900 font-medium shadow-md shadow-blue-500/10 dark:shadow-blue-400/5 border border-blue-700/10 dark:border-blue-300/20"
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        {submitting ? "Booking..." : "Book Now"}
+                      </Button>
+                    </CardFooter>
+                  </motion.div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default VehicleForm;

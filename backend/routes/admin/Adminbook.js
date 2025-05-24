@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import auth from "../../middlewares/auth.js";
 import prisma from "../../prisma/client.js";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 const router = express.Router();
@@ -66,7 +67,7 @@ router.post("/", auth, async (req, res) => {
         data: {
           userId,
           parkingLotId,
-          paymentId: null,
+          paymentId: "Done manually by Admin",
         },
       });
 
@@ -83,11 +84,17 @@ router.post("/", auth, async (req, res) => {
 
       return { booking, vehicle };
     });
+    const verifytoken = jwt.sign(
+      { userId, parkingLotId, inTime, registrationNumber },
+      process.env.JWT_PAYMENT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     res.status(201).json({
       message: "Booking successful",
       booking: result.booking,
       vehicle: result.vehicle,
+      verifytoken: verifytoken,
     });
   } catch (error) {
     console.error("Booking error:", error);

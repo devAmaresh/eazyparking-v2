@@ -32,6 +32,7 @@ import {
   PartyPopper,
   User,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const BookingStatus = () => {
   const location = useLocation();
@@ -46,6 +47,14 @@ const BookingStatus = () => {
     width: 0,
     height: 0,
   });
+  useEffect(() => {
+    //if no token is found, redirect to home
+    if (!Cookies.get("token") && !Cookies.get("adminToken")) {
+      toast.error("You must be logged in to view this page.");
+      navigate("/");
+      return;
+    }
+  }, []);
   const [redirectTimer, setRedirectTimer] = useState<number | null>(null);
 
   // Parse payment token from URL
