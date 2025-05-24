@@ -3,6 +3,8 @@ import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import auth from '../middlewares/auth.js';
 import prisma from '../prisma/client.js';
+import jwt from 'jsonwebtoken';
+
 
 dotenv.config();
 
@@ -27,12 +29,18 @@ router.post('/create-checkout-session', auth , async (req, res) => {
         });
 
         const price = priceObj.price;
+        //create a unique jwt token for the session containing the userId and parkingLotId and inTime and registrationNumber
+        const verifytoken = jwt.sign(
+            { userId, parkingLotId, inTime, registrationNumber },
+            process.env.JWT_PAYMENT_SECRET,
+            { expiresIn: '1h' }
+        );
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'payment',
-            success_url: `${process.env.FRONTEND_URL}/bookings`,
-            cancel_url: `${process.env.FRONTEND_URL}/bookings`,
+            success_url: `${process.env.FRONTEND_URL}/booking-status?status=success&token=${verifytoken}`,
+            cancel_url: `${process.env.FRONTEND_URL}/booking-status?status=failed`,
             line_items: [
                 {
                     price_data: {

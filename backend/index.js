@@ -24,7 +24,7 @@ import adminprofileRoute from "./routes/admin/profile.js";
 import adminchangePasswordRoute from "./routes/admin/changePassword.js";
 import googleAuthRoute from "./routes/googleAuth.js";
 import getReport from "./routes/user/getReport.js";
-
+import verifyPayment from "./routes/verifyPayment.js";
 import stripeRoutes from "./routes/stripe.js";
 import webhookRouter from "./routes/stripeWebhook.js";
 
@@ -74,6 +74,7 @@ app.use("/api/user/changePassword", changePasswordRoute);
 app.use("/api/user/googleAuth", googleAuthRoute);
 
 app.use("/api/stripe", stripeRoutes);
+app.use("/api/payment/verifyPayment", verifyPayment);
 
 
 

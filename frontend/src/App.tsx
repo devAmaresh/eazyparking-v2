@@ -9,7 +9,7 @@ import Register from "./pages/Register";
 import AdminLogin from "./pages/admin/adminlogin";
 import Logout from "./pages/Logout";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import { Toaster as ShadToaster } from "@/components/ui/sonner";
 import { ConfigProvider, theme as antdtheme } from "antd";
 import { Toaster } from "react-hot-toast";
 import NotFound from "./pages/NotFound";
@@ -20,6 +20,7 @@ import Reports from "./pages/Reports";
 import Dashboard from "./pages/Dashboard";
 import Book from "./pages/Book";
 import UserLayout from "./pages/UserLayout";
+import BookingStatus from "./pages/BookingStatus";
 
 const AppContent = () => {
   const { theme } = useContext(ThemeContext);
@@ -35,6 +36,7 @@ const AppContent = () => {
           : {}
       }
     >
+      <ShadToaster />
       <Toaster
         position="top-center"
         toastOptions={{
@@ -77,6 +79,14 @@ const AppContent = () => {
             <Route path="reports" element={<Reports />} />
             <Route path="*" element={<h1>404 Not Found</h1>} />
           </Route>
+          <Route
+            path="/booking-status"
+            element={
+              <ProtectedRoute redirectPath="/login">
+                <BookingStatus />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </ConfigProvider>
