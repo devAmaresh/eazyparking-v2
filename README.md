@@ -2,8 +2,8 @@
 
 A modern full-stack web application for efficient vehicle parking slot booking and management. EazyParking offers a clean and responsive frontend built with React and TypeScript, backed by RESTful APIs in Node.js and Express.
 
-🔗 **Live Demo**: [EazyParking App](https://eazyparking.tech/)  
-💻 **Source Code**: [GitHub Repository](https://github.com/latelateef/eazy-parking-mern)
+🔗 **Live Demo**: [Eazyparking](https://eazyparking.tech/)  
+
 
 ---
 
