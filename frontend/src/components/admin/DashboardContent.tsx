@@ -457,9 +457,9 @@ const DashboardContent: React.FC = () => {
             <Card className="border shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <div>
-                  <CardTitle>Vehicle Occupancy Distribution</CardTitle>
+                  <CardTitle>Parking Lot Occupancy Distribution</CardTitle>
                   <CardDescription>
-                    Current distribution of vehicles by status
+                    Current distribution by status
                   </CardDescription>
                 </div>
                 <CircleDot className="h-5 w-5 text-muted-foreground" />
@@ -513,7 +513,7 @@ const DashboardContent: React.FC = () => {
                             <div className="flex flex-col items-center">
                               <span className="font-medium text-sm">{value}</span>
                               <span className="text-xs text-muted-foreground">
-                                {occupancyData[index]?.value || 0} vehicles (
+                                {occupancyData[index]?.value || 0} parking lot (
                                 {(
                                   ((occupancyData[index]?.value || 0) /
                                     occupancyData.reduce(
