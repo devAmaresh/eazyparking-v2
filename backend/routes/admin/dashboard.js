@@ -32,22 +32,46 @@ router.get("/stats", auth, async (req, res) => {
 
 router.get("/occupancy", auth, async (req, res) => {
   try {
-    if (!req.isAdmin) 
+    if (!req.isAdmin)
       return res.status(403).json({ message: "Access denied" });
-    
-    const parkingLots = await prisma.parkingLot.findMany();
-    const occupied = parkingLots.reduce((acc, lot) => acc + lot.bookedSlot, 0);
-    const empty = parkingLots.reduce((acc, lot) => acc + (lot.totalSlot - lot.bookedSlot), 0);
+
+    const parkingLots = await prisma.parkingLot.findMany({
+      include: {
+        bookings: {
+          include: {
+            vehicle: true,
+          },
+        },
+      },
+    });
+
+    let totalOccupied = 0;
+    let totalEmpty = 0;
+    const now = new Date();
+
+    parkingLots.forEach(lot => {
+      const occupiedVehicles = lot.bookings.filter(booking => {
+        const vehicle = booking.vehicle;
+        return vehicle && vehicle.inTime <= now && vehicle.outTime === null;
+      });
+
+      const occupiedCount = occupiedVehicles.length;
+      const emptyCount = lot.totalSlot - occupiedCount;
+
+      totalOccupied += occupiedCount;
+      totalEmpty += emptyCount;
+    });
 
     res.status(200).json([
-      { name: "Occupied", value: occupied },
-      { name: "Empty", value: empty }
+      { name: "Occupied", value: totalOccupied },
+      { name: "Empty", value: totalEmpty }
     ]);
   } catch (error) {
     console.error("Error fetching occupancy data:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 router.get("/trends", auth, async (req, res) => {
