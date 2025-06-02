@@ -23,6 +23,20 @@ const Header = ({ isMobile }: HeaderProps) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Smooth scroll handler for navigation links
+  const handleNavClick = (href: string) => {
+    setIsMenuOpen(false);
+    setTimeout(() => {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100); // Small delay to allow menu to close first
+  };
+
   const navItems = [
     { name: "Home", href: "#hero" },
     { name: "Features", href: "#features" },
@@ -111,14 +125,13 @@ const Header = ({ isMobile }: HeaderProps) => {
           >
             <div className="flex flex-col py-2">
               {navItems.map((item) => (
-                <a
+                <button
                   key={item.name}
-                  href={item.href}
-                  className="py-3 px-6 text-zinc-600 dark:text-zinc-300 hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => handleNavClick(item.href)}
+                  className="py-3 px-6 text-zinc-600 dark:text-zinc-300 hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-left"
                 >
                   {item.name}
-                </a>
+                </button>
               ))}
               <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
               <div className="flex flex-col gap-2 px-4 py-2">
