@@ -645,8 +645,8 @@ const UserData = () => {
                                   <TooltipContent side="right" align="start" className="p-0 overflow-hidden">
                                     <div className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 rounded-lg border border-blue-100 dark:border-blue-900/30">
                                       <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 dark:from-blue-600 dark:to-indigo-600 flex items-center justify-center text-white font-medium text-lg shadow-sm">
-                                        {user.firstName.charAt(0)}
-                                        {user.lastName.charAt(0)}
+                                        {user?.firstName?.charAt(0)}
+                                        {user?.lastName?.charAt(0)}
                                       </div>
                                       <div>
                                         <div className="font-medium text-zinc-900 dark:text-zinc-100">

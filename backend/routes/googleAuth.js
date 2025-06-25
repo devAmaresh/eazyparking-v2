@@ -34,7 +34,7 @@ router.post('/', async (req, res) => {
             const newUser = await prisma.user.create({
                 data: {
                     firstName: data.given_name,
-                    lastName: data.family_name,
+                    lastName: data.family_name || "NA",
                     email,
                     password: await bcrypt.hash(data.jti, 10),
                     mobileNumber: null,
