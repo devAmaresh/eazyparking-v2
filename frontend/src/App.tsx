@@ -21,6 +21,7 @@ import Dashboard from "./pages/Dashboard";
 import Book from "./pages/Book";
 import UserLayout from "./pages/UserLayout";
 import BookingStatus from "./pages/BookingStatus";
+import ResetPassword from "./pages/ResetPassword";
 
 const AppContent = () => {
   const { theme } = useContext(ThemeContext);
@@ -54,6 +55,7 @@ const AppContent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="reset-password/:token" element={<ResetPassword />} />
           <Route
             path="/admin/*"
             element={
@@ -77,6 +79,7 @@ const AppContent = () => {
             <Route path="bookings" element={<Bookings />} />
             <Route path="bookings/:id" element={<Book />} />
             <Route path="reports" element={<Reports />} />
+
             <Route path="*" element={<h1>404 Not Found</h1>} />
           </Route>
           <Route path="/booking-status" element={<BookingStatus />} />

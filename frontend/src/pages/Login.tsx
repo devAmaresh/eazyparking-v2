@@ -32,6 +32,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import GoogleButton from "@/components/auth/GoogleButton";
 
@@ -47,7 +54,7 @@ import {
   UserPlus,
 } from "lucide-react";
 
-// Form validation schema
+// Form validation schemas
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
   password: z.string().min(6, {
@@ -56,7 +63,12 @@ const formSchema = z.object({
   remember: z.boolean().default(false).optional(),
 });
 
+const forgotPasswordSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address." }),
+});
+
 type FormValues = z.infer<typeof formSchema>;
+type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -65,7 +77,12 @@ export default function SignIn() {
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
 
-
+  // Forgot password modal states
+  const [forgotPasswordOpen, setForgotPasswordOpen] = React.useState(false);
+  const [forgotPasswordLoading, setForgotPasswordLoading] =
+    React.useState(false);
+  const [forgotPasswordError, setForgotPasswordError] = React.useState("");
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = React.useState("");
 
   React.useEffect(() => {
     const token = Cookies.get("token");
@@ -80,6 +97,13 @@ export default function SignIn() {
       email: "",
       password: "",
       remember: false,
+    },
+  });
+
+  const forgotPasswordForm = useForm<ForgotPasswordValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
     },
   });
 
@@ -104,6 +128,42 @@ export default function SignIn() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onForgotPasswordSubmit = async (data: ForgotPasswordValues) => {
+    setForgotPasswordError("");
+    setForgotPasswordSuccess("");
+
+    try {
+      setForgotPasswordLoading(true);
+      await axios.post(`${BACKEND_URL}/api/auth/forgot-password`, {
+        email: data.email,
+      });
+
+      setForgotPasswordSuccess(
+        "Password reset link sent to your email if you are registered. Please check your inbox."
+      );
+      forgotPasswordForm.reset();
+
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        setForgotPasswordOpen(false);
+        setForgotPasswordSuccess("");
+      }, 2000);
+    } catch (err: any) {
+      setForgotPasswordError(
+        err?.response?.data?.message || "Failed to send reset email"
+      );
+    } finally {
+      setForgotPasswordLoading(false);
+    }
+  };
+
+  const handleForgotPasswordClick = () => {
+    setForgotPasswordOpen(true);
+    setForgotPasswordError("");
+    setForgotPasswordSuccess("");
+    forgotPasswordForm.reset();
   };
 
   const containerVariants = {
@@ -246,7 +306,7 @@ export default function SignIn() {
                   />
                   <button
                     type="button"
-                    
+                    onClick={handleForgotPasswordClick}
                     className="text-sm text-blue-600 dark:text-blue-400 hover:underline underline-offset-4 font-medium"
                   >
                     Forgot password?
@@ -347,6 +407,98 @@ export default function SignIn() {
           </CardFooter>
         </Card>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
+        <DialogContent className="sm:max-w-md border border-blue-100 dark:border-blue-900/30 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <Mail className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+              Reset Password
+            </DialogTitle>
+            <DialogDescription className="text-zinc-500 dark:text-zinc-400">
+              Enter your email address and we'll send you a link to reset your
+              password.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...forgotPasswordForm}>
+            <form
+              onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={forgotPasswordForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-zinc-800 dark:text-zinc-200 text-sm font-medium">
+                      Email Address
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="your@email.com"
+                        type="email"
+                        autoComplete="email"
+                        className="h-11 bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-0"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500 dark:text-red-400 text-xs font-medium" />
+                  </FormItem>
+                )}
+              />
+
+              {forgotPasswordError && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 rounded-lg p-3 flex items-start gap-2.5">
+                  <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 flex-shrink-0" />
+                  <p className="text-sm text-red-600 dark:text-red-400">
+                    {forgotPasswordError}
+                  </p>
+                </div>
+              )}
+
+              {forgotPasswordSuccess && (
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 rounded-lg p-3 flex items-start gap-2.5">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400 flex-shrink-0" />
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    {forgotPasswordSuccess}
+                  </p>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setForgotPasswordOpen(false)}
+                  className="flex-1 h-11 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                  disabled={forgotPasswordLoading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 h-11 gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-400 dark:hover:to-indigo-400 text-white dark:text-zinc-900 font-medium"
+                  disabled={forgotPasswordLoading}
+                >
+                  {forgotPasswordLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="h-4 w-4" />
+                      <span>Send Reset Link</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
