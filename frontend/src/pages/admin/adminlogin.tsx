@@ -287,14 +287,6 @@ export default function AdminLogin() {
                 </Button>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="text-center">
-                <button
-                  type="button"
-                  className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white underline decoration-slate-300 underline-offset-4 hover:decoration-slate-500 dark:decoration-[#333] dark:hover:decoration-slate-400 transition-colors"
-                >
-                  Forgot your password?
-                </button>
-              </motion.div>
             </CardContent>
           </Card>
         </motion.div>
